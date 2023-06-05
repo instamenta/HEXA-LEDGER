@@ -10,19 +10,18 @@ const API = express();
 
 API.use(cors());
 API.use(express.json());
-
 API.use('/', router);
 
 async function START_API() {
 
-	API.listen(API_PORT, () => {
+	await API.listen(API_PORT, () => {
 		console.log(`Server is running on port: ${API_PORT}`);
 	});
-
 	API.on('error', async (error) => {
 		console.log('API ran into error: ', error);
 	});
 }
+
 START_API().catch((ERROR) => {
 	console.log('#ERROR: Ran into Error white running ~ START_API: ', ERROR);
 });

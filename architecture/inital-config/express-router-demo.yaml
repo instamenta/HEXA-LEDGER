@@ -15,9 +15,12 @@ spec:
       containers:
         - name: express-router-demo
           image: janoopsi/express-router-demo
+          env:
+            - name: ROUTER_PORT
+              value: '5065'
           ports:
             - containerPort: 5065
-
+          imagePullPolicy: Always
 ---
 
 apiVersion: v1

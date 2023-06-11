@@ -31,4 +31,5 @@ spec:
     - protocol: TCP
       port: 5055
       targetPort: 5055
+
   type: LoadBalancer

@@ -9,7 +9,7 @@ const MONGOOSE = require('mongoose')
 /**
  * @returns {Promise<void>}
  */
-async function CONNECT_DATABASE () {
+async function connectDatabase () {
 	await MONGOOSE.connect(MONGODB_URI, {
 		dbName: 'user-router',
 		retryWrites: true,
@@ -22,4 +22,4 @@ async function CONNECT_DATABASE () {
 	console.log('Connected to MongoDB');
 }
 
-module.exports = CONNECT_DATABASE;
+module.exports = connectDatabase;

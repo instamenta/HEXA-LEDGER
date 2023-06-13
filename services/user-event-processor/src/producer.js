@@ -6,9 +6,9 @@ const {Kafka} = require('kafkajs')
 ;
 
 /**
- *
+ * @returns {Promise}
  */
-async function CONNECT_PRODUCER() {
+async function connectProducer() {
 	try {
 		await PRODUCER.connect();
 		return async (message) => {
@@ -23,9 +23,9 @@ async function CONNECT_PRODUCER() {
 }
 
 /**
- *
+ * @returns {Promise<void>}
  */
-async function DISCONNECT_PRODUCER() {
+async function disconnectProducer() {
 	try {
 		await PRODUCER.disconnect();
 	} catch (error) {
@@ -33,4 +33,4 @@ async function DISCONNECT_PRODUCER() {
 	}
 }
 
-module.exports = {CONNECT_PRODUCER, DISCONNECT_PRODUCER};
+module.exports = {connectProducer, disconnectProducer};

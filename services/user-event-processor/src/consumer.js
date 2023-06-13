@@ -9,7 +9,7 @@ const {Kafka} = require('kafkajs')
 /**
  * @returns {Promise<void>}
  */
-async function CONNECT_CONSUMER() {
+async function connectConsumer() {
 	try {
 		await CONSUMER.connect();
 		await CONSUMER.subscribe({topic: 'user_events_topic'});
@@ -27,9 +27,9 @@ async function CONNECT_CONSUMER() {
 }
 
 /**
- *
+ * @returns {Promise<void>}
  */
-async function DISCONNECT_CONSUMER() {
+async function disconnectConsumer() {
 	try {
 		await CONSUMER.disconnect();
 	} catch (error) {
@@ -37,4 +37,4 @@ async function DISCONNECT_CONSUMER() {
 	}
 }
 
-module.exports = {CONNECT_CONSUMER, DISCONNECT_CONSUMER};
+module.exports = {connectConsumer, disconnectConsumer};

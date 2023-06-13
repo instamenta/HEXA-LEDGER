@@ -6,7 +6,7 @@ const EXPRESS = require('express')
 	, AUTH_ROUTER = require('./routes/auth-routes')
 	, USER_ROUTER = require('./routes/user-routes')
 	, COOKIE_PARSER = require('cookie-parser')
-	, CONNECT_DB = require('./mongodb')
+	, CONNECT_DATABASE = require('./mongodb')
 ;
 require('dotenv').config();
 
@@ -21,11 +21,11 @@ API.use('/user', USER_ROUTER);
 API.use('/auth', AUTH_ROUTER);
 API.use('/', ROUTER);
 
-(async function START_API() {
+(async function initializeService() {
 	await API.listen(API_PORT, async () => {
 		console.log(`Server is running on port: ${API_PORT}`);
 		console.log(`SERVICE_NAME: ${SERVICE_NAME}`);
-		await CONNECT_DB();
+		await CONNECT_DATABASE();
 	});
 	API.on('error', async (error) => {
 		console.log('API ran into Error: ', error);
@@ -35,10 +35,10 @@ API.use('/', ROUTER);
 });
 
 // Following part is important for handling process shutdown properly
-['unhandledRejection', 'uncaughtException'].map(TYPE => {
-	process.on(TYPE, async (error) => {
+['unhandledRejection', 'uncaughtException'].map(type => {
+	process.on(type, async (error) => {
 		try {
-			console.error(`process.on ${ TYPE }`);
+			console.error(`process.on ${ type }`);
 			console.error(error);
 		} catch (_) {
 			process.exit(1);
@@ -46,13 +46,13 @@ API.use('/', ROUTER);
 	});
 });
 
-['SIGTERM', 'SIGINT', 'SIGUSR2'].map(TYPE => {
-	process.once(TYPE, async (error) => {
+['SIGTERM', 'SIGINT', 'SIGUSR2'].map(type => {
+	process.once(type, async (error) => {
 		try {
-			console.error(`process.on ${ TYPE }`, error);
+			console.error(`process.on ${ type }`, error);
 			process.exit(0);
 		} finally {
-			process.kill(process.pid, TYPE);
+			process.kill(process.pid, type);
 		}
 	});
 });

@@ -1,30 +1,30 @@
 'use strict';
 
 const {Kafka} = require('kafkajs')
-    , REDPANDA = new Kafka({brokers: ['redpanda-0:9092']})
-    , ADMIN = REDPANDA.admin()
+	, REDPANDA = new Kafka({brokers: ['redpanda-0:9092']})
+	, ADMIN = REDPANDA.admin()
 ;
 
 /**
- * @param {string} TOPIC
- * @param {number} PARTITION
- * @param {number} REPLICAS
+ * @param {string} topic
+ * @param {number} partition
+ * @param {number} replicas
  */
-async function CREATE_TOPIC(TOPIC, PARTITION, REPLICAS) {
-    await ADMIN.connect();
-    const EXISTING_TOPIC = await ADMIN.listTopics();
-    if (!EXISTING_TOPIC.includes(TOPIC)) {
-        await ADMIN.createTopics({
-            topics: [
-                {
-                    topic: TOPIC,
-                    numPartitions: PARTITION ? PARTITION : 1,
-                    replicationFactor: REPLICAS ? REPLICAS : 1,
-                },
-            ],
-        });
-    }
-    await ADMIN.disconnect();
+async function createTopic(topic, partition, replicas) {
+	await ADMIN.connect();
+	const EXISTING_TOPIC = await ADMIN.listTopics();
+	if (!EXISTING_TOPIC.includes(topic)) {
+		await ADMIN.createTopics({
+			topics: [
+				{
+					topic,
+					numPartitions: partition ? partition : 1,
+					replicationFactor: replicas ? replicas : 1,
+				},
+			],
+		});
+	}
+	await ADMIN.disconnect();
 }
 
-module.exports = {CREATE_TOPIC};
+module.exports = {createTopic};

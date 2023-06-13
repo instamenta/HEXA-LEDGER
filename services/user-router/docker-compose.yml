@@ -10,4 +10,9 @@ services:
     env_file: .env
     volumes:
       - ./:/app/
-    network_mode: bridge
+    networks:
+      - redpanda-network
+networks:
+  redpanda-network:
+    external:
+      name: redpanda-quickstart_redpanda_network

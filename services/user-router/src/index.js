@@ -10,9 +10,10 @@ const EXPRESS = require('express')
 ;
 require('dotenv').config();
 
-const API_PORT = process.env.ROUTER_PORT || 5050;
-const API = EXPRESS();
-
+const API_PORT = process.env.ROUTER_PORT || 5050
+	, API = EXPRESS()
+	, SERVICE_NAME = process.env.SERVICE_NAME || 'FAIL'
+;
 API.use(CORS());
 API.use(COOKIE_PARSER());
 API.use(EXPRESS.json());
@@ -20,10 +21,10 @@ API.use('/user', USER_ROUTER);
 API.use('/auth', AUTH_ROUTER);
 API.use('/', ROUTER);
 
-
 (async function START_API() {
 	await API.listen(API_PORT, async () => {
 		console.log(`Server is running on port: ${API_PORT}`);
+		console.log(`SERVICE_NAME: ${SERVICE_NAME}`);
 		await CONNECT_DB();
 	});
 	API.on('error', async (error) => {
@@ -34,25 +35,24 @@ API.use('/', ROUTER);
 });
 
 // Following part is important for handling process shutdown properly
-['unhandledRejection', 'uncaughtException'].map(type => {
-	process.on(type, async (error) => {
+['unhandledRejection', 'uncaughtException'].map(TYPE => {
+	process.on(TYPE, async (error) => {
 		try {
-			console.log(`process.on ${ type }`);
-			console.log(error);
-			process.exit(0);
-		} catch ( _ ) {
+			console.error(`process.on ${ TYPE }`);
+			console.error(error);
+		} catch (_) {
 			process.exit(1);
 		}
 	});
 });
 
-['SIGTERM', 'SIGINT', 'SIGUSR2'].map(type => {
-	process.once(type, async (error) => {
+['SIGTERM', 'SIGINT', 'SIGUSR2'].map(TYPE => {
+	process.once(TYPE, async (error) => {
 		try {
-			console.log(`process.on ${ type }`, error);
+			console.error(`process.on ${ TYPE }`, error);
 			process.exit(0);
 		} finally {
-			process.kill(process.pid, type);
+			process.kill(process.pid, TYPE);
 		}
 	});
 });

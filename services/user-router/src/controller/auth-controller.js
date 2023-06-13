@@ -3,6 +3,7 @@ const USER_MODEL = require('../model/user-model')
 	, {GENERATE_TOKEN} = require('../utilities/token-tools')
 	, {Request, Response} = require('express')
 ;
+const {CONNECT_PRODUCER} = require("../producer");
 
 /**
  * @param {Request} request
@@ -10,23 +11,33 @@ const USER_MODEL = require('../model/user-model')
  * @returns {Promise<void>}
  */
 async function REGISTER(request, response) {
-	const {username, email, password} = request.body;
+	try {
+		const {username, email, password} = request.body;
 
-	const USER = await USER_MODEL.create({
-		username,
-		email,
-		password,
-	});
-	if (USER) {
-		response.status(200).json({
-			_id: USER._id,
-			username: USER.username,
-			email: USER.email,
-			token: await GENERATE_TOKEN(USER),
-		}).end();
-	} else {
+		const SEND_MESSAGE = await CONNECT_PRODUCER()
+		await SEND_MESSAGE({username, email, password})
+
+		const USER = await USER_MODEL.create({
+			username,
+			email,
+			password,
+		});
+		if (USER) {
+			response.status(200).json({
+				_id: USER._id,
+				username: USER.username,
+				email: USER.email,
+				token: await GENERATE_TOKEN(USER),
+			}).end();
+		} else {
+			response.status(400).end(JSON.stringify({
+				message: 'Invalid credentials'
+			}));
+		}
+	} catch (error) {
 		response.status(400).end(JSON.stringify({
-			message: 'Invalid credentials'
+			message: 'Invalid credentials',
+			err: error?.message
 		}));
 	}
 }
@@ -39,6 +50,10 @@ async function REGISTER(request, response) {
 async function LOGIN(request, response) {
 
 	const {username, password} = request.body;
+
+	const SEND_MESSAGE = await CONNECT_PRODUCER()
+	await SEND_MESSAGE({username, password})
+
 	const USER = await USER_MODEL.findOne({username});
 
 	if (!USER || !password || !username) {

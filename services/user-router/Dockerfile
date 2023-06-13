@@ -8,4 +8,6 @@ RUN npm install
 
 COPY . .
 
-CMD ["node", "src/index.js"]
+EXPOSE 5065
+
+CMD ["npx", "nodemon", "src/index.js"]

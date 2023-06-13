@@ -121,6 +121,7 @@ data:
       port: 20001
       web_root: /kiali
 ...
+
 ---
 # Source: kiali-server/templates/role-viewer.yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -418,6 +419,8 @@ spec:
     appProtocol: http
     protocol: TCP
     port: 9090
+    nodePort: 30069
+  type: NodePort
   selector:
     app.kubernetes.io/name: kiali
     app.kubernetes.io/instance: kiali

@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-router
+    ports:
+      - '5050:5050'
+    env_file: .env
+    volumes:
+      - ./:/app/
+    network_mode: bridge

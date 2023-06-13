@@ -17,7 +17,7 @@ const JWT = require('jsonwebtoken')
  * @param {UserModel} USER
  * @returns {Promise<string>}
  */
-async function GENERATE_TOKEN(USER) {
+async function generateToken(USER) {
 	const PAYLOAD = {
 		username: USER.username,
 		_id: USER._id,
@@ -32,7 +32,7 @@ async function GENERATE_TOKEN(USER) {
  * @param {string} TOKEN
  * @returns {Promise<string>}
  */
-async function DECODE_TOKEN(TOKEN) {
+async function decodeToken(TOKEN) {
 	if (TOKEN) {
 		return await JWT.decode(TOKEN, TOKEN_SECRET);
 	} else {
@@ -40,4 +40,4 @@ async function DECODE_TOKEN(TOKEN) {
 	}
 }
 
-module.exports = {GENERATE_TOKEN, DECODE_TOKEN};
+module.exports = {generateToken, decodeToken};

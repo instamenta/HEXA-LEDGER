@@ -1,9 +1,9 @@
 const USER_MODEL = require('../model/user-model')
     , BCRYPT = require('bcrypt')
-    , {GENERATE_TOKEN} = require('../utilities/token-tools')
+    , {generateToken} = require('../utilities/token-tools')
     , {Request, Response} = require('express')
 ;
-const {CONNECT_PRODUCER} = require('../producer');
+const {connectProducer} = require('../producer');
 
 /**
  * @param {Request} request
@@ -14,8 +14,8 @@ async function register(request, response) {
     try {
         const {username, email, password} = request.body;
 
-        const SEND_MESSAGE = await CONNECT_PRODUCER();
-        await SEND_MESSAGE({username, email, password});
+        const sendMessage = await connectProducer();
+        await sendMessage({username, email, password});
 
         const USER = await USER_MODEL.create({
             username,
@@ -27,7 +27,7 @@ async function register(request, response) {
                 _id: USER._id,
                 username: USER.username,
                 email: USER.email,
-                token: await GENERATE_TOKEN(USER),
+                token: await generateToken(USER),
             }).end();
         } else {
             response.status(400).end(JSON.stringify({
@@ -51,8 +51,8 @@ async function login(request, response) {
 
     const {username, password} = request.body;
 
-    const SEND_MESSAGE = await CONNECT_PRODUCER();
-    await SEND_MESSAGE({username, password});
+    const sendMessage = await connectProducer();
+    await sendMessage({username, password});
 
     const USER = await USER_MODEL.findOne({username});
 
@@ -63,7 +63,7 @@ async function login(request, response) {
     }
 
     if (await BCRYPT.compare(password, USER.password)) {
-        const TOKEN = await GENERATE_TOKEN(USER);
+        const TOKEN = await generateToken(USER);
         response.cookie('accessToken', TOKEN, {httpOnly: true});
 
         response.status(200).json({

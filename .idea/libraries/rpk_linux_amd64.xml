@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="rpk-linux-amd64">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/services/frontend/rpk-linux-amd64.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

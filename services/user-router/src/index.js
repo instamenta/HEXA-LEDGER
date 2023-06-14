@@ -7,10 +7,12 @@ const EXPRESS = require('express')
 	, USER_ROUTER = require('./routes/user-routes')
 	, COOKIE_PARSER = require('cookie-parser')
 	, CONNECT_DATABASE = require('./mongodb')
+	, ERROR_MIDDLEWARE = require('./middlewares/error-middleware')
 ;
+const {disconnectProducer, connectProducer} = require('./producer');
 require('dotenv').config();
 
-const API_PORT = process.env.ROUTER_PORT || 5050
+const API_PORT = process.env.ROUTER_PORT || 5065
 	, API = EXPRESS()
 	, SERVICE_NAME = process.env.SERVICE_NAME || 'FAIL'
 ;
@@ -21,10 +23,14 @@ API.use('/user', USER_ROUTER);
 API.use('/auth', AUTH_ROUTER);
 API.use('/', ROUTER);
 
+API.use(ERROR_MIDDLEWARE);
+
+
 (async function initializeService() {
 	await API.listen(API_PORT, async () => {
 		console.log(`Server is running on port: ${API_PORT}`);
 		console.log(`SERVICE_NAME: ${SERVICE_NAME}`);
+		await connectProducer().then(() => console.log(`producer: connected`))
 		await CONNECT_DATABASE();
 	});
 	API.on('error', async (error) => {
@@ -41,6 +47,7 @@ API.use('/', ROUTER);
 			console.error(`process.on ${ type }`);
 			console.error(error);
 		} catch (_) {
+			await disconnectProducer();
 			process.exit(1);
 		}
 	});
@@ -50,6 +57,7 @@ API.use('/', ROUTER);
 	process.once(type, async (error) => {
 		try {
 			console.error(`process.on ${ type }`, error);
+			await disconnectProducer();
 			process.exit(0);
 		} finally {
 			process.kill(process.pid, type);

@@ -1,7 +1,9 @@
 'use strict';
 
 const {Kafka} = require('kafkajs')
-	, REDPANDA = new Kafka({brokers: ['redpanda-0:9092']})
+	, BROKER_URL = process.env.BROKER_URL || 'redpanda-0'
+	, BROKER_PORT = process.env.BROKER_PORT || 9092
+	, REDPANDA = new Kafka({brokers: [`redpanda-0:9092`]})
 	, ADMIN = REDPANDA.admin()
 ;
 

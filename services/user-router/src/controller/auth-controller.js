@@ -1,9 +1,9 @@
 const USER_MODEL = require('../model/user-model')
-    , BCRYPT = require('bcrypt')
-    , {generateToken} = require('../utilities/token-tools')
-    , {Request, Response} = require('express')
-;
-const {connectProducer} = require('../producer');
+	, BCRYPT = require('bcrypt')
+	, {generateToken} = require('../utilities/token-tools')
+	, {Request, Response} = require('express')
+	, {sendMessage} = require('../producer');
+
 
 /**
  * @param {Request} request
@@ -11,35 +11,28 @@ const {connectProducer} = require('../producer');
  * @returns {Promise<void>}
  */
 async function register(request, response) {
-    try {
-        const {username, email, password} = request.body;
-
-        const sendMessage = await connectProducer();
-        await sendMessage({username, email, password});
-
-        const USER = await USER_MODEL.create({
-            username,
-            email,
-            password,
-        });
-        if (USER) {
-            response.status(200).json({
-                _id: USER._id,
-                username: USER.username,
-                email: USER.email,
-                token: await generateToken(USER),
-            }).end();
-        } else {
-            response.status(400).end(JSON.stringify({
-                message: 'Invalid credentials'
-            }));
-        }
-    } catch (error) {
-        response.status(400).end(JSON.stringify({
-            message: 'Invalid credentials',
-            err: error?.message
-        }));
-    }
+	try {
+		const {username, email, password} = request.body;
+		await sendMessage({username, email, password}, 'REGISTER');
+		const User = await USER_MODEL.create({
+			username,
+			email,
+			password,
+		});
+		if (User) {
+			response.json({
+				_id: User._id,
+				username: User.username,
+				email: User.email,
+				token: await generateToken(User),
+			}).status(200).end();
+		} else {
+			throw new Error('Invalid credentials');
+		}
+	} catch (error) {
+		response.json({message: error.message})
+			.status(400).end();
+	}
 }
 
 /**
@@ -48,35 +41,41 @@ async function register(request, response) {
  * @returns {Promise<void>}
  */
 async function login(request, response) {
+	try {
+		const {username, password} = request.body;
+		await sendMessage({username, password}, 'LOGIN');
+		const User = await USER_MODEL.findOne({username});
 
-    const {username, password} = request.body;
+		if (!User || !password || !username) {
+			throw new Error('Invalid username or password');
+		}
 
-    const sendMessage = await connectProducer();
-    await sendMessage({username, password});
-
-    const USER = await USER_MODEL.findOne({username});
-
-    if (!USER || !password || !username) {
-        return response.status(400).end(JSON.stringify({
-            message: 'Invalid username or password'
-        }));
-    }
-
-    if (await BCRYPT.compare(password, USER.password)) {
-        const TOKEN = await generateToken(USER);
-        response.cookie('accessToken', TOKEN, {httpOnly: true});
-
-        response.status(200).json({
-            _id: USER._id,
-            username: USER.username,
-            email: USER.email,
-            token: TOKEN,
-        }).end();
-    } else {
-        response.status(400).end(JSON.stringify({
-            message: 'Invalid username or password'
-        }));
-    }
+		if (await BCRYPT.compare(password, User.password)) {
+			const token = await generateToken(User);
+			response.cookie('accessToken', token, {httpOnly: true});
+			response.json({
+				_id: User._id,
+				username: User.username,
+				email: User.email,
+				token: token,
+			}).status(200).end();
+		} else {
+			throw new Error('Invalid username or password');
+		}
+	} catch (error) {
+		response.json({message: error.message})
+			.status(400).end();
+	}
 }
 
-module.exports = {login, register};
+/**
+ * @param {Request} request
+ * @param {Response} response
+ * @returns {Promise<void>}
+ */
+async function validate(request, response) {
+	console.log('valid');
+	response.end();
+}
+
+module.exports = {login, register, validate};

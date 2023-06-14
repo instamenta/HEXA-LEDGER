@@ -4,24 +4,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: user-event-processor
+    container_name: user-remote
     ports:
-      - '5045:5045'
+      - '50051:50051'
     env_file: .env
     environment:
-      - PORT=5045
       - GRPC_PORT=50051
-      - GRPC_HOST=user-remote-api
-      - BROKER_URL=redpanda-0
-      - BROKER_PORT=9092
     volumes:
-      - user-event-processor:/var/data
+     - ./:/var/data
     networks:
       - redpanda-network
 networks:
   redpanda-network:
     external:
       name: redpanda-quickstart_redpanda_network
-volumes:
-  user-event-processor:
-    driver: local

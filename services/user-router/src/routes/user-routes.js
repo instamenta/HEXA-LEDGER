@@ -1,10 +1,10 @@
-const express = require('express')
-	, ROUTER = express.Router();
+const EXPRESS = require('express')
+	, USER_ROUTER = EXPRESS.Router();
 
-ROUTER.get('/', (request, response) => {
+USER_ROUTER.get('/', (request, response) => {
 	response.send('user :333');
 	response.end();
 });
 
 
-module.exports = ROUTER;
+module.exports = USER_ROUTER;

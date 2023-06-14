@@ -1,6 +1,7 @@
 const EXPRESS = require('express')
 	, AUTH_ROUTER = EXPRESS.Router()
-	, {register, login} = require('../controller/auth-controller')
+	, {register, login, validate} = require('../controller/auth-controller')
+	, {isGuest, isAuthenticated} = require('../middlewares/auth-middleware')
 ;
 
 AUTH_ROUTER.get('/', (request, response) => {
@@ -8,7 +9,8 @@ AUTH_ROUTER.get('/', (request, response) => {
 	response.end();
 });
 
-AUTH_ROUTER.route('/register').post(register);
-AUTH_ROUTER.route('/login').post(login);
+AUTH_ROUTER.route('/register').post(isGuest, register);
+AUTH_ROUTER.route('/login').post(isGuest, login);
+AUTH_ROUTER.route('/validate').post(isAuthenticated, validate);
 
 module.exports = AUTH_ROUTER;

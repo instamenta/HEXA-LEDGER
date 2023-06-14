@@ -14,30 +14,34 @@ const JWT = require('jsonwebtoken')
  */
 
 /**
- * @param {UserModel} USER
+ * @param {UserModel} User
  * @returns {Promise<string>}
  */
-async function generateToken(USER) {
+function generateToken(User) {
 	const PAYLOAD = {
-		username: USER.username,
-		_id: USER._id,
+		username: User.username,
+		email: User.email,
+		_id: User._id,
 	};
-
-	return await JWT.sign(PAYLOAD, TOKEN_SECRET, {
+	return JWT.sign(PAYLOAD, TOKEN_SECRET, {
 		expiresIn: '60 days'
 	});
 }
 
 /**
- * @param {string} TOKEN
- * @returns {Promise<string>}
+ * @param {string} token
+ * @returns {Promise<string|UserModel>}
  */
-async function decodeToken(TOKEN) {
-	if (TOKEN) {
-		return await JWT.decode(TOKEN, TOKEN_SECRET);
-	} else {
-		return 'NO_TOKEN';
-	}
+function decodeToken(token) {
+	return JWT.decode(token, TOKEN_SECRET);
 }
 
-module.exports = {generateToken, decodeToken};
+/**
+ * @param {string} token
+ * @returns {string}
+ */
+function verifyToken(token) {
+	return JWT.verify(token, TOKEN_SECRET);
+}
+
+module.exports = {generateToken, decodeToken, verifyToken};

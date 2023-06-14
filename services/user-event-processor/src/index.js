@@ -1,10 +1,10 @@
 const {connectConsumer, disconnectConsumer} = require('./consumer')
-	// , {CREATE_TOPIC} = require('./admin')
+	, {createTopic} = require('./admin')
 ;
 
 (async function START() {
-	// const TOPIC = 'user_events_topic';
-	// await CREATE_TOPIC(TOPIC);
+	const TOPIC = 'user_events_topic';
+	await createTopic(TOPIC);
 	await connectConsumer();
 })();
 

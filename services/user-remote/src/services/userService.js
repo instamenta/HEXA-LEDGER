@@ -1,39 +1,103 @@
-const { User, LoginResponse, RegisterResponse } = require('../generated/users_pb');
-const { handleUnaryCall, sendUnaryData} = require('@grpc/grpc-js')
+'use strict';
+const proto = require('../generated/users_pb')
+    ,{UserModel} = proto.user
+    , {ServerUnaryCall, sendUnaryData} = require('@grpc/grpc-js')
+    , {StringValue, BoolValue} = require('google-protobuf/google/protobuf/wrappers_pb')
+    , MongooseUserModel = require('../models/userModelSchema')
+    , {generateToken} = require('../utilities/token-tools')
+;
+
 /**
- *
- * @param {handleUnaryCall} call
+ * @param {ServerUnaryCall} call
  * @param {sendUnaryData} callback
+ * @returns {Promise<void>}}
  */
-function login(call, callback) {
-	const { email, password } = call.request;
+async function login(call, callback) {
+    const m = call.request;
+    const o = {
+        email: m.hasEmail() ? m.getEmail() : null,
+        password: m.hasPassword() ? m.getPassword() : null,
+    };
+    console.table(o);
 
-	// Perform login logic and generate token
-	const token = 'generated_token';
+    /**
+     * @type {MongooseUserModel|undefined}
+     */
+    const User = await MongooseUserModel.findOne({
+        email: o.email,
+    }).catch((error) => console.error(error.message));
 
-	const response = new LoginResponse();
-	response.setToken(token);
+    if (!User) {
+        return callback(new Error('Login Error'));
+    }
 
-	callback(null, response);
+    /**
+     * @type {!proto.user.UserModel}
+
+     */
+    const message = new UserModel()
+    /**
+     * @type {string}
+     */
+    const token = await generateToken(User)
+
+    message.setUsername(new StringValue().setValue(User.username));
+    message.setEmail(new StringValue().setValue(User.email));
+    message.setToken(new StringValue().setValue(token));
+
+    callback(null, message);
 }
 
 /**
- * @param {handleUnaryCall} call
+ * @param {ServerUnaryCall} call
  * @param {sendUnaryData} callback
+ * @returns {Promise<void>}
  */
-function register(call, callback) {
-	const { email, username, password } = call.request;
+async function register(call, callback) {
+    const m = call.request;
 
-	// Perform registration logic
-	const message = `User ${username} registered successfully`;
+    const o = {
+        username: m.hasUsername() ? m.getUsername().getValue() : null,
+        email: m.hasEmail() ? m.getEmail().getValue() : null,
+        password: m.hasPassword() ? m.getPassword().getValue() : null,
+    };
+    console.table(o);
 
-	const response = new RegisterResponse();
-	response.setMessage(message);
+    /**
+     * @type {MongooseUserModel|undefined}
+     */
+    const User = await MongooseUserModel.create({
+        username: o.username,
+        email: o.email,
+        password: o.password,
+    }).catch((error) => console.error(error.message));
 
-	callback(null, response);
+    if (!User) {
+        return callback(new Error('Registation Error'));
+    }
+
+    /**
+     * @type {!proto.user.UserModel}
+     */
+    const message = new UserModel()
+    /**
+     * @type {string}
+     */
+    const token = await generateToken(User);
+
+    message.setUsername(new StringValue().setValue(User.username));
+    message.setEmail(new StringValue().setValue(User.email));
+    message.setToken(new StringValue().setValue(token));
+
+    callback(null, message);
 }
 
 module.exports = {
-	login,
-	register,
+    login,
+    register,
 };
+
+
+/**
+ * @type {UserModelSchema}
+ */

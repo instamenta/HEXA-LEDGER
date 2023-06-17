@@ -1,21 +1,13 @@
 'use strict';
-
 require('dotenv').config();
 
 const JWT = require('jsonwebtoken')
 	, TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET'
-	, {ObjectId} = require('bson')
+	, MongooseUserModel = require('../models/userModelSchema')
 ;
 
 /**
- * @typedef {object} UserModel
- * @property {ObjectId} _id
- * @property {string} username
- * @property {string} email
- */
-
-/**
- * @param {UserModel} User
+ * @param {MongooseUserModel} User
  * @returns {Promise<string>}
  */
 function generateToken(User) {
@@ -31,7 +23,7 @@ function generateToken(User) {
 
 /**
  * @param {string} token
- * @returns {Promise<string|UserModel>}
+ * @returns {Promise<{ username: string, email: string, _id: string}|string>}
  */
 function decodeToken(token) {
 	return JWT.decode(token, TOKEN_SECRET);

@@ -31,10 +31,10 @@ async function isAuthenticated(request, response, next) {
 async function isGuest(request, response, next) {
 	try {
 		const token = request.headers['x-authorization-token'];
-		if (!token) {
-			next();
-		} else {
+		if (token) {
 			throw new Error('Valid authorization token');
+		} else {
+			next();
 		}
 	} catch (error) {
 		response

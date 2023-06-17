@@ -91,4 +91,9 @@
 # Chalanges
  - Handle certificates
  - Implement Firewall
- 
+ - Implement Healt check service
+
+# Notes
+```
+enable.idempotence property must be set to true in your producer configuration
+```

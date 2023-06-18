@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
 
 package user;
 
@@ -11,7 +12,7 @@ message UserModel {
   google.protobuf.StringValue password = 4;
   google.protobuf.StringValue picture = 5;
   google.protobuf.StringValue token = 6;
-  UserWallet userWallet= 7;
+  UserWallet userWallet = 7;
 }
 
 message LoginForm {
@@ -35,23 +36,87 @@ message GetUserByIdForm {
   google.protobuf.StringValue _id = 1;
 }
 
-message GetUsersForm {
-  google.protobuf.Int32Value count = 1;
+message GetAllUsersRequest {
+  google.protobuf.Int32Value limit = 1;
+  google.protobuf.Int32Value page = 2;
+}
+
+message GetUsersRequest {
+  google.protobuf.Int32Value limit = 1;
   google.protobuf.Int32Value page = 2;
   google.protobuf.StringValue filter = 3;
   google.protobuf.StringValue match = 4;
   GetUserByIdForm _idList = 5;
 }
 
-message UserList {
-  google.protobuf.BoolValue status = 1;
-  repeated UserModel userList = 2;
+message GetUserByIdRequest {
+  google.protobuf.StringValue id = 1;
 }
 
+message GetUserByIdResponse {
+  UserModel user = 1;
+}
+
+message GetUserFollowersRequest {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Int32Value limit = 2;
+  google.protobuf.Int32Value page = 3;
+}
+
+message GetUserFollowersResponse {
+  repeated UserModel followers = 1;
+
+}
+
+message GetUserFollowingRequest {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.Int32Value limit = 2;
+  google.protobuf.Int32Value page = 3;
+}
+
+message GetUserFollowingResponse {
+  repeated UserModel following = 1;
+}
+
+message FollowUserRequest {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue current_user_id = 2;
+}
+
+message UnfollowUserRequest {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue current_user_id = 2;
+}
 
 service UserService {
   rpc Login(LoginForm) returns (UserModel);
   rpc Register(RegisterForm) returns (UserModel);
-  rpc GetById(GetUserByIdForm) returns (UserModel);
-  rpc GetAllUsers(GetUsersForm) returns (UserList);
+
+  rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+  rpc FollowUser(FollowUserRequest) returns (google.protobuf.Empty);
+  rpc UnfollowUser(UnfollowUserRequest) returns (google.protobuf.Empty);
+
+  rpc GetUsers(GetUsersRequest) returns (stream UserModel);
+  rpc GetAllUsers(GetAllUsersRequest) returns (stream UserModel);
+  rpc GetUserFollowers(GetUserFollowersRequest) returns (stream UserModel);
+  rpc GetUserFollowing(GetUserFollowingRequest) returns (stream UserModel);
+  //  rpc GetUserPosts(GetUserPostsRequest) returns (stream GetUserPostsResponse);
+  //  rpc GetUserComments(GetUserCommentsRequest) returns (stream GetUserCommentsResponse);
 }
+
+//
+//message GetUserPostsRequest {
+//  google.protobuf.StringValue id = 1;
+//}
+
+//message GetUserPostsResponse {
+//  repeated PostModel posts = 1;
+//}
+
+//message GetUserCommentsRequest {
+//  google.protobuf.StringValue id = 1;
+//}
+
+//message GetUserCommentsResponse {
+//  repeated CommentModel comments = 1;
+//}

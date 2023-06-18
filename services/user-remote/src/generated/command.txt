@@ -1,5 +1,7 @@
 grpc_tools_node_protoc \
---proto_path=./src/protos \
---js_out=import_style=commonjs,binary:./src/generated \
---grpc_out=grpc_js,minimum_node_version=12:./src/generated \
+--plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts \
+--ts_out=./src/generated/types \
+--js_out=import_style=commonjs,binary:./src/generated/ \
+--grpc_out=grpc_js:./src/generated \
+-I ./src/protos/ \
 ./src/protos/users.proto

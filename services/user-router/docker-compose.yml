@@ -5,11 +5,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: user-router
-
     ports:
       - '5085:5085'
     env_file: .env
-
     environment:
       - ROUTER_PORT=5085
     volumes:

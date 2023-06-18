@@ -4,10 +4,10 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm i
 
 COPY . .
 
 EXPOSE 5085
 
-CMD ["npx", "nodemon", "src/index.js"]
+CMD ["npx", "nodemon", "typescript/index.js"]

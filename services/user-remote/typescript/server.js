@@ -34,13 +34,9 @@ const { UserServiceService } = require('./generated/users_grpc_pb');
 (async function main() {
     const Server = new GRPC.Server();
     Server.addService(UserServiceService, {
-        // @ts-ignore
         getUsers: user_service_1.getUsers,
-        // @ts-ignore
         getAllUsers: user_service_1.getAllUsers,
-        // @ts-ignore
         getUserFollowers: user_service_1.getUserFollowers,
-        // @ts-ignore
         getUserFollowing: user_service_1.getUserFollowing,
         getUserById: user_service_1.getUserById,
         login: auth_service_1.login,
@@ -48,12 +44,12 @@ const { UserServiceService } = require('./generated/users_grpc_pb');
         followUser: user_service_1.followUser,
         unfollowUser: user_service_1.unfollowUser,
     });
-    Server.bindAsync('0.0.0.0:50051', GRPC.ServerCredentials.createInsecure(), async (error, boundPort) => {
+    Server.bindAsync('0.0.0.0:50051', GRPC.ServerCredentials.createInsecure(), async (error, port) => {
         if (error) {
-            console.error('Failed to bind server on PORT:', boundPort, error);
+            console.error('Failed to bind server on port:', port, error);
             process.exit(1);
         }
-        console.log('GRPC Server is running on port:', boundPort);
+        console.log('GRPC Server is running on port:', port);
         Server.start();
         await (0, mongodb_1.default)();
     });

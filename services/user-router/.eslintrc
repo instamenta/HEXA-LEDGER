@@ -60,6 +60,8 @@ rules:
   no-prototype-builtins: off
   sonarjs/no-duplicate-string: off
   promise/no-callback-in-promise: off
+  no-unexpected-multiline: off
+  '@typescript-eslint/ban-ts-comment': off
 plugins:
   - '@typescript-eslint'
   - import

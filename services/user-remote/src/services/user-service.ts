@@ -21,16 +21,15 @@ const {UserModel} = require('../generated/users_pb');
 
 /**
  * @param call
- * @param callback
- * @returns
  */
-async function getUsers(call: ServerWritableStream<GetUsersRequest, IUserModel>, callback: sendUnaryData<IUserModel>) {
+async function getUsers(
+	call: ServerWritableStream<GetUsersRequest, IUserModel>,
+): Promise<void> {
 	try {
-		const r = call.request;
-		const limit = r.hasLimit() ? r.getLimit()!.getValue() : 5;
-		const page = r.hasPage() ? r.getPage()!.getValue() : 1;
-
-		const pipeline = [];
+		const r = call.request
+			, limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
+			, page = r.hasPage() ? r.getPage()!.getValue() : 1
+			, pipeline = [];
 		if (r.hasFilter()) {
 			const filter = r.getFilter()!.getValue();
 			pipeline.push({
@@ -53,47 +52,50 @@ async function getUsers(call: ServerWritableStream<GetUsersRequest, IUserModel>,
 
 		call.end();
 	} catch (error: Error | any) {
-		callback(error);
+		call.emit(error);
 	}
 }
 
 /**
  * @param call
- * @param callback
- * @returns
  */
-async function getAllUsers(call: ServerWritableStream<GetAllUsersRequest, IUserModel>, callback: sendUnaryData<IUserModel>) {
+async function getAllUsers(
+	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
+): Promise<void> {
 	try {
 		const r = call.request;
 
 		const limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
-			, page = r.hasPage() ? r.getPage()!.getValue() : 1
-			, UserArray: IUser[] = await MongooseUserModel
-				.find()
-				.skip((page - 1) * limit)
-				.limit(limit);
+			, page = r.hasPage() ? r.getPage()!.getValue() : 1;
 
-		UserArray.forEach((user) => {
+		const UserArray: IUser[] = await MongooseUserModel
+			.find()
+			.skip((page - 1) * limit)
+			.limit(limit);
+
+		UserArray.forEach((User) => {
 			const m = new UserModel();
-			m.setId(new StringValue().setValue(user.id));
-			m.setUsername(new StringValue().setValue(user.username));
-			m.setEmail(new StringValue().setValue(user.email));
+			m.setId(new StringValue().setValue(User.id));
+			m.setUsername(new StringValue().setValue(User.username));
+			m.setEmail(new StringValue().setValue(User.email));
 
 			call.write(m);
 		});
 
 		call.end();
 	} catch (error: Error | any) {
-		callback(error);
+		call.emit(error);
 	}
 }
 
 /**
  * @param call
  * @param callback
- * @returns
  */
-async function getUserById(call: ServerUnaryCall<GetUserByIdRequest, IUserModel>, callback: sendUnaryData<IUserModel>) {
+async function getUserById(
+	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
+	callback: sendUnaryData<IUserModel>
+): Promise<void> {
 	try {
 		const r = call.request;
 		const id = r.hasId() ? r.getId()!.getValue() : null;
@@ -102,14 +104,14 @@ async function getUserById(call: ServerUnaryCall<GetUserByIdRequest, IUserModel>
 			throw new Error('Invalid User id');
 		}
 		const u: IUser | null = await MongooseUserModel.findById(id);
-		console.table(u)
-
 		if (!u) {
 			throw new Error('User not found');
 		}
 
+		const stringId: string = u._id.toString();
 		const m = new UserModel();
-		m.setId(new StringValue().setValue(u._id));
+
+		m.setId(new StringValue().setValue(stringId));
 		m.setUsername(new StringValue().setValue(u.username));
 		m.setEmail(new StringValue().setValue(u.email));
 
@@ -122,12 +124,9 @@ async function getUserById(call: ServerUnaryCall<GetUserByIdRequest, IUserModel>
 
 /**
  * @param call
- * @param callback
- * @returns
  */
 async function getUserFollowers(
-	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>,
-	callback: sendUnaryData<IUserModel>
+	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
 ): Promise<void> {
 	try {
 		const r = call.request;
@@ -156,7 +155,7 @@ async function getUserFollowers(
 		]).exec();
 
 		UserArray.forEach((user) => {
-			console.table(user);
+			console.log(user);
 
 			const m = new UserModel();
 			m.setId(new StringValue().setValue(user.id));
@@ -169,18 +168,15 @@ async function getUserFollowers(
 		call.end();
 
 	} catch (error: Error | any) {
-		callback(error);
+		call.emit(error);
 	}
 }
 
 /**
  * @param call
- * @param callback
- * @returns
  */
 async function getUserFollowing(
-	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>,
-	callback: sendUnaryData<IUserModel>
+	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
 ): Promise<void> {
 	try {
 		const r = call.request;
@@ -209,7 +205,7 @@ async function getUserFollowing(
 		]).exec();
 
 		UserArray.forEach((user) => {
-			console.table(user);
+			console.log(user);
 
 			const m = new UserModel();
 			m.setId(new StringValue().setValue(user.id));
@@ -221,16 +217,18 @@ async function getUserFollowing(
 
 		call.end();
 	} catch (error: Error | any) {
-		callback(error);
+		call.emit(error);
 	}
 }
 
 /**
  * @param call
  * @param callback
- * @returns
  */
-async function followUser(call: ServerUnaryCall<FollowUserRequest, Empty>, callback: sendUnaryData<Empty>) {
+async function followUser(
+	call: ServerUnaryCall<FollowUserRequest, Empty>,
+	callback: sendUnaryData<Empty>
+): Promise<void> {
 	try {
 		const r = call.request;
 		const currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null;
@@ -273,9 +271,11 @@ async function followUser(call: ServerUnaryCall<FollowUserRequest, Empty>, callb
 /**
  * @param call
  * @param callback
- * @returns
  */
-async function unfollowUser(call: ServerUnaryCall<UnfollowUserRequest, Empty>, callback: sendUnaryData<Empty>) {
+async function unfollowUser(
+	call: ServerUnaryCall<UnfollowUserRequest, Empty>,
+	callback: sendUnaryData<Empty>
+): Promise<void> {
 	try {
 		const r = call.request;
 		const currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null;

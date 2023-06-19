@@ -13,6 +13,8 @@ message UserModel {
   google.protobuf.StringValue picture = 5;
   google.protobuf.StringValue token = 6;
   UserWallet userWallet = 7;
+  repeated google.protobuf.StringValue followers = 8;
+  repeated google.protobuf.StringValue following = 9;
 }
 
 message LoginForm {
@@ -32,10 +34,6 @@ message UserWallet {
   google.protobuf.StringValue toUsd = 3;
 }
 
-message GetUserByIdForm {
-  google.protobuf.StringValue _id = 1;
-}
-
 message GetAllUsersRequest {
   google.protobuf.Int32Value limit = 1;
   google.protobuf.Int32Value page = 2;
@@ -46,15 +44,12 @@ message GetUsersRequest {
   google.protobuf.Int32Value page = 2;
   google.protobuf.StringValue filter = 3;
   google.protobuf.StringValue match = 4;
-  GetUserByIdForm _idList = 5;
+  repeated google.protobuf.StringValue _ids = 5;
+
 }
 
 message GetUserByIdRequest {
   google.protobuf.StringValue id = 1;
-}
-
-message GetUserByIdResponse {
-  UserModel user = 1;
 }
 
 message GetUserFollowersRequest {
@@ -65,7 +60,6 @@ message GetUserFollowersRequest {
 
 message GetUserFollowersResponse {
   repeated UserModel followers = 1;
-
 }
 
 message GetUserFollowingRequest {
@@ -92,7 +86,7 @@ service UserService {
   rpc Login(LoginForm) returns (UserModel);
   rpc Register(RegisterForm) returns (UserModel);
 
-  rpc GetUserById(GetUserByIdRequest) returns (GetUserByIdResponse);
+  rpc GetUserById(GetUserByIdRequest) returns (UserModel);
   rpc FollowUser(FollowUserRequest) returns (google.protobuf.Empty);
   rpc UnfollowUser(UnfollowUserRequest) returns (google.protobuf.Empty);
 

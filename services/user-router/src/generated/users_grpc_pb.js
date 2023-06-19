@@ -50,17 +50,6 @@ function deserialize_user_GetUserByIdRequest(buffer_arg) {
   return users_pb.GetUserByIdRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_user_GetUserByIdResponse(arg) {
-  if (!(arg instanceof users_pb.GetUserByIdResponse)) {
-    throw new Error('Expected argument of type user.GetUserByIdResponse');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_user_GetUserByIdResponse(buffer_arg) {
-  return users_pb.GetUserByIdResponse.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_user_GetUserFollowersRequest(arg) {
   if (!(arg instanceof users_pb.GetUserFollowersRequest)) {
     throw new Error('Expected argument of type user.GetUserFollowersRequest');
@@ -167,11 +156,11 @@ var UserServiceService = exports.UserServiceService = {
     requestStream: false,
     responseStream: false,
     requestType: users_pb.GetUserByIdRequest,
-    responseType: users_pb.GetUserByIdResponse,
+    responseType: users_pb.UserModel,
     requestSerialize: serialize_user_GetUserByIdRequest,
     requestDeserialize: deserialize_user_GetUserByIdRequest,
-    responseSerialize: serialize_user_GetUserByIdResponse,
-    responseDeserialize: deserialize_user_GetUserByIdResponse,
+    responseSerialize: serialize_user_UserModel,
+    responseDeserialize: deserialize_user_UserModel,
   },
   followUser: {
     path: '/user.UserService/FollowUser',

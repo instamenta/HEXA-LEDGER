@@ -44,6 +44,14 @@ export class UserModel extends jspb.Message {
     clearUserwallet(): void;
     getUserwallet(): UserWallet | undefined;
     setUserwallet(value?: UserWallet): UserModel;
+    clearFollowersList(): void;
+    getFollowersList(): Array<google_protobuf_wrappers_pb.StringValue>;
+    setFollowersList(value: Array<google_protobuf_wrappers_pb.StringValue>): UserModel;
+    addFollowers(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
+    clearFollowingList(): void;
+    getFollowingList(): Array<google_protobuf_wrappers_pb.StringValue>;
+    setFollowingList(value: Array<google_protobuf_wrappers_pb.StringValue>): UserModel;
+    addFollowing(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): UserModel.AsObject;
@@ -64,6 +72,8 @@ export namespace UserModel {
         picture?: google_protobuf_wrappers_pb.StringValue.AsObject,
         token?: google_protobuf_wrappers_pb.StringValue.AsObject,
         userwallet?: UserWallet.AsObject,
+        followersList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
+        followingList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
     }
 }
 
@@ -166,29 +176,6 @@ export namespace UserWallet {
     }
 }
 
-export class GetUserByIdForm extends jspb.Message { 
-
-    hasId(): boolean;
-    clearId(): void;
-    getId(): google_protobuf_wrappers_pb.StringValue | undefined;
-    setId(value?: google_protobuf_wrappers_pb.StringValue): GetUserByIdForm;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): GetUserByIdForm.AsObject;
-    static toObject(includeInstance: boolean, msg: GetUserByIdForm): GetUserByIdForm.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: GetUserByIdForm, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): GetUserByIdForm;
-    static deserializeBinaryFromReader(message: GetUserByIdForm, reader: jspb.BinaryReader): GetUserByIdForm;
-}
-
-export namespace GetUserByIdForm {
-    export type AsObject = {
-        Id?: google_protobuf_wrappers_pb.StringValue.AsObject,
-    }
-}
-
 export class GetAllUsersRequest extends jspb.Message { 
 
     hasLimit(): boolean;
@@ -239,11 +226,10 @@ export class GetUsersRequest extends jspb.Message {
     clearMatch(): void;
     getMatch(): google_protobuf_wrappers_pb.StringValue | undefined;
     setMatch(value?: google_protobuf_wrappers_pb.StringValue): GetUsersRequest;
-
-    hasIdlist(): boolean;
-    clearIdlist(): void;
-    getIdlist(): GetUserByIdForm | undefined;
-    setIdlist(value?: GetUserByIdForm): GetUsersRequest;
+    clearIdsList(): void;
+    getIdsList(): Array<google_protobuf_wrappers_pb.StringValue>;
+    setIdsList(value: Array<google_protobuf_wrappers_pb.StringValue>): GetUsersRequest;
+    addIds(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): GetUsersRequest.AsObject;
@@ -261,7 +247,7 @@ export namespace GetUsersRequest {
         page?: google_protobuf_wrappers_pb.Int32Value.AsObject,
         filter?: google_protobuf_wrappers_pb.StringValue.AsObject,
         match?: google_protobuf_wrappers_pb.StringValue.AsObject,
-        Idlist?: GetUserByIdForm.AsObject,
+        IdsList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
     }
 }
 
@@ -285,29 +271,6 @@ export class GetUserByIdRequest extends jspb.Message {
 export namespace GetUserByIdRequest {
     export type AsObject = {
         id?: google_protobuf_wrappers_pb.StringValue.AsObject,
-    }
-}
-
-export class GetUserByIdResponse extends jspb.Message { 
-
-    hasUser(): boolean;
-    clearUser(): void;
-    getUser(): UserModel | undefined;
-    setUser(value?: UserModel): GetUserByIdResponse;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): GetUserByIdResponse.AsObject;
-    static toObject(includeInstance: boolean, msg: GetUserByIdResponse): GetUserByIdResponse.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: GetUserByIdResponse, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): GetUserByIdResponse;
-    static deserializeBinaryFromReader(message: GetUserByIdResponse, reader: jspb.BinaryReader): GetUserByIdResponse;
-}
-
-export namespace GetUserByIdResponse {
-    export type AsObject = {
-        user?: UserModel.AsObject,
     }
 }
 

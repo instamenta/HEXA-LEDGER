@@ -12,15 +12,10 @@ const bson_1 = require("bson");
 const { UserModel } = require('../generated/users_pb');
 /**
  * @param call
- * @param callback
- * @returns
  */
-async function getUsers(call, callback) {
+async function getUsers(call) {
     try {
-        const r = call.request;
-        const limit = r.hasLimit() ? r.getLimit().getValue() : 5;
-        const page = r.hasPage() ? r.getPage().getValue() : 1;
-        const pipeline = [];
+        const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, pipeline = [];
         if (r.hasFilter()) {
             const filter = r.getFilter().getValue();
             pipeline.push({
@@ -41,40 +36,38 @@ async function getUsers(call, callback) {
         call.end();
     }
     catch (error) {
-        callback(error);
+        call.emit(error);
     }
 }
 exports.getUsers = getUsers;
 /**
  * @param call
- * @param callback
- * @returns
  */
-async function getAllUsers(call, callback) {
+async function getAllUsers(call) {
     try {
         const r = call.request;
-        const limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, UserArray = await user_schema_1.default
+        const limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1;
+        const UserArray = await user_schema_1.default
             .find()
             .skip((page - 1) * limit)
             .limit(limit);
-        UserArray.forEach((user) => {
+        UserArray.forEach((User) => {
             const m = new UserModel();
-            m.setId(new wrappers_pb_1.StringValue().setValue(user.id));
-            m.setUsername(new wrappers_pb_1.StringValue().setValue(user.username));
-            m.setEmail(new wrappers_pb_1.StringValue().setValue(user.email));
+            m.setId(new wrappers_pb_1.StringValue().setValue(User.id));
+            m.setUsername(new wrappers_pb_1.StringValue().setValue(User.username));
+            m.setEmail(new wrappers_pb_1.StringValue().setValue(User.email));
             call.write(m);
         });
         call.end();
     }
     catch (error) {
-        callback(error);
+        call.emit(error);
     }
 }
 exports.getAllUsers = getAllUsers;
 /**
  * @param call
  * @param callback
- * @returns
  */
 async function getUserById(call, callback) {
     try {
@@ -84,12 +77,12 @@ async function getUserById(call, callback) {
             throw new Error('Invalid User id');
         }
         const u = await user_schema_1.default.findById(id);
-        console.table(u);
         if (!u) {
             throw new Error('User not found');
         }
+        const stringId = u._id.toString();
         const m = new UserModel();
-        m.setId(new wrappers_pb_1.StringValue().setValue(u.id));
+        m.setId(new wrappers_pb_1.StringValue().setValue(stringId));
         m.setUsername(new wrappers_pb_1.StringValue().setValue(u.username));
         m.setEmail(new wrappers_pb_1.StringValue().setValue(u.email));
         callback(null, m);
@@ -101,10 +94,8 @@ async function getUserById(call, callback) {
 exports.getUserById = getUserById;
 /**
  * @param call
- * @param callback
- * @returns
  */
-async function getUserFollowers(call, callback) {
+async function getUserFollowers(call) {
     try {
         const r = call.request;
         const id = r.hasId() ? r.getId().getValue() : null;
@@ -127,7 +118,7 @@ async function getUserFollowers(call, callback) {
             { $limit: limit },
         ]).exec();
         UserArray.forEach((user) => {
-            console.table(user);
+            console.log(user);
             const m = new UserModel();
             m.setId(new wrappers_pb_1.StringValue().setValue(user.id));
             m.setUsername(new wrappers_pb_1.StringValue().setValue(user.username));
@@ -137,16 +128,14 @@ async function getUserFollowers(call, callback) {
         call.end();
     }
     catch (error) {
-        callback(error);
+        call.emit(error);
     }
 }
 exports.getUserFollowers = getUserFollowers;
 /**
  * @param call
- * @param callback
- * @returns
  */
-async function getUserFollowing(call, callback) {
+async function getUserFollowing(call) {
     try {
         const r = call.request;
         const id = r.hasId() ? r.getId().getValue() : null;
@@ -169,7 +158,7 @@ async function getUserFollowing(call, callback) {
             { $limit: limit },
         ]).exec();
         UserArray.forEach((user) => {
-            console.table(user);
+            console.log(user);
             const m = new UserModel();
             m.setId(new wrappers_pb_1.StringValue().setValue(user.id));
             m.setUsername(new wrappers_pb_1.StringValue().setValue(user.username));
@@ -179,14 +168,13 @@ async function getUserFollowing(call, callback) {
         call.end();
     }
     catch (error) {
-        callback(error);
+        call.emit(error);
     }
 }
 exports.getUserFollowing = getUserFollowing;
 /**
  * @param call
  * @param callback
- * @returns
  */
 async function followUser(call, callback) {
     try {
@@ -231,7 +219,6 @@ exports.followUser = followUser;
 /**
  * @param call
  * @param callback
- * @returns
  */
 async function unfollowUser(call, callback) {
     try {

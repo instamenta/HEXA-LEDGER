@@ -6,7 +6,7 @@ env:
   jest: true
 extends:
   - eslint:recommended
-  - plugin:@typescript-eslint/recommended
+  - "plugin:@typescript-eslint/recommended"
   - plugin:import/errors
   - plugin:import/warnings
   - plugin:import/typescript
@@ -21,8 +21,8 @@ extends:
 overrides:
   - files: [ '*.test.ts' ]
     extends:
-      - 'plugin:jest/recommended'
-parser: '@typescript-eslint/parser'
+      - "plugin:jest/recommended"
+parser: "@typescript-eslint/parser"
 parserOptions:
   ecmaVersion: 2022
   sourceType: module
@@ -52,18 +52,19 @@ rules:
   unicorn/prefer-module: off
   node/no-missing-import: off
   import/no-unresolved: off
-  '@typescript-eslint/no-var-requires': off
-  '@typescript-eslint/no-explicit-any': off
-  '@typescript-eslint/no-non-null-assertion': off
+  "@typescript-eslint/no-var-requires": off
+  "@typescript-eslint/no-explicit-any": off
+  "@typescript-eslint/no-non-null-assertion": off
   promise/always-return: off
   lodash/prefer-lodash-typecheck: off
   no-prototype-builtins: off
   sonarjs/no-duplicate-string: off
   promise/no-callback-in-promise: off
   no-unexpected-multiline: off
-  '@typescript-eslint/ban-ts-comment': off
+  "@typescript-eslint/ban-ts-comment": off
+  sonarjs/cognitive-complexity: off
 plugins:
-  - '@typescript-eslint'
+  - "@typescript-eslint"
   - import
   - jest
   - jsdoc

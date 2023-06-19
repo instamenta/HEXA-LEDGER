@@ -1,7 +1,6 @@
 'use strict';
 
 import {ServerUnaryCall, sendUnaryData, ServerWritableStream} from '@grpc/grpc-js';
-import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import MongooseUserModel, {IUser} from '../models/user-schema';
 import {Types} from 'mongoose';
@@ -16,8 +15,7 @@ import {
 	GetUserFollowersRequest,
 	GetUserFollowingRequest,
 } from '../generated/types/users_pb';
-
-const {UserModel} = require('../generated/users_pb');
+import {convertUserModel} from '../utilities/grpc-tools';
 
 /**
  * @param call
@@ -41,13 +39,13 @@ async function getUsers(
 		pipeline.push({$skip: (page - 1) * limit}, {$limit: limit});
 
 		const UserArray: IUser[] = await MongooseUserModel.aggregate(pipeline).exec();
-		UserArray.forEach((user) => {
-			const u = new UserModel();
-			u.setId(new StringValue().setValue(user.id));
-			u.setUsername(new StringValue().setValue(user.username));
-			u.setEmail(new StringValue().setValue(user.email));
-
-			call.write(u);
+		UserArray.forEach((u) => {
+			const m = convertUserModel(u);
+			// const u = new UserModel();
+			// u.setId(new StringValue().setValue(user.id));
+			// u.setUsername(new StringValue().setValue(user.username));
+			// u.setEmail(new StringValue().setValue(user.email));
+			call.write(m);
 		});
 
 		call.end();
@@ -73,11 +71,11 @@ async function getAllUsers(
 			.skip((page - 1) * limit)
 			.limit(limit);
 
-		UserArray.forEach((User) => {
-			const m = new UserModel();
-			m.setId(new StringValue().setValue(User.id));
-			m.setUsername(new StringValue().setValue(User.username));
-			m.setEmail(new StringValue().setValue(User.email));
+		UserArray.forEach((u) => {
+			const m = convertUserModel(u);
+			// m.setId(new StringValue().setValue(User.id));
+			// m.setUsername(new StringValue().setValue(User.username));
+			// m.setEmail(new StringValue().setValue(User.email));
 
 			call.write(m);
 		});
@@ -108,12 +106,12 @@ async function getUserById(
 			throw new Error('User not found');
 		}
 
-		const stringId: string = u._id.toString();
-		const m = new UserModel();
-
-		m.setId(new StringValue().setValue(stringId));
-		m.setUsername(new StringValue().setValue(u.username));
-		m.setEmail(new StringValue().setValue(u.email));
+		// const stringId: string = u._id.toString();
+		const m = convertUserModel(u);
+		// const m = new UserModel();
+		// m.setId(new StringValue().setValue(stringId));
+		// m.setUsername(new StringValue().setValue(u.username));
+		// m.setEmail(new StringValue().setValue(u.email));
 
 		callback(null, m);
 	} catch (error: Error | any) {
@@ -154,13 +152,13 @@ async function getUserFollowers(
 			{$limit: limit},
 		]).exec();
 
-		UserArray.forEach((user) => {
-			console.log(user);
-
-			const m = new UserModel();
-			m.setId(new StringValue().setValue(user.id));
-			m.setUsername(new StringValue().setValue(user.username));
-			m.setEmail(new StringValue().setValue(user.email));
+		UserArray.forEach((u) => {
+			console.log(u);
+			const m = convertUserModel(u);
+			// const m = new UserModel();
+			// m.setId(new StringValue().setValue(user.id));
+			// m.setUsername(new StringValue().setValue(user.username));
+			// m.setEmail(new StringValue().setValue(user.email));
 
 			call.write(m);
 		});
@@ -204,13 +202,13 @@ async function getUserFollowing(
 			{$limit: limit},
 		]).exec();
 
-		UserArray.forEach((user) => {
-			console.log(user);
-
-			const m = new UserModel();
-			m.setId(new StringValue().setValue(user.id));
-			m.setUsername(new StringValue().setValue(user.username));
-			m.setEmail(new StringValue().setValue(user.email));
+		UserArray.forEach((u) => {
+			console.log(u);
+			const m = convertUserModel(u);
+			// const m = new UserModel();
+			// m.setId(new StringValue().setValue(user.id));
+			// m.setUsername(new StringValue().setValue(user.username));
+			// m.setEmail(new StringValue().setValue(user.email));
 
 			call.write(m);
 		});

@@ -4,12 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.getUserFollowers = exports.getUserById = exports.getAllUsers = exports.getUsers = void 0;
-const wrappers_pb_1 = require("google-protobuf/google/protobuf/wrappers_pb");
 const empty_pb_1 = require("google-protobuf/google/protobuf/empty_pb");
 const user_schema_1 = __importDefault(require("../models/user-schema"));
 const mongoose_1 = require("mongoose");
 const bson_1 = require("bson");
-const { UserModel } = require('../generated/users_pb');
+const grpc_tools_1 = require("../utilities/grpc-tools");
 /**
  * @param call
  */
@@ -26,12 +25,13 @@ async function getUsers(call) {
         }
         pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
         const UserArray = await user_schema_1.default.aggregate(pipeline).exec();
-        UserArray.forEach((user) => {
-            const u = new UserModel();
-            u.setId(new wrappers_pb_1.StringValue().setValue(user.id));
-            u.setUsername(new wrappers_pb_1.StringValue().setValue(user.username));
-            u.setEmail(new wrappers_pb_1.StringValue().setValue(user.email));
-            call.write(u);
+        UserArray.forEach((u) => {
+            const m = (0, grpc_tools_1.convertUserModel)(u);
+            // const u = new UserModel();
+            // u.setId(new StringValue().setValue(user.id));
+            // u.setUsername(new StringValue().setValue(user.username));
+            // u.setEmail(new StringValue().setValue(user.email));
+            call.write(m);
         });
         call.end();
     }
@@ -51,11 +51,11 @@ async function getAllUsers(call) {
             .find()
             .skip((page - 1) * limit)
             .limit(limit);
-        UserArray.forEach((User) => {
-            const m = new UserModel();
-            m.setId(new wrappers_pb_1.StringValue().setValue(User.id));
-            m.setUsername(new wrappers_pb_1.StringValue().setValue(User.username));
-            m.setEmail(new wrappers_pb_1.StringValue().setValue(User.email));
+        UserArray.forEach((u) => {
+            const m = (0, grpc_tools_1.convertUserModel)(u);
+            // m.setId(new StringValue().setValue(User.id));
+            // m.setUsername(new StringValue().setValue(User.username));
+            // m.setEmail(new StringValue().setValue(User.email));
             call.write(m);
         });
         call.end();
@@ -80,11 +80,12 @@ async function getUserById(call, callback) {
         if (!u) {
             throw new Error('User not found');
         }
-        const stringId = u._id.toString();
-        const m = new UserModel();
-        m.setId(new wrappers_pb_1.StringValue().setValue(stringId));
-        m.setUsername(new wrappers_pb_1.StringValue().setValue(u.username));
-        m.setEmail(new wrappers_pb_1.StringValue().setValue(u.email));
+        // const stringId: string = u._id.toString();
+        const m = (0, grpc_tools_1.convertUserModel)(u);
+        // const m = new UserModel();
+        // m.setId(new StringValue().setValue(stringId));
+        // m.setUsername(new StringValue().setValue(u.username));
+        // m.setEmail(new StringValue().setValue(u.email));
         callback(null, m);
     }
     catch (error) {
@@ -117,12 +118,13 @@ async function getUserFollowers(call) {
             { $skip: (page - 1) * limit },
             { $limit: limit },
         ]).exec();
-        UserArray.forEach((user) => {
-            console.log(user);
-            const m = new UserModel();
-            m.setId(new wrappers_pb_1.StringValue().setValue(user.id));
-            m.setUsername(new wrappers_pb_1.StringValue().setValue(user.username));
-            m.setEmail(new wrappers_pb_1.StringValue().setValue(user.email));
+        UserArray.forEach((u) => {
+            console.log(u);
+            const m = (0, grpc_tools_1.convertUserModel)(u);
+            // const m = new UserModel();
+            // m.setId(new StringValue().setValue(user.id));
+            // m.setUsername(new StringValue().setValue(user.username));
+            // m.setEmail(new StringValue().setValue(user.email));
             call.write(m);
         });
         call.end();
@@ -157,12 +159,13 @@ async function getUserFollowing(call) {
             { $skip: (page - 1) * limit },
             { $limit: limit },
         ]).exec();
-        UserArray.forEach((user) => {
-            console.log(user);
-            const m = new UserModel();
-            m.setId(new wrappers_pb_1.StringValue().setValue(user.id));
-            m.setUsername(new wrappers_pb_1.StringValue().setValue(user.username));
-            m.setEmail(new wrappers_pb_1.StringValue().setValue(user.email));
+        UserArray.forEach((u) => {
+            console.log(u);
+            const m = (0, grpc_tools_1.convertUserModel)(u);
+            // const m = new UserModel();
+            // m.setId(new StringValue().setValue(user.id));
+            // m.setUsername(new StringValue().setValue(user.username));
+            // m.setEmail(new StringValue().setValue(user.email));
             call.write(m);
         });
         call.end();

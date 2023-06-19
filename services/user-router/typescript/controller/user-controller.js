@@ -24,10 +24,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.getUserFollowers = exports.getUserById = exports.getAllUsers = exports.getUsers = void 0;
-// import { iRequestWithUser } from '../middlewares/auth-middleware';
 const USER_CLIENT = __importStar(require("../client/user"));
 /**
- *
  * @param request
  * @param response
  */
@@ -44,7 +42,6 @@ async function getUsers(request, response) {
 }
 exports.getUsers = getUsers;
 /**
- *
  * @param request
  * @param response
  */
@@ -61,7 +58,6 @@ async function getAllUsers(request, response) {
 }
 exports.getAllUsers = getAllUsers;
 /**
- *
  * @param request
  * @param response
  */
@@ -78,7 +74,6 @@ async function getUserById(request, response) {
 }
 exports.getUserById = getUserById;
 /**
- *
  * @param request
  * @param response
  */
@@ -96,7 +91,6 @@ async function getUserFollowers(request, response) {
 }
 exports.getUserFollowers = getUserFollowers;
 /**
- *
  * @param request
  * @param response
  */
@@ -114,7 +108,6 @@ async function getUserFollowing(request, response) {
 }
 exports.getUserFollowing = getUserFollowing;
 /**
- *
  * @param request
  * @param response
  */
@@ -136,7 +129,6 @@ async function followUser(request, response) {
 }
 exports.followUser = followUser;
 /**
- *
  * @param request
  * @param response
  */

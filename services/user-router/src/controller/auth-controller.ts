@@ -4,17 +4,15 @@ import {Request, Response} from 'express';
 /**
  * @param request
  * @param response
- * @returns
  */
 async function register(request: Request, response: Response): Promise<void> {
 	try {
 		const {username, email, password} = request.body;
-
 		await AUTH_CLIENT.registerUser(username, email, password)
-			.then(async (User) => {
+			.then(User => {
 				response.json(User).status(200).end();
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw new Error('Register Error: ' + error.message);
 			});
 	} catch (error: Error | any) {
@@ -26,16 +24,16 @@ async function register(request: Request, response: Response): Promise<void> {
 /**
  * @param request
  * @param response
- * @returns
  */
 async function login(request: Request, response: Response): Promise<void> {
 	try {
 		const {email, password} = request.body;
+		console.log(email,password);
 		await AUTH_CLIENT.loginUser(email, password)
-			.then(async (User) => {
+			.then(User => {
 				response.json(User).status(200).end();
 			})
-			.catch((error) => {
+			.catch(error => {
 				throw new Error('Login Error: ' + error.message);
 			});
 	} catch (error: Error | any) {

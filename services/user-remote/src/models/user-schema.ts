@@ -1,18 +1,18 @@
 'use strict';
 
-import MONGOOSE, { Schema, Document } from 'mongoose';
+import MONGOOSE, {Document, Schema} from 'mongoose';
 import BCRYPT from 'bcrypt';
-import { ObjectId } from 'bson';
+import {ObjectId} from 'bson';
 
 export interface IUser extends Document {
-	_id: ObjectId;
-	username: string;
-	email: string;
-	password: string;
-	picture: string;
-	followers: ObjectId[];
-	following: ObjectId[];
-	comments: ObjectId[];
+    _id: ObjectId;
+    username: string;
+    email: string;
+    password: string;
+    picture: string;
+    followers: ObjectId[];
+    following: ObjectId[];
+    comments: ObjectId[];
 }
 
 const UserSchema: Schema<IUser> = new MONGOOSE.Schema<IUser>({
@@ -62,10 +62,21 @@ const UserSchema: Schema<IUser> = new MONGOOSE.Schema<IUser>({
  * Pre-save hook to hash the password before saving the user.
  * @returns {Promise<void>}
  */
-UserSchema.pre<IUser>('save', async function () {
-	const SALT = await BCRYPT.genSalt(10);
-	this.password = await BCRYPT.hash(this.password, SALT);
+UserSchema.pre<IUser>('save', async function (next) {
+	try {
+		if (!this.isModified('password')) {
+			return next();
+		}
+
+		const SALT = await BCRYPT.genSalt(10);
+		this.password = await BCRYPT.hash(this.password, SALT);
+
+		return next();
+	} catch (error: Error | any) {
+		return next(error);
+	}
 });
+
 
 const UserModel = MONGOOSE.model<IUser>('User', UserSchema);
 

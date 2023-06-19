@@ -74,6 +74,10 @@ function extractUserModel(call, extractAll = true, include = {}) {
     }
 }
 exports.extractUserModel = extractUserModel;
+/**
+ * @param u
+ * @returns
+ */
 function convertUserModel(u) {
     const m = new UserModel();
     const stringId = u._id.toString();

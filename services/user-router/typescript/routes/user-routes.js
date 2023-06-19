@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const auth_middleware_1 = require("../middlewares/auth-middleware");
 // import { isAuthenticated, notOwner, isOwner} from '../middlewares/auth-middleware';
 const user_controller_1 = require("../controller/user-controller");
 const USER_ROUTER = (0, express_1.Router)();
@@ -24,7 +25,7 @@ USER_ROUTER.route('/:id/followers')
 USER_ROUTER.route('/:id/following')
     .get(user_controller_1.getUserFollowing);
 USER_ROUTER.route('/:id/follow')
-    .post(user_controller_1.followUser);
+    .post(auth_middleware_1.isAuthenticated, user_controller_1.followUser);
 USER_ROUTER.route('/:id/unfollow')
-    .post(user_controller_1.unfollowUser);
+    .post(auth_middleware_1.isAuthenticated, user_controller_1.unfollowUser);
 exports.default = USER_ROUTER;

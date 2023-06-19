@@ -5,10 +5,10 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
  * @param token
  * @returns
  */
-function decodeToken(token: string): Promise<string> {
+function decodeToken(token: string): Promise<JSON> {
 	return new Promise((resolve, reject) => {
 		verify(token, 'SECRET', (error, decoded) => {
-			error ? reject(error) : resolve(decoded as string);
+			error ? reject(error) : resolve(decoded as JSON);
 		});
 	});
 }

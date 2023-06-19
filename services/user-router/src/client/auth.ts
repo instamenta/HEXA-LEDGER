@@ -20,7 +20,6 @@ function loginUser(email: string, password: string): Promise<UserClass> {
 		CLIENT.login(m, (err: GRPC.ServiceError, response: UserModel) => {
 			err ? reject(err.message)
 				: resolve(UserClass.fromUserGRPCMessage(response));
-
 		});
 	});
 }

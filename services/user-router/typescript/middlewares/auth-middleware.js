@@ -16,10 +16,14 @@ async function isAuthenticated(request, response, next) {
         if (!token) {
             throw new Error('Authorization token not provided');
         }
+        console.log('in');
         const extracted = token.toString();
         await (0, token_tools_1.decodeToken)(extracted)
             .then((decoded) => {
-            request.userData = JSON.parse(decoded);
+            console.log(decoded);
+            console.log(typeof decoded);
+            // @ts-ignore
+            request.userData = decoded;
             next();
         })
             .catch(() => {

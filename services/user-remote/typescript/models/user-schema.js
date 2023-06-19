@@ -52,9 +52,18 @@ const UserSchema = new mongoose_1.default.Schema({
  * Pre-save hook to hash the password before saving the user.
  * @returns {Promise<void>}
  */
-UserSchema.pre('save', async function () {
-    const SALT = await bcrypt_1.default.genSalt(10);
-    this.password = await bcrypt_1.default.hash(this.password, SALT);
+UserSchema.pre('save', async function (next) {
+    try {
+        if (!this.isModified('password')) {
+            return next();
+        }
+        const SALT = await bcrypt_1.default.genSalt(10);
+        this.password = await bcrypt_1.default.hash(this.password, SALT);
+        return next();
+    }
+    catch (error) {
+        return next(error);
+    }
 });
 const UserModel = mongoose_1.default.model('User', UserSchema);
 exports.default = UserModel;

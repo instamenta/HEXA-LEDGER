@@ -1,18 +1,15 @@
 import { Request, Response } from 'express';
-// import { iRequestWithUser } from '../middlewares/auth-middleware';
+import { iRequestWithUser } from '../middlewares/auth-middleware';
 import * as USER_CLIENT from '../client/user';
 
 /**
- *
  * @param request
  * @param response
  */
 async function getUsers(request: Request, response: Response): Promise<void> {
 	try {
 		// let { page = 1 , limit = 5, filter } = request.query;
-
-
-		const users = await USER_CLIENT.getUsers(1, 5, );
+		const users = await USER_CLIENT.getUsers(1, 5,);
 
 		response.json(users).status(200).end();
 	} catch (error: Error | any) {
@@ -22,7 +19,6 @@ async function getUsers(request: Request, response: Response): Promise<void> {
 }
 
 /**
- *
  * @param request
  * @param response
  */
@@ -38,7 +34,6 @@ async function getAllUsers(request: Request, response: Response): Promise<void> 
 }
 
 /**
- *
  * @param request
  * @param response
  */
@@ -55,7 +50,6 @@ async function getUserById(request: Request, response: Response): Promise<void> 
 
 
 /**
- *
  * @param request
  * @param response
  */
@@ -72,7 +66,6 @@ async function getUserFollowers(request: Request, response: Response): Promise<v
 }
 
 /**
- *
  * @param request
  * @param response
  */
@@ -88,11 +81,10 @@ async function getUserFollowing(request: Request, response: Response): Promise<v
 	}
 }
 /**
- *
  * @param request
  * @param response
  */
-async function followUser(request: Request, response: Response): Promise<void> {
+async function followUser(request: iRequestWithUser, response: Response): Promise<void> {
 	try {
 		const { id } = request.params;
 		// const currentUser = request.userData;
@@ -109,11 +101,10 @@ async function followUser(request: Request, response: Response): Promise<void> {
 }
 
 /**
- *
  * @param request
  * @param response
  */
-async function unfollowUser(request: Request, response: Response): Promise<void> {
+async function unfollowUser(request: iRequestWithUser, response: Response): Promise<void> {
 	try {
 		const { id } = request.params;
 		// const currentUser = request.userData;

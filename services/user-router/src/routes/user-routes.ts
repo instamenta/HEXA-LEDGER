@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import {isAuthenticated} from '../middlewares/auth-middleware';
 // import { isAuthenticated, notOwner, isOwner} from '../middlewares/auth-middleware';
 import {
 	getAllUsers,
@@ -14,6 +15,7 @@ import {
 	followUser,
 	unfollowUser,
 } from '../controller/user-controller';
+
 const USER_ROUTER: Router = Router();
 
 USER_ROUTER.route('/')
@@ -41,9 +43,9 @@ USER_ROUTER.route('/:id/following')
 	.get(getUserFollowing);
 
 USER_ROUTER.route('/:id/follow')
-	.post(followUser);
+	.post(isAuthenticated as any, followUser as any);
 
 USER_ROUTER.route('/:id/unfollow')
-	.post(unfollowUser);
+	.post(isAuthenticated as any, unfollowUser as any);
 
 export default USER_ROUTER;

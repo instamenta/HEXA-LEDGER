@@ -28,16 +28,15 @@ const AUTH_CLIENT = __importStar(require("../client/auth"));
 /**
  * @param request
  * @param response
- * @returns
  */
 async function register(request, response) {
     try {
         const { username, email, password } = request.body;
         await AUTH_CLIENT.registerUser(username, email, password)
-            .then(async (User) => {
+            .then(User => {
             response.json(User).status(200).end();
         })
-            .catch((error) => {
+            .catch(error => {
             throw new Error('Register Error: ' + error.message);
         });
     }
@@ -50,16 +49,16 @@ exports.register = register;
 /**
  * @param request
  * @param response
- * @returns
  */
 async function login(request, response) {
     try {
         const { email, password } = request.body;
+        console.log(email, password);
         await AUTH_CLIENT.loginUser(email, password)
-            .then(async (User) => {
+            .then(User => {
             response.json(User).status(200).end();
         })
-            .catch((error) => {
+            .catch(error => {
             throw new Error('Login Error: ' + error.message);
         });
     }

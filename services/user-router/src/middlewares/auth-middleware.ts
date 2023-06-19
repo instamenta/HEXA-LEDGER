@@ -28,10 +28,15 @@ async function isAuthenticated(request: iRequestWithUser, response: Response, ne
 		if (!token) {
 			throw new Error('Authorization token not provided');
 		}
+		console.log('in');
 		const extracted = token.toString();
 		await decodeToken(extracted)
 			.then((decoded) => {
-				request.userData = JSON.parse(decoded);
+				console.log(decoded);
+				console.log(typeof decoded);
+				// @ts-ignore
+
+				request.userData = decoded;
 				next();
 			})
 			.catch(() => {

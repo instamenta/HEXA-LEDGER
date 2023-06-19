@@ -56,6 +56,12 @@ rules:
   '@typescript-eslint/no-explicit-any': off
   '@typescript-eslint/no-non-null-assertion': off
   promise/always-return: off
+  lodash/prefer-lodash-typecheck: off
+  no-prototype-builtins: off
+  sonarjs/no-duplicate-string: off
+  promise/no-callback-in-promise: off
+  no-unexpected-multiline: off
+  '@typescript-eslint/ban-ts-comment': off
 plugins:
   - '@typescript-eslint'
   - import

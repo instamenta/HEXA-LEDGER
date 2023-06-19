@@ -23,7 +23,44 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const GRPC = __importStar(require("@grpc/grpc-js"));
-const users_grpc_pb_1 = require("./generated/users_grpc_pb");
-const CLIENT = new users_grpc_pb_1.UserServiceClient('user-remote:50051', GRPC.credentials.createInsecure());
-exports.default = CLIENT;
+const mongoose_1 = __importStar(require("mongoose"));
+const CommentSchema = new mongoose_1.Schema({
+    content: {
+        type: String,
+        required: true,
+    },
+    postId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Post',
+        required: true,
+    },
+    likes: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+    ],
+    dislikes: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+    ],
+    subcomments: [
+        {
+            type: mongoose_1.Schema.Types.ObjectId,
+            ref: 'Comment',
+        },
+    ],
+    ownerId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    postedAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
+const CommentModel = mongoose_1.default.model('Comment', CommentSchema);
+exports.default = CommentModel;

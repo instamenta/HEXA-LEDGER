@@ -27,14 +27,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const GRPC = __importStar(require("@grpc/grpc-js"));
-const users_grpc_pb_1 = require("./generated/users_grpc_pb");
 const mongodb_1 = __importDefault(require("./mongodb"));
-const userService_1 = require("./services/userService");
+const auth_service_1 = require("./services/auth-service");
+const user_service_1 = require("./services/user-service");
+const { UserServiceService } = require('./generated/users_grpc_pb');
 (async function main() {
     const Server = new GRPC.Server();
-    Server.addService(users_grpc_pb_1.UserServiceService, {
-        login: userService_1.login,
-        register: userService_1.register,
+    Server.addService(UserServiceService, {
+        // @ts-ignore
+        getUsers: user_service_1.getUsers,
+        // @ts-ignore
+        getAllUsers: user_service_1.getAllUsers,
+        // @ts-ignore
+        getUserFollowers: user_service_1.getUserFollowers,
+        // @ts-ignore
+        getUserFollowing: user_service_1.getUserFollowing,
+        getUserById: user_service_1.getUserById,
+        login: auth_service_1.login,
+        register: auth_service_1.register,
+        followUser: user_service_1.followUser,
+        unfollowUser: user_service_1.unfollowUser,
     });
     Server.bindAsync('0.0.0.0:50051', GRPC.ServerCredentials.createInsecure(), async (error, boundPort) => {
         if (error) {

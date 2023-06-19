@@ -6,10 +6,10 @@ import {isGuest} from '../middlewares/auth-middleware';
 const AUTH_ROUTER: Router = Router();
 
 AUTH_ROUTER.route('/login')
-    .post(isGuest, loginValidator, login);
+	.post(isGuest, loginValidator, login);
 
 AUTH_ROUTER.route('/register')
-    .post(isGuest, registerValidator, register);
+	.post(isGuest, registerValidator, register);
 
 export default AUTH_ROUTER;
 

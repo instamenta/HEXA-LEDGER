@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import { isAuthenticated, notOwner, isOwner} from '../middlewares/auth-middleware';
+// import { isAuthenticated, notOwner, isOwner} from '../middlewares/auth-middleware';
 import {
 	getAllUsers,
 	getUserById,
 	getUsers,
 	// updateUserById,
 	// deleteUserById,
-	getUserPosts,
+	// getUserPosts,
 	// createUserPost,
-	getUserComments,
+	// getUserComments,
 	getUserFollowers,
 	getUserFollowing,
 	followUser,
@@ -17,22 +17,22 @@ import {
 const USER_ROUTER: Router = Router();
 
 USER_ROUTER.route('/')
-	.get(getAllUsers)
+	.get(getAllUsers);
 
 USER_ROUTER.route('/find')
-	.get(getUsers)
+	.get(getUsers);
 
 USER_ROUTER.route('/:id')
-	.get(getUserById)
-	// .put(updateUserById)
-	// .delete(deleteUserById);
-
-USER_ROUTER.route('/:id/posts')
-	.get(getUserPosts)
-	// .post(createUserPost);
-
-USER_ROUTER.route('/:id/comments')
-	.get(getUserComments);
+	.get(getUserById);
+// .put(updateUserById)
+// .delete(deleteUserById);
+//
+// USER_ROUTER.route('/:id/posts')
+// 	.get(getUserPosts);
+// // .post(createUserPost);
+//
+// USER_ROUTER.route('/:id/comments')
+// 	.get(getUserComments);
 
 USER_ROUTER.route('/:id/followers')
 	.get(getUserFollowers);
@@ -41,9 +41,9 @@ USER_ROUTER.route('/:id/following')
 	.get(getUserFollowing);
 
 USER_ROUTER.route('/:id/follow')
-	.post(isAuthenticated, followUser);
+	.post(followUser);
 
 USER_ROUTER.route('/:id/unfollow')
-	.post(isAuthenticated, unfollowUser);
+	.post(unfollowUser);
 
 export default USER_ROUTER;

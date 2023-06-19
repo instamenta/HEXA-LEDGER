@@ -2,18 +2,19 @@
 
 import {ServerUnaryCall, sendUnaryData, ServerWritableStream} from '@grpc/grpc-js';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
-import {Empty} from "google-protobuf/google/protobuf/empty_pb";
+import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import MongooseUserModel, {IUser} from '../models/user-schema';
-import {Types} from 'mongoose'
+import {Types} from 'mongoose';
+import {ObjectId} from 'bson';
 import {
-    UserModel as IUserModel,
-    GetAllUsersRequest,
-    GetUsersRequest,
-    GetUserByIdRequest,
-    FollowUserRequest,
-    UnfollowUserRequest,
-    // GetUserFollowersRequest,
-    // GetUserFollowingRequest,
+	UserModel as IUserModel,
+	GetAllUsersRequest,
+	GetUsersRequest,
+	GetUserByIdRequest,
+	FollowUserRequest,
+	UnfollowUserRequest,
+	GetUserFollowersRequest,
+	GetUserFollowingRequest,
 } from '../generated/types/users_pb';
 
 const {UserModel} = require('../generated/users_pb');
@@ -24,38 +25,36 @@ const {UserModel} = require('../generated/users_pb');
  * @returns
  */
 async function getUsers(call: ServerWritableStream<GetUsersRequest, IUserModel>, callback: sendUnaryData<IUserModel>) {
-    try {
-        const r = call.request;
-        const limit = r.hasLimit() ? r.getLimit()!.getValue() : 5;
-        const page = r.hasPage() ? r.getPage()!.getValue() : 1;
+	try {
+		const r = call.request;
+		const limit = r.hasLimit() ? r.getLimit()!.getValue() : 5;
+		const page = r.hasPage() ? r.getPage()!.getValue() : 1;
 
-        const pipeline = [];
-        if (r.hasFilter()) {
-            const filter = r.getFilter()!.getValue();
-            pipeline.push({
-                $match: {
-                    fieldToFilter: {$regex: filter},
-                },
-            });
-        }
-        pipeline.push({$skip: (page - 1) * limit});
-        pipeline.push({$limit: limit});
+		const pipeline = [];
+		if (r.hasFilter()) {
+			const filter = r.getFilter()!.getValue();
+			pipeline.push({
+				$match: {
+					fieldToFilter: {$regex: filter},
+				},
+			});
+		}
+		pipeline.push({$skip: (page - 1) * limit}, {$limit: limit});
 
+		const UserArray: IUser[] = await MongooseUserModel.aggregate(pipeline).exec();
+		UserArray.forEach((user) => {
+			const u = new UserModel();
+			u.setId(new StringValue().setValue(user.id));
+			u.setUsername(new StringValue().setValue(user.username));
+			u.setEmail(new StringValue().setValue(user.email));
 
-        const UserArray: IUser[] = await MongooseUserModel.aggregate(pipeline).exec();
-        UserArray.forEach((user) => {
-            const u = new UserModel();
-            u.setId(new StringValue().setValue(user.id));
-            u.setUsername(new StringValue().setValue(user.username));
-            u.setEmail(new StringValue().setValue(user.email));
+			call.write(u);
+		});
 
-            call.write(u);
-        });
-
-        call.end();
-    } catch (error: Error | any) {
-        callback(error);
-    }
+		call.end();
+	} catch (error: Error | any) {
+		callback(error);
+	}
 }
 
 /**
@@ -64,30 +63,29 @@ async function getUsers(call: ServerWritableStream<GetUsersRequest, IUserModel>,
  * @returns
  */
 async function getAllUsers(call: ServerWritableStream<GetAllUsersRequest, IUserModel>, callback: sendUnaryData<IUserModel>) {
-    try {
-        const r = call.request;
-        const o = {
-            limit: r.hasLimit() ? r.getLimit()!.getValue() : 5,
-            page: r.hasPage() ? r.getPage()!.getValue() : 1,
-        }
-        const UserArray: IUser[] = await MongooseUserModel
-            .find()
-            .skip((o.page - 1) * o.limit)
-            .limit(o.limit);
+	try {
+		const r = call.request;
 
-        UserArray.forEach((user) => {
-            const m = new UserModel();
-            m.setId(new StringValue().setValue(user.id));
-            m.setUsername(new StringValue().setValue(user.username));
-            m.setEmail(new StringValue().setValue(user.email));
+		const limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
+			, page = r.hasPage() ? r.getPage()!.getValue() : 1
+			, UserArray: IUser[] = await MongooseUserModel
+				.find()
+				.skip((page - 1) * limit)
+				.limit(limit);
 
-            call.write(m);
-        });
+		UserArray.forEach((user) => {
+			const m = new UserModel();
+			m.setId(new StringValue().setValue(user.id));
+			m.setUsername(new StringValue().setValue(user.username));
+			m.setEmail(new StringValue().setValue(user.email));
 
-        call.end();
-    } catch (error: Error | any) {
-        callback(error);
-    }
+			call.write(m);
+		});
+
+		call.end();
+	} catch (error: Error | any) {
+		callback(error);
+	}
 }
 
 /**
@@ -96,96 +94,136 @@ async function getAllUsers(call: ServerWritableStream<GetAllUsersRequest, IUserM
  * @returns
  */
 async function getUserById(call: ServerUnaryCall<GetUserByIdRequest, IUserModel>, callback: sendUnaryData<IUserModel>) {
-    try {
-        const r = call.request;
-        const id = r.hasId() ? r.getId()!.getValue() : null;
+	try {
+		const r = call.request;
+		const id = r.hasId() ? r.getId()!.getValue() : null;
 
-        if (!id || !Types.ObjectId.isValid(id)) {
-            throw new Error
-        }
-        const u: IUser | null = await MongooseUserModel.findById(id);
+		if (!id || !Types.ObjectId.isValid(id)) {
+			throw new Error('Invalid User id');
+		}
+		const u: IUser | null = await MongooseUserModel.findById(id);
+		console.table(u)
 
-        if (!u) {
-            throw new Error('User not found');
-        }
+		if (!u) {
+			throw new Error('User not found');
+		}
 
-        const m = new UserModel();
-        m.setId(new StringValue().setValue(u.id));
-        m.setUsername(new StringValue().setValue(u.username));
-        m.setEmail(new StringValue().setValue(u.email));
+		const m = new UserModel();
+		m.setId(new StringValue().setValue(u._id));
+		m.setUsername(new StringValue().setValue(u.username));
+		m.setEmail(new StringValue().setValue(u.email));
 
-        callback(null, m);
-    } catch (error: Error | any) {
-        callback(error);
-    }
+		callback(null, m);
+	} catch (error: Error | any) {
+		callback(error);
+	}
 }
 
-//
-// /**
-//  * @param call
-//  * @param callback
-//  * @returns
-//  */
-// async function getUserFollowers(call: ServerDuplexStream<GetUserFollowersRequest, UserFollowerModel>) {
-//     try {
-//         const requestStream = call;
-//         const responseStream = call;
-//
-//         requestStream.on('data', async (request: GetUserFollowersRequest) => {
-//             const userId = request.getId()?.getValue();
-//             const page = request.getPage()?.getValue() || 1;
-//             const limit = request.getLimit()?.getValue() || 5;
-//
-//             // Implement the logic to retrieve user followers from the database with pagination
-//             // and send them through the gRPC stream
-//             // For example:
-//             const followers: UserFollowerModel[] = []; // Retrieve user followers from the database with pagination
-//
-//             followers.forEach((follower) => {
-//                 responseStream.write(follower);
-//             });
-//         });
-//
-//         requestStream.on('end', () => {
-//             responseStream.end();
-//         });
-//     } catch (error: Error | any) {
-//         call.emit('error', error);
-//     }
-// }
-//
-// /**
-//  * @param call
-//  * @param callback
-//  * @returns
-//  */
-// async function getUserFollowing(call: ServerDuplexStream<GetUserFollowingRequest, UserFollowingModel>) {
-//     try {
-//         const requestStream = call;
-//         const responseStream = call;
-//
-//         requestStream.on('data', async (request: GetUserFollowingRequest) => {
-//             const userId = request.getId()?.getValue();
-//             const page = request.getPage()?.getValue() || 1;
-//             const limit = request.getLimit()?.getValue() || 5;
-//
-//             // Implement the logic to retrieve users following from the database with pagination
-//             // and send them through the gRPC stream
-//             // For example:
-//             const following: UserFollowingModel[] = []; // Retrieve users following from the database with pagination
-//
-//             following.forEach((followedUser) => {
-//                 responseStream.write(followedUser);
-//             });
-//         });
-//
-//         requestStream.on('end', () => {
-//             responseStream.end();
-//         });
-//     } catch (error: Error | any) {
-//         call.emit('error', error);
-//     }
-// }
+
+/**
+ * @param call
+ * @param callback
+ * @returns
+ */
+async function getUserFollowers(
+	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>,
+	callback: sendUnaryData<IUserModel>
+): Promise<void> {
+	try {
+		const r = call.request;
+
+		const id = r.hasId() ? r.getId()!.getValue() : null;
+		const page = r.hasPage() ? r.getPage()!.getValue() : 1;
+		const limit = r.getLimit() ? r.getLimit()!.getValue() : 5;
+
+		if (!id || !Types.ObjectId.isValid(id)
+            || page > 0 || Number.isNaN(page)
+            || limit > 0 || Number.isNaN(limit)
+		) {
+			throw new Error('Invalid User id');
+		}
+		const u: IUser | null = await MongooseUserModel.findById(id);
+		if (!u) {
+			throw new Error('User not found');
+		}
+
+		const UserArray = await MongooseUserModel.aggregate([
+			{$match: {_id: id}},
+			{$lookup: {from: 'users', localField: 'followers', foreignField: '_id', as: 'followers'}},
+			{$unwind: 'followers'},
+			{$skip: (page - 1) * limit},
+			{$limit: limit},
+		]).exec();
+
+		UserArray.forEach((user) => {
+			console.table(user);
+
+			const m = new UserModel();
+			m.setId(new StringValue().setValue(user.id));
+			m.setUsername(new StringValue().setValue(user.username));
+			m.setEmail(new StringValue().setValue(user.email));
+
+			call.write(m);
+		});
+
+		call.end();
+
+	} catch (error: Error | any) {
+		callback(error);
+	}
+}
+
+/**
+ * @param call
+ * @param callback
+ * @returns
+ */
+async function getUserFollowing(
+	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>,
+	callback: sendUnaryData<IUserModel>
+): Promise<void> {
+	try {
+		const r = call.request;
+
+		const id = r.hasId() ? r.getId()!.getValue() : null;
+		const page = r.hasPage() ? r.getPage()!.getValue() : 1;
+		const limit = r.getLimit() ? r.getLimit()!.getValue() : 5;
+
+		if (!id || !Types.ObjectId.isValid(id)
+            || page > 0 || Number.isNaN(page)
+            || limit > 0 || Number.isNaN(limit)
+		) {
+			throw new Error('Invalid User id');
+		}
+		const u: IUser | null = await MongooseUserModel.findById(id);
+		if (!u) {
+			throw new Error('User not found');
+		}
+
+		const UserArray = await MongooseUserModel.aggregate([
+			{$match: {_id: id}},
+			{$lookup: {from: 'users', localField: 'following', foreignField: '_id', as: 'following'}},
+			{$unwind: '$following'},
+			{$skip: (page - 1) * limit},
+			{$limit: limit},
+		]).exec();
+
+		UserArray.forEach((user) => {
+			console.table(user);
+
+			const m = new UserModel();
+			m.setId(new StringValue().setValue(user.id));
+			m.setUsername(new StringValue().setValue(user.username));
+			m.setEmail(new StringValue().setValue(user.email));
+
+			call.write(m);
+		});
+
+		call.end();
+	} catch (error: Error | any) {
+		callback(error);
+	}
+}
 
 /**
  * @param call
@@ -193,17 +231,43 @@ async function getUserById(call: ServerUnaryCall<GetUserByIdRequest, IUserModel>
  * @returns
  */
 async function followUser(call: ServerUnaryCall<FollowUserRequest, Empty>, callback: sendUnaryData<Empty>) {
-    try {
-        const r = call.request;
-        const o = {
-            currentUserId: r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null,
-            userId: r.hasId() ? r.getId()!.getValue() : null,
-        }
-        await MongooseUserModel.findByIdAndUpdate(o.currentUserId, {$addToSet: {following: o.userId}});
-        callback(null, new Empty());
-    } catch (error: Error | any) {
-        callback(error);
-    }
+	try {
+		const r = call.request;
+		const currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null;
+		const userId = r.hasId() ? r.getId()!.getValue() : null;
+
+		if (!currentUserId || !Types.ObjectId.isValid(currentUserId)
+            || !userId || !Types.ObjectId.isValid(userId)) {
+			throw new Error('Invalid User id');
+		}
+		const currentUserBId = new ObjectId(currentUserId);
+		const userBId = new ObjectId(userId);
+
+		await MongooseUserModel.collection.bulkWrite([
+			{
+				updateOne: {
+					filter: {_id: currentUserBId},
+					update: {$addToSet: {following: userBId}},
+				},
+			},
+			{
+				updateOne: {
+					filter: {_id: userBId},
+					update: {$addToSet: {followers: currentUserBId}},
+				},
+			},
+		] as any)
+			.then((result) => {
+				if (result && result.ok) {
+					console.log('Bulk write operation successful');
+					callback(null, new Empty());
+				} else {
+					throw new Error('Failed to update users');
+				}
+			});
+	} catch (error: Error | any) {
+		callback(error);
+	}
 }
 
 /**
@@ -212,27 +276,54 @@ async function followUser(call: ServerUnaryCall<FollowUserRequest, Empty>, callb
  * @returns
  */
 async function unfollowUser(call: ServerUnaryCall<UnfollowUserRequest, Empty>, callback: sendUnaryData<Empty>) {
-    try {
-        const r = call.request;
-        const o = {
-            currentUserId: r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null,
-            userId: r.hasId() ? r.getId()!.getValue() : null,
-        }
-        await MongooseUserModel.findByIdAndUpdate(o.currentUserId, {$pull: {following: o.userId}});
-        callback(null, new Empty());
-    } catch (error: Error | any) {
-        callback(error);
-    }
+	try {
+		const r = call.request;
+		const currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null;
+		const userId = r.hasId() ? r.getId()!.getValue() : null;
+
+
+		if (!currentUserId || !Types.ObjectId.isValid(currentUserId)
+            || !userId || !Types.ObjectId.isValid(userId)) {
+			throw new Error('Invalid User id');
+		}
+		const currentUserBId = new ObjectId(currentUserId);
+		const userBId = new ObjectId(userId);
+
+		await MongooseUserModel.bulkWrite([
+			{
+				updateOne: {
+					filter: {_id: currentUserBId},
+					update: {$pull: {following: userBId}},
+				},
+			},
+			{
+				updateOne: {
+					filter: {_id: userBId},
+					update: {$pull: {followers: currentUserBId}},
+				},
+			},
+		] as any)
+			.then((result) => {
+				if (result && result.ok) {
+					console.log('Bulk write operation successful');
+					callback(null, new Empty());
+				} else {
+					throw new Error('Failed to update users');
+				}
+			});
+	} catch (error: Error | any) {
+		callback(error);
+	}
 }
 
 export {
-    getUsers,
-    getAllUsers,
-    getUserById,
-    // getUserFollowers,
-    // getUserFollowing,
-    followUser,
-    unfollowUser,
+	getUsers,
+	getAllUsers,
+	getUserById,
+	getUserFollowers,
+	getUserFollowing,
+	followUser,
+	unfollowUser,
 };
 
 

@@ -6,4 +6,4 @@ const CLIENT = new UserServiceClient(
 	GRPC.credentials.createInsecure()
 );
 
-export default CLIENT
+export default CLIENT;

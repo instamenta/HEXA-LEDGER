@@ -58,6 +58,8 @@ rules:
   promise/always-return: off
   lodash/prefer-lodash-typecheck: off
   no-prototype-builtins: off
+  sonarjs/no-duplicate-string: off
+  promise/no-callback-in-promise: off
 plugins:
   - '@typescript-eslint'
   - import

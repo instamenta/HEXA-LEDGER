@@ -1,13 +1,30 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = exports.login = void 0;
-// const USER_MODEL = require('../model/user-model')
-// 	, BCRYPT = require('bcrypt')
-// , {generateToken} = require('../utilities/token-tools')
-// , {Request, Response} = require('express')
-// , {sendMessage} = require('../producer');
-const grpc_client_1 = require("../grpc-client");
-const token_tools_1 = require("../utilities/token-tools");
+const AUTH_CLIENT = __importStar(require("../client/auth"));
 /**
  * @param request
  * @param response
@@ -16,18 +33,13 @@ const token_tools_1 = require("../utilities/token-tools");
 async function register(request, response) {
     try {
         const { username, email, password } = request.body;
-        const status = await (0, grpc_client_1.registerUser)(username, email, password)
+        await AUTH_CLIENT.registerUser(username, email, password)
             .then(async (User) => {
-            console.log(User);
-            if (User.hasOwnProperty('token') && typeof User.token === 'string') {
-                console.log(await (0, token_tools_1.decodeToken)(User.token));
-            }
             response.json(User).status(200).end();
         })
             .catch((error) => {
             throw new Error('Register Error: ' + error.message);
         });
-        console.table(status);
     }
     catch (error) {
         console.log(error);
@@ -43,12 +55,8 @@ exports.register = register;
 async function login(request, response) {
     try {
         const { email, password } = request.body;
-        await (0, grpc_client_1.loginUser)(email, password)
+        await AUTH_CLIENT.loginUser(email, password)
             .then(async (User) => {
-            console.log(User);
-            if (User.hasOwnProperty('token') && typeof User.token === 'string') {
-                console.log(await (0, token_tools_1.decodeToken)(User.token));
-            }
             response.json(User).status(200).end();
         })
             .catch((error) => {

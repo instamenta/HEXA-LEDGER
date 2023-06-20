@@ -64,13 +64,14 @@ const UserSchema: Schema<IUser> = new MONGOOSE.Schema<IUser>({
  */
 UserSchema.pre<IUser>('save', async function (next) {
 	try {
+		console.log(this.isModified('password'));
 		if (!this.isModified('password')) {
+			console.log('not modified');
 			return next();
 		}
 
 		const SALT = await BCRYPT.genSalt(10);
 		this.password = await BCRYPT.hash(this.password, SALT);
-
 		return next();
 	} catch (error: Error | any) {
 		return next(error);

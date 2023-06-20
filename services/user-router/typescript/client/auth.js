@@ -18,7 +18,6 @@ function loginUser(email, password) {
         const m = new LoginForm();
         m.setEmail(new wrappers_pb_1.StringValue().setValue(email));
         m.setPassword(new wrappers_pb_1.StringValue().setValue(password));
-        console.log('wtf');
         grpc_client_1.default.login(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(userClass_1.default.fromUserGRPCMessage(response));

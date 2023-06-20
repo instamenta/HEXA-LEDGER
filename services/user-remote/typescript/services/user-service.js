@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -10,7 +10,11 @@ const mongoose_1 = require("mongoose");
 const bson_1 = require("bson");
 const grpc_tools_1 = require("../utilities/grpc-tools");
 /**
- * @param call
+ * Retrieves a list of users based on the specified criteria.
+ * ( optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUsers(call) {
     try {
@@ -41,7 +45,11 @@ async function getUsers(call) {
 }
 exports.getUsers = getUsers;
 /**
- * @param call
+ * Retrieves all users.
+ * ( takes optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getAllUsers(call) {
     try {
@@ -66,8 +74,12 @@ async function getAllUsers(call) {
 }
 exports.getAllUsers = getAllUsers;
 /**
- * @param call
- * @param callback
+ * Retrieves a user by their ID.
+ * ( takes user _id )
+ * @param call - The call object for the gRPC writable stream.
+ * @param callback  - The callback function to send the response.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUserById(call, callback) {
     try {
@@ -94,7 +106,11 @@ async function getUserById(call, callback) {
 }
 exports.getUserById = getUserById;
 /**
- * @param call
+ * Retrieves the followers of a user.
+ * ( takes _id, and optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUserFollowers(call) {
     try {
@@ -135,7 +151,11 @@ async function getUserFollowers(call) {
 }
 exports.getUserFollowers = getUserFollowers;
 /**
- * @param call
+ * Retrieves the users that a user is following
+ * ( takes _id, and optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUserFollowing(call) {
     try {
@@ -176,8 +196,11 @@ async function getUserFollowing(call) {
 }
 exports.getUserFollowing = getUserFollowing;
 /**
- * @param call
- * @param callback
+ * Follows a user ( takes 2 user _id's current and target )
+ * @param call - The call object for the gRPC writable stream.
+ * @param callback  - The callback function to send the response.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function followUser(call, callback) {
     try {
@@ -220,8 +243,11 @@ async function followUser(call, callback) {
 }
 exports.followUser = followUser;
 /**
- * @param call
- * @param callback
+ * Unfollows a user ( takes 2 user _id's current and target )
+ * @param call - The call object for the gRPC writable stream.
+ * @param callback  - The callback function to send the response.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function unfollowUser(call, callback) {
     try {
@@ -263,3 +289,64 @@ async function unfollowUser(call, callback) {
     }
 }
 exports.unfollowUser = unfollowUser;
+// /**
+//  * @param call
+//  * @param callback
+//  * @returns
+//  */
+// async function getUserPosts(call: ServerDuplexStream<GetUserPostsRequest, PostModel>) {
+//     try {
+//         const requestStream = call;
+//         const responseStream = call;
+//
+//         requestStream.on('data', async (request: GetUserPostsRequest) => {
+//             const userId = request.getId()?.getValue();
+//
+//             // Implement the logic to retrieve user posts from the database
+//             // and send them through the gRPC stream
+//             // For example:
+//             const posts: PostModel[] = []; // Retrieve user posts from the database
+//
+//             posts.forEach((post) => {
+//                 responseStream.write(post);
+//             });
+//         });
+//
+//         requestStream.on('end', () => {
+//             responseStream.end();
+//         });
+//     } catch (error: Error | any) {
+//         call.emit('error', error);
+//     }
+// }
+//
+// /**
+//  * @param call
+//  * @param callback
+//  * @returns
+//  */
+// async function getUserComments(call: ServerDuplexStream<GetUserCommentsRequest, CommentModel>) {
+//     try {
+//         const requestStream = call;
+//         const responseStream = call;
+//
+//         requestStream.on('data', async (request: GetUserCommentsRequest) => {
+//             const userId = request.getId()?.getValue();
+//
+//             // Implement the logic to retrieve user comments from the database
+//             // and send them through the gRPC stream
+//             // For example:
+//             const comments: CommentModel[] = []; // Retrieve user comments from the database
+//
+//             comments.forEach((comment) => {
+//                 responseStream.write(comment);
+//             });
+//         });
+//
+//         requestStream.on('end', () => {
+//             responseStream.end();
+//         });
+//     } catch (error: Error | any) {
+//         call.emit('error', error);
+//     }
+// }

@@ -1,5 +1,3 @@
-'use strict';
-
 import {ServerUnaryCall, sendUnaryData, ServerWritableStream} from '@grpc/grpc-js';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import MongooseUserModel, {IUser} from '../models/user-schema';
@@ -18,7 +16,11 @@ import {
 import {convertUserModel} from '../utilities/grpc-tools';
 
 /**
- * @param call
+ * Retrieves a list of users based on the specified criteria.
+ * ( optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUsers(
 	call: ServerWritableStream<GetUsersRequest, IUserModel>,
@@ -55,7 +57,11 @@ async function getUsers(
 }
 
 /**
- * @param call
+ * Retrieves all users.
+ * ( takes optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getAllUsers(
 	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
@@ -87,8 +93,12 @@ async function getAllUsers(
 }
 
 /**
- * @param call
- * @param callback
+ * Retrieves a user by their ID.
+ * ( takes user _id )
+ * @param call - The call object for the gRPC writable stream.
+ * @param callback  - The callback function to send the response.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUserById(
 	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
@@ -106,14 +116,7 @@ async function getUserById(
 			throw new Error('User not found');
 		}
 
-		// const stringId: string = u._id.toString();
-		const m = convertUserModel(u);
-		// const m = new UserModel();
-		// m.setId(new StringValue().setValue(stringId));
-		// m.setUsername(new StringValue().setValue(u.username));
-		// m.setEmail(new StringValue().setValue(u.email));
-
-		callback(null, m);
+		callback(null, convertUserModel(u));
 	} catch (error: Error | any) {
 		callback(error);
 	}
@@ -121,7 +124,11 @@ async function getUserById(
 
 
 /**
- * @param call
+ * Retrieves the followers of a user.
+ * ( takes _id, and optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUserFollowers(
 	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
@@ -171,7 +178,11 @@ async function getUserFollowers(
 }
 
 /**
- * @param call
+ * Retrieves the users that a user is following
+ * ( takes _id, and optionally page & limit )
+ * @param call - The call object for the gRPC writable stream.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function getUserFollowing(
 	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
@@ -220,8 +231,11 @@ async function getUserFollowing(
 }
 
 /**
- * @param call
- * @param callback
+ * Follows a user ( takes 2 user _id's current and target )
+ * @param call - The call object for the gRPC writable stream.
+ * @param callback  - The callback function to send the response.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function followUser(
 	call: ServerUnaryCall<FollowUserRequest, Empty>,
@@ -267,8 +281,11 @@ async function followUser(
 }
 
 /**
- * @param call
- * @param callback
+ * Unfollows a user ( takes 2 user _id's current and target )
+ * @param call - The call object for the gRPC writable stream.
+ * @param callback  - The callback function to send the response.
+ * @throws - Emits an error if the input is invalid
+ * @async
  */
 async function unfollowUser(
 	call: ServerUnaryCall<UnfollowUserRequest, Empty>,

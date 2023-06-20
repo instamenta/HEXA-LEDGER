@@ -1,5 +1,3 @@
-'use strict';
-
 import MONGOOSE, {Document, Schema} from 'mongoose';
 import BCRYPT from 'bcrypt';
 import {ObjectId} from 'bson';
@@ -64,9 +62,7 @@ const UserSchema: Schema<IUser> = new MONGOOSE.Schema<IUser>({
  */
 UserSchema.pre<IUser>('save', async function (next) {
 	try {
-		console.log(this.isModified('password'));
 		if (!this.isModified('password')) {
-			console.log('not modified');
 			return next();
 		}
 

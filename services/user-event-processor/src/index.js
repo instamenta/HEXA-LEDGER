@@ -3,7 +3,7 @@ const {connectConsumer, disconnectConsumer} = require('./consumer')
 ;
 
 (async function START() {
-	const TOPIC = 'user_events_topic';
+	const TOPIC = 'logger_topic';
 	await createTopic(TOPIC);
 	await connectConsumer();
 })();

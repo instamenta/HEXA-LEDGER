@@ -17,8 +17,12 @@ API.use('/user', USER_ROUTER);
 API.use(ERROR_MIDDLEWARE);
 
 (async function initializeService(): Promise<void> {
-	await API.listen(Number(API_PORT), () => console.log(`Server is running on port: ${API_PORT}`));
-	API.on('error', (error: Error|any) => console.log('API ran into Error:', error));
+	await API.listen(Number(API_PORT), () => {
+		console.log(`Server is running on port: ${API_PORT}`);
+	});
+	API.on('error', (error: Error | any) => {
+		console.log('API ran into Error:', error);
+	});
 })().catch(error => console.log(error));
 
 ['unhandledRejection', 'uncaughtException'].forEach(type => {

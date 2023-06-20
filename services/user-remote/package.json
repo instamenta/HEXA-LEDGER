@@ -22,6 +22,7 @@
     "dotenv": "^16.1.4",
     "google-protobuf": "^3.21.2",
     "jsonwebtoken": "^9.0.0",
+    "kafkajs": "^2.2.4",
     "mongoose": "^7.3.0"
   },
   "devDependencies": {

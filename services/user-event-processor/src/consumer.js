@@ -6,8 +6,8 @@ const {Kafka} = require('kafkajs')
 	, BROKER_PORT = process.env.BROKER_PORT || 9092
 	, REDPANDA = new Kafka({brokers: [`redpanda-0:9092`]})
 	, CONSUMER = REDPANDA.consumer({groupId: v4()})
-	, CLIENT = require('./grpc-client')
-	, { loginUser, registerUser} = require('./grpc-client')
+	// , CLIENT = require('./grpc-client')
+	// , { loginUser, registerUser} = require('./grpc-client')
 ;
 
 
@@ -17,7 +17,7 @@ const {Kafka} = require('kafkajs')
 async function connectConsumer() {
 	try {
 		await CONSUMER.connect();
-		await CONSUMER.subscribe({topic: 'user_events_topic'});
+		await CONSUMER.subscribe({topic: 'logger_topic'});
 		await CONSUMER.run({
 			eachMessage: async ({topic, partition, message}) => {
 				const event = message.headers?.event.toString()
@@ -28,11 +28,11 @@ async function connectConsumer() {
 				console.log(messageValue);
 				console.log(event)
 
-				if (event === 'LOGIN') {
-					loginUser(message.timestamp)
-				} else if (event === 'REGISTER') {
-					registerUser()
-				}
+				// if (event === 'LOGIN') {
+				// 	loginUser(message.timestamp)
+				// } else if (event === 'REGISTER') {
+				// 	registerUser()
+				// }
 			}
 		});
 	} catch (error) {

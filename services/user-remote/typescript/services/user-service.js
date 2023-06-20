@@ -1,352 +1,183 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.getUserFollowers = exports.getUserById = exports.getAllUsers = exports.getUsers = void 0;
+exports.UNFOLLOW_USER = exports.FOLLOW_USER = exports.GET_USER_FOLLOWING = exports.GET_USER_FOLLOWERS = exports.GET_USER_BY_ID = exports.GET_ALL_USERS = exports.GET_USERS = void 0;
 const empty_pb_1 = require("google-protobuf/google/protobuf/empty_pb");
 const user_schema_1 = __importDefault(require("../models/user-schema"));
-const mongoose_1 = require("mongoose");
-const bson_1 = require("bson");
 const grpc_tools_1 = require("../utilities/grpc-tools");
+const Validator = __importStar(require("../utilities/validator"));
 /**
- * Retrieves a list of users based on the specified criteria.
- * ( optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @throws
  * @async
  */
-async function getUsers(call) {
-    try {
-        const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, pipeline = [];
-        if (r.hasFilter()) {
-            const filter = r.getFilter().getValue();
-            pipeline.push({
-                $match: {
-                    fieldToFilter: { $regex: filter },
-                },
-            });
-        }
-        pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
-        const UserArray = await user_schema_1.default.aggregate(pipeline).exec();
-        UserArray.forEach((u) => {
-            const m = (0, grpc_tools_1.convertUserModel)(u);
-            // const u = new UserModel();
-            // u.setId(new StringValue().setValue(user.id));
-            // u.setUsername(new StringValue().setValue(user.username));
-            // u.setEmail(new StringValue().setValue(user.email));
-            call.write(m);
+async function GET_USERS(call) {
+    const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, filter = r.hasFilter() ? r.getFilter().getValue() : null, pipeline = [];
+    if (filter) {
+        pipeline.push({
+            $match: { fieldToFilter: { $regex: filter } }
         });
-        call.end();
     }
-    catch (error) {
-        call.emit(error);
-    }
+    pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
+    const UserArray = await user_schema_1.default.aggregate(pipeline).exec();
+    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
+    call.end();
 }
-exports.getUsers = getUsers;
+exports.GET_USERS = GET_USERS;
 /**
- * Retrieves all users.
- * ( takes optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @throws
  * @async
  */
-async function getAllUsers(call) {
-    try {
-        const r = call.request;
-        const limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1;
-        const UserArray = await user_schema_1.default
-            .find()
-            .skip((page - 1) * limit)
-            .limit(limit);
-        UserArray.forEach((u) => {
-            const m = (0, grpc_tools_1.convertUserModel)(u);
-            // m.setId(new StringValue().setValue(User.id));
-            // m.setUsername(new StringValue().setValue(User.username));
-            // m.setEmail(new StringValue().setValue(User.email));
-            call.write(m);
-        });
-        call.end();
-    }
-    catch (error) {
-        call.emit(error);
-    }
+async function GET_ALL_USERS(call) {
+    const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, UserArray = await user_schema_1.default
+        .find().skip((page - 1) * limit).limit(limit);
+    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
+    call.end();
 }
-exports.getAllUsers = getAllUsers;
+exports.GET_ALL_USERS = GET_ALL_USERS;
 /**
- * Retrieves a user by their ID.
- * ( takes user _id )
- * @param call - The call object for the gRPC writable stream.
- * @param callback  - The callback function to send the response.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @param callback
+ * @throws
  * @async
  */
-async function getUserById(call, callback) {
-    try {
-        const r = call.request;
-        const id = r.hasId() ? r.getId().getValue() : null;
-        if (!id || !mongoose_1.Types.ObjectId.isValid(id)) {
-            throw new Error('Invalid User id');
-        }
-        const u = await user_schema_1.default.findById(id);
-        if (!u) {
-            throw new Error('User not found');
-        }
-        // const stringId: string = u._id.toString();
-        const m = (0, grpc_tools_1.convertUserModel)(u);
-        // const m = new UserModel();
-        // m.setId(new StringValue().setValue(stringId));
-        // m.setUsername(new StringValue().setValue(u.username));
-        // m.setEmail(new StringValue().setValue(u.email));
-        callback(null, m);
-    }
-    catch (error) {
-        callback(error);
-    }
+async function GET_USER_BY_ID(call, callback) {
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null;
+    Validator.ValidateId(id);
+    const u = await user_schema_1.default.findById(id);
+    Validator.ValidateUser(u);
+    callback(null, (0, grpc_tools_1.convertUserModel)(u));
 }
-exports.getUserById = getUserById;
+exports.GET_USER_BY_ID = GET_USER_BY_ID;
 /**
- * Retrieves the followers of a user.
- * ( takes _id, and optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @throws
  * @async
  */
-async function getUserFollowers(call) {
-    try {
-        const r = call.request;
-        const id = r.hasId() ? r.getId().getValue() : null;
-        const page = r.hasPage() ? r.getPage().getValue() : 1;
-        const limit = r.getLimit() ? r.getLimit().getValue() : 5;
-        if (!id || !mongoose_1.Types.ObjectId.isValid(id)
-            || page > 0 || Number.isNaN(page)
-            || limit > 0 || Number.isNaN(limit)) {
-            throw new Error('Invalid User id');
-        }
-        const u = await user_schema_1.default.findById(id);
-        if (!u) {
-            throw new Error('User not found');
-        }
-        const UserArray = await user_schema_1.default.aggregate([
-            { $match: { _id: id } },
-            { $lookup: { from: 'users', localField: 'followers', foreignField: '_id', as: 'followers' } },
-            { $unwind: 'followers' },
-            { $skip: (page - 1) * limit },
-            { $limit: limit },
-        ]).exec();
-        UserArray.forEach((u) => {
-            console.log(u);
-            const m = (0, grpc_tools_1.convertUserModel)(u);
-            // const m = new UserModel();
-            // m.setId(new StringValue().setValue(user.id));
-            // m.setUsername(new StringValue().setValue(user.username));
-            // m.setEmail(new StringValue().setValue(user.email));
-            call.write(m);
-        });
-        call.end();
-    }
-    catch (error) {
-        call.emit(error);
-    }
+async function GET_USER_FOLLOWERS(call) {
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, page = r.hasPage() ? r.getPage().getValue() : 1, limit = r.getLimit() ? r.getLimit().getValue() : 5;
+    Validator.ValidateFilters(id, page, limit);
+    const u = await user_schema_1.default.findById(id);
+    Validator.ValidateUser(u);
+    const UserArray = await user_schema_1.default.aggregate([
+        { $match: { _id: id } },
+        { $lookup: { from: 'users', localField: 'followers', foreignField: '_id', as: 'followers' } },
+        { $unwind: 'followers' },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+    ]).exec();
+    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
+    call.end();
 }
-exports.getUserFollowers = getUserFollowers;
+exports.GET_USER_FOLLOWERS = GET_USER_FOLLOWERS;
 /**
- * Retrieves the users that a user is following
- * ( takes _id, and optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @throws
  * @async
  */
-async function getUserFollowing(call) {
-    try {
-        const r = call.request;
-        const id = r.hasId() ? r.getId().getValue() : null;
-        const page = r.hasPage() ? r.getPage().getValue() : 1;
-        const limit = r.getLimit() ? r.getLimit().getValue() : 5;
-        if (!id || !mongoose_1.Types.ObjectId.isValid(id)
-            || page > 0 || Number.isNaN(page)
-            || limit > 0 || Number.isNaN(limit)) {
-            throw new Error('Invalid User id');
-        }
-        const u = await user_schema_1.default.findById(id);
-        if (!u) {
-            throw new Error('User not found');
-        }
-        const UserArray = await user_schema_1.default.aggregate([
-            { $match: { _id: id } },
-            { $lookup: { from: 'users', localField: 'following', foreignField: '_id', as: 'following' } },
-            { $unwind: '$following' },
-            { $skip: (page - 1) * limit },
-            { $limit: limit },
-        ]).exec();
-        UserArray.forEach((u) => {
-            console.log(u);
-            const m = (0, grpc_tools_1.convertUserModel)(u);
-            // const m = new UserModel();
-            // m.setId(new StringValue().setValue(user.id));
-            // m.setUsername(new StringValue().setValue(user.username));
-            // m.setEmail(new StringValue().setValue(user.email));
-            call.write(m);
-        });
-        call.end();
-    }
-    catch (error) {
-        call.emit(error);
-    }
+async function GET_USER_FOLLOWING(call) {
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, page = r.hasPage() ? r.getPage().getValue() : 1, limit = r.getLimit() ? r.getLimit().getValue() : 5;
+    Validator.ValidateFilters(id, page, limit);
+    const u = await user_schema_1.default.findById(id);
+    Validator.ValidateUser(u);
+    const UserArray = await user_schema_1.default.aggregate([
+        { $match: { _id: id } },
+        { $lookup: { from: 'users', localField: 'following', foreignField: '_id', as: 'following' } },
+        { $unwind: '$following' },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+    ]).exec();
+    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
+    call.end();
 }
-exports.getUserFollowing = getUserFollowing;
+exports.GET_USER_FOLLOWING = GET_USER_FOLLOWING;
 /**
- * Follows a user ( takes 2 user _id's current and target )
- * @param call - The call object for the gRPC writable stream.
- * @param callback  - The callback function to send the response.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @param callback
+ * @throws
  * @async
  */
-async function followUser(call, callback) {
-    try {
-        const r = call.request;
-        const currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null;
-        const userId = r.hasId() ? r.getId().getValue() : null;
-        if (!currentUserId || !mongoose_1.Types.ObjectId.isValid(currentUserId)
-            || !userId || !mongoose_1.Types.ObjectId.isValid(userId)) {
-            throw new Error('Invalid User id');
-        }
-        const currentUserBId = new bson_1.ObjectId(currentUserId);
-        const userBId = new bson_1.ObjectId(userId);
-        await user_schema_1.default.collection.bulkWrite([
-            {
-                updateOne: {
-                    filter: { _id: currentUserBId },
-                    update: { $addToSet: { following: userBId } },
-                },
+async function FOLLOW_USER(call, callback) {
+    const r = call.request, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null, userId = r.hasId() ? r.getId().getValue() : null, currentUserB_Id = Validator.CovertToObjectId(currentUserId), userB_Id = Validator.CovertToObjectId(userId);
+    await user_schema_1.default.collection.bulkWrite([
+        {
+            updateOne: {
+                filter: { _id: currentUserB_Id },
+                update: { $addToSet: { following: userB_Id } },
             },
-            {
-                updateOne: {
-                    filter: { _id: userBId },
-                    update: { $addToSet: { followers: currentUserBId } },
-                },
+        },
+        {
+            updateOne: {
+                filter: { _id: userB_Id },
+                update: { $addToSet: { followers: currentUserB_Id } },
             },
-        ])
-            .then((result) => {
-            if (result && result.ok) {
-                console.log('Bulk write operation successful');
-                callback(null, new empty_pb_1.Empty());
-            }
-            else {
-                throw new Error('Failed to update users');
-            }
-        });
-    }
-    catch (error) {
-        callback(error);
-    }
+        },
+    ]).then((result) => {
+        if (result && result.ok) {
+            console.log('Bulk write operation successful');
+            callback(null, new empty_pb_1.Empty());
+        }
+        else {
+            throw new Error('Failed to update users');
+        }
+    });
 }
-exports.followUser = followUser;
+exports.FOLLOW_USER = FOLLOW_USER;
 /**
- * Unfollows a user ( takes 2 user _id's current and target )
- * @param call - The call object for the gRPC writable stream.
- * @param callback  - The callback function to send the response.
- * @throws - Emits an error if the input is invalid
+ * @param call
+ * @param callback
+ * @throws
  * @async
  */
-async function unfollowUser(call, callback) {
-    try {
-        const r = call.request;
-        const currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null;
-        const userId = r.hasId() ? r.getId().getValue() : null;
-        if (!currentUserId || !mongoose_1.Types.ObjectId.isValid(currentUserId)
-            || !userId || !mongoose_1.Types.ObjectId.isValid(userId)) {
-            throw new Error('Invalid User id');
+async function UNFOLLOW_USER(call, callback) {
+    const r = call.request, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null, userId = r.hasId() ? r.getId().getValue() : null, currentUserB_Id = Validator.CovertToObjectId(currentUserId), userB_Id = Validator.CovertToObjectId(userId);
+    await user_schema_1.default.bulkWrite([
+        {
+            updateOne: {
+                filter: { _id: currentUserB_Id },
+                update: { $pull: { following: userB_Id } },
+            },
+        },
+        {
+            updateOne: {
+                filter: { _id: userB_Id },
+                update: { $pull: { followers: currentUserB_Id } },
+            },
+        },
+    ]).then((result) => {
+        if (result && result.ok) {
+            console.log('Bulk write operation successful');
+            callback(null, new empty_pb_1.Empty());
         }
-        const currentUserBId = new bson_1.ObjectId(currentUserId);
-        const userBId = new bson_1.ObjectId(userId);
-        await user_schema_1.default.bulkWrite([
-            {
-                updateOne: {
-                    filter: { _id: currentUserBId },
-                    update: { $pull: { following: userBId } },
-                },
-            },
-            {
-                updateOne: {
-                    filter: { _id: userBId },
-                    update: { $pull: { followers: currentUserBId } },
-                },
-            },
-        ])
-            .then((result) => {
-            if (result && result.ok) {
-                console.log('Bulk write operation successful');
-                callback(null, new empty_pb_1.Empty());
-            }
-            else {
-                throw new Error('Failed to update users');
-            }
-        });
-    }
-    catch (error) {
-        callback(error);
-    }
+        else {
+            throw new Error('Failed to update users');
+        }
+    });
 }
-exports.unfollowUser = unfollowUser;
-// /**
-//  * @param call
-//  * @param callback
-//  * @returns
-//  */
-// async function getUserPosts(call: ServerDuplexStream<GetUserPostsRequest, PostModel>) {
-//     try {
-//         const requestStream = call;
-//         const responseStream = call;
-//
-//         requestStream.on('data', async (request: GetUserPostsRequest) => {
-//             const userId = request.getId()?.getValue();
-//
-//             // Implement the logic to retrieve user posts from the database
-//             // and send them through the gRPC stream
-//             // For example:
-//             const posts: PostModel[] = []; // Retrieve user posts from the database
-//
-//             posts.forEach((post) => {
-//                 responseStream.write(post);
-//             });
-//         });
-//
-//         requestStream.on('end', () => {
-//             responseStream.end();
-//         });
-//     } catch (error: Error | any) {
-//         call.emit('error', error);
-//     }
-// }
-//
-// /**
-//  * @param call
-//  * @param callback
-//  * @returns
-//  */
-// async function getUserComments(call: ServerDuplexStream<GetUserCommentsRequest, CommentModel>) {
-//     try {
-//         const requestStream = call;
-//         const responseStream = call;
-//
-//         requestStream.on('data', async (request: GetUserCommentsRequest) => {
-//             const userId = request.getId()?.getValue();
-//
-//             // Implement the logic to retrieve user comments from the database
-//             // and send them through the gRPC stream
-//             // For example:
-//             const comments: CommentModel[] = []; // Retrieve user comments from the database
-//
-//             comments.forEach((comment) => {
-//                 responseStream.write(comment);
-//             });
-//         });
-//
-//         requestStream.on('end', () => {
-//             responseStream.end();
-//         });
-//     } catch (error: Error | any) {
-//         call.emit('error', error);
-//     }
-// }
+exports.UNFOLLOW_USER = UNFOLLOW_USER;

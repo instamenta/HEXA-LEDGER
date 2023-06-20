@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -54,9 +54,7 @@ const UserSchema = new mongoose_1.default.Schema({
  */
 UserSchema.pre('save', async function (next) {
     try {
-        console.log(this.isModified('password'));
         if (!this.isModified('password')) {
-            console.log('not modified');
             return next();
         }
         const SALT = await bcrypt_1.default.genSalt(10);

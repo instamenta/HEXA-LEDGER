@@ -1,15 +1,12 @@
-'use strict';
-
-const {Kafka} = require('kafkajs')
+const {Kafka, CompressionCodecs, CompressionTypes} = require('kafkajs')
     , {v4} = require('uuid')
+    , SnappyCodec = require('kafkajs-snappy')
     , BROKER_URL = process.env.BROKER_URL || 'redpanda-0'
     , BROKER_PORT = process.env.BROKER_PORT || 9092
     , REDPANDA = new Kafka({brokers: [`redpanda-0:9092`]})
     , CONSUMER = REDPANDA.consumer({groupId: v4()})
-    // , CLIENT = require('./grpc-client')
-    // , { loginUser, registerUser} = require('./grpc-client')
 ;
-
+CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
 /**
  * @returns {Promise<void>}

@@ -21,6 +21,7 @@
     "google-protobuf": "^3.21.2",
     "ip": "^1.1.8",
     "kafkajs": "^2.2.4",
+    "kafkajs-snappy": "^1.1.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

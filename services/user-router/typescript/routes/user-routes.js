@@ -25,7 +25,7 @@ USER_ROUTER.route('/:id/followers')
 USER_ROUTER.route('/:id/following')
     .get(user_controller_1.getUserFollowing);
 USER_ROUTER.route('/:id/follow')
-    .post(auth_middleware_1.isAuthenticated, user_controller_1.followUser);
+    .put(auth_middleware_1.isAuthenticated, user_controller_1.followUser);
 USER_ROUTER.route('/:id/unfollow')
-    .post(auth_middleware_1.isAuthenticated, user_controller_1.unfollowUser);
+    .put(auth_middleware_1.isAuthenticated, user_controller_1.unfollowUser);
 exports.default = USER_ROUTER;

@@ -29,6 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const mongodb_1 = __importDefault(require("./mongodb"));
 const producer_1 = require("./producer");
+const logger_1 = require("./utilities/logger");
 const wrapper_1 = require("./services/wrapper");
 const { UserServiceService } = require('./generated/users_grpc_pb');
 (async function StartService() {
@@ -42,16 +43,11 @@ const { UserServiceService } = require('./generated/users_grpc_pb');
     });
     Server.bindAsync('0.0.0.0:50051', GRPC.ServerCredentials.createInsecure(), async (error, port) => {
         if (error) {
-            console.log(`================================================================
-				GRPC Server ran into Error, Port: ${port}
-				================================================================`, error);
+            (0, logger_1.grpc_disconnect_log)(port, error);
             process.exit(1);
         }
         Server.start();
-        console.log(`
-				================================================================
-				GRPC Server is running on port: ${port}
-				================================================================`);
+        (0, logger_1.grpc_start_log)(port);
         await (0, mongodb_1.default)();
         await (0, producer_1.connectProducer)();
     });
@@ -59,9 +55,7 @@ const { UserServiceService } = require('./generated/users_grpc_pb');
 ['unhandledRejection', 'uncaughtException'].forEach(type => {
     process.on(type, async (error) => {
         try {
-            console.log(`================================================================
-				Process.on ${type}: ${error.message}
-				================================================================`, error);
+            (0, logger_1.process_disconnect_log)(type, error);
             await (0, producer_1.disconnectProducer)();
         }
         catch {
@@ -73,16 +67,12 @@ const { UserServiceService } = require('./generated/users_grpc_pb');
 ['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
     process.once(type, async (error) => {
         try {
-            console.log(`================================================================
-				Process.on ${type}: ${error.message}
-				================================================================`, error);
+            (0, logger_1.process_disconnect_log)(type, error);
             process.exit(0);
         }
         finally {
             await (0, producer_1.disconnectProducer)();
-            console.log(`================================================================
-				Kafka Producer disconnected: ${error.message}
-				================================================================`);
+            (0, logger_1.kafka_disconnect_log)(error);
             process.kill(process.pid, type);
         }
     });

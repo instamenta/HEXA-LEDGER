@@ -20,9 +20,6 @@ async function isAuthenticated(request, response, next) {
         const extracted = token.toString();
         await (0, token_tools_1.decodeToken)(extracted)
             .then((decoded) => {
-            console.log(decoded);
-            console.log(typeof decoded);
-            // @ts-ignore
             request.userData = decoded;
             next();
         })

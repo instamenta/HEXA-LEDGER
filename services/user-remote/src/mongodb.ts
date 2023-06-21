@@ -1,9 +1,9 @@
 import Mongoose, {ConnectOptions} from 'mongoose';
+import {mongo_desconnect_log, mongo_start_log} from './utilities/logger';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'NO URI';
 
 /**
- *
  */
 function connectDatabase(): void {
 	const options: ConnectOptions = {
@@ -11,16 +11,8 @@ function connectDatabase(): void {
 		retryWrites: true,
 	};
 	Mongoose.connect(MONGODB_URI, options)
-		.then(() => console.log(`Connected to MongoDB
-		=================================================`))
-		.catch((error: Error) => {
-			console.error(`=================================================
-            Error connecting to MongoDB ~  
-            MONGODB's URI: ${MONGODB_URI} 
-            ERROR MESSAGE: ${error.message} 
-            =====================ERROR======================='
-            `, error);
-		});
+		.then(() => mongo_start_log())
+		.catch((error: Error) => mongo_desconnect_log(MONGODB_URI, error));
 }
 
 export default connectDatabase;

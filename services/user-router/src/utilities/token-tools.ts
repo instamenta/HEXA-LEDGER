@@ -1,14 +1,15 @@
 import {verify} from 'jsonwebtoken';
+import {ITokenData} from '../middlewares/auth-middleware';
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 
 /**
  * @param token
  * @returns
  */
-function decodeToken(token: string): Promise<JSON> {
+function decodeToken(token: string): Promise<ITokenData> {
 	return new Promise((resolve, reject) => {
 		verify(token, 'SECRET', (error, decoded) => {
-			error ? reject(error) : resolve(decoded as JSON);
+			error ? reject(error) : resolve(decoded as ITokenData);
 		});
 	});
 }

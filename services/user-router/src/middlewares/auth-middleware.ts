@@ -1,7 +1,7 @@
 import {decodeToken} from '../utilities/token-tools';
 import {Request, Response, NextFunction} from 'express';
 
-type ITokenData = {
+export type ITokenData = {
     _id: string;
     username: string;
     email: string;
@@ -32,10 +32,6 @@ async function isAuthenticated(request: iRequestWithUser, response: Response, ne
 		const extracted = token.toString();
 		await decodeToken(extracted)
 			.then((decoded) => {
-				console.log(decoded);
-				console.log(typeof decoded);
-				// @ts-ignore
-
 				request.userData = decoded;
 				next();
 			})

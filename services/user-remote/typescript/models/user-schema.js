@@ -32,13 +32,15 @@ const UserSchema = new mongoose_1.default.Schema({
     followers: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            unique: true
         }
     ],
     following: [
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
-            ref: 'User'
+            ref: 'User',
+            unique: true
         }
     ],
     comments: [

@@ -40,13 +40,15 @@ const UserSchema: Schema<IUser> = new MONGOOSE.Schema<IUser>({
 	followers: [
 		{
 			type: MONGOOSE.Schema.Types.ObjectId,
-			ref: 'User'
+			ref: 'User',
+			unique: true
 		}
 	],
 	following: [
 		{
 			type: MONGOOSE.Schema.Types.ObjectId,
-			ref: 'User'
+			ref: 'User',
+			unique: true
 		}
 	],
 	comments: [

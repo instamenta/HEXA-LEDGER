@@ -3,6 +3,7 @@ import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import MongooseUserModel, {IUser} from '../models/user-schema';
 import {convertUserModel} from '../utilities/grpc-tools';
 import * as Validator from '../utilities/validator';
+import {Thrower} from '../utilities/validator';
 import {
 	UserModel as IUserModel,
 	GetAllUsersRequest,
@@ -13,6 +14,7 @@ import {
 	GetUserFollowersRequest,
 	GetUserFollowingRequest,
 } from '../generated/types/users_pb';
+import {ObjectId} from 'bson';
 
 export {
 	GET_USERS,
@@ -47,9 +49,8 @@ async function GET_USERS(
 	pipeline.push(
 		{$skip: (page - 1) * limit}, {$limit: limit}
 	);
-	const UserArray: IUser[] = await MongooseUserModel.aggregate(pipeline).exec();
-	UserArray.forEach(u => call.write(convertUserModel(u)));
-	call.end();
+	await MongooseUserModel.aggregate(pipeline).exec()
+		.then((arr) => arr.forEach(u => call.write(convertUserModel(u))));
 }
 
 /**
@@ -64,11 +65,9 @@ async function GET_ALL_USERS(
 	const r = call.request
 		, limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
-		, UserArray: IUser[] = await MongooseUserModel
-			.find().skip((page - 1) * limit).limit(limit)
     ;
-	UserArray.forEach(u => call.write(convertUserModel(u)));
-	call.end();
+	await MongooseUserModel.find().skip((page - 1) * limit).limit(limit)
+		.then((arr) => arr.forEach(u => call.write(convertUserModel(u))));
 }
 
 /**
@@ -81,6 +80,7 @@ async function GET_USER_BY_ID(
 	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
+
 	const r = call.request
 		, id = r.hasId() ? r.getId()!.getValue() : null
     ;
@@ -105,19 +105,14 @@ async function GET_USER_FOLLOWERS(
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
 		, limit = r.getLimit() ? r.getLimit()!.getValue() : 5
     ;
-	Validator.ValidateFilters(id, page, limit);
+	Validator.ValidateId(id);
+	Validator.ValidateFilters(page, limit);
 	const u: IUser | null = await MongooseUserModel.findById(id);
-	Validator.ValidateUser(u);
-	const UserArray = await MongooseUserModel.aggregate([
-		{$match: {_id: id}},
-		{$lookup: {from: 'users', localField: 'followers', foreignField: '_id', as: 'followers'}},
-		{$unwind: 'followers'},
-		{$skip: (page - 1) * limit},
-		{$limit: limit},
-	]).exec();
-
-	UserArray.forEach(u => call.write(convertUserModel(u)));
-	call.end();
+	if (!u) {
+		Thrower(`Ivalid user._id : ${id}`);
+	}
+	await MongooseUserModel.find({_id: {$in: u.following}})
+		.then(arr => arr.forEach(u => call.write(convertUserModel(u))));
 }
 
 /**
@@ -134,20 +129,16 @@ async function GET_USER_FOLLOWING(
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
 		, limit = r.getLimit() ? r.getLimit()!.getValue() : 5
     ;
-	Validator.ValidateFilters(id, page, limit);
+	Validator.ValidateId(id);
+	Validator.ValidateFilters(page, limit);
 	const u: IUser | null = await MongooseUserModel.findById(id);
-	Validator.ValidateUser(u);
-	const UserArray = await MongooseUserModel.aggregate([
-		{$match: {_id: id}},
-		{$lookup: {from: 'users', localField: 'following', foreignField: '_id', as: 'following'}},
-		{$unwind: '$following'},
-		{$skip: (page - 1) * limit},
-		{$limit: limit},
-	]).exec();
-
-	UserArray.forEach(u => call.write(convertUserModel(u)));
-	call.end();
+	if (!u) {
+		Thrower(`Ivalid user._id : ${id}`);
+	}
+	await MongooseUserModel.find({_id: {$in: u.following}})
+		.then(arr => arr.forEach(u => call.write(convertUserModel(u))));
 }
+
 
 /**
  * @param call
@@ -163,9 +154,18 @@ async function FOLLOW_USER(
 	const r = call.request
 		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null
 		, userId = r.hasId() ? r.getId()!.getValue() : null
-		, currentUserB_Id = Validator.CovertToObjectId(currentUserId)
-		, userB_Id = Validator.CovertToObjectId(userId)
+		, currentUserB_Id: ObjectId = Validator.CovertToObjectId(currentUserId)
+		, userB_Id: ObjectId = Validator.CovertToObjectId(userId)
     ;
+	if (userId === currentUserId) {
+		Thrower('Users _id\'s are equal');
+	}
+	if (await MongooseUserModel.exists({
+		_id: currentUserB_Id,
+		following: {$in: [userB_Id]}
+	})) {
+		Thrower('Users is already follower');
+	}
 	await MongooseUserModel.collection.bulkWrite([
 		{
 			updateOne: {
@@ -179,14 +179,9 @@ async function FOLLOW_USER(
 				update: {$addToSet: {followers: currentUserB_Id}},
 			},
 		},
-	] as any).then((result) => {
-		if (result && result.ok) {
-			console.log('Bulk write operation successful');
-			callback(null, new Empty());
-		} else {
-			throw new Error('Failed to update users');
-		}
-	});
+	] as any).then(r => (r && r.ok) ? callback(null, new Empty())
+		: Thrower('Failed to update users')
+	);
 }
 
 /**
@@ -203,9 +198,18 @@ async function UNFOLLOW_USER(
 	const r = call.request
 		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null
 		, userId = r.hasId() ? r.getId()!.getValue() : null
-		, currentUserB_Id = Validator.CovertToObjectId(currentUserId)
-		, userB_Id = Validator.CovertToObjectId(userId)
+		, currentUserB_Id: ObjectId = Validator.CovertToObjectId(currentUserId)
+		, userB_Id: ObjectId = Validator.CovertToObjectId(userId)
     ;
+	if (userId === currentUserId) {
+		Thrower('Users _id\'s are equal');
+	}
+	if (!await MongooseUserModel.exists({
+		_id: currentUserB_Id,
+		following: {$in: [userB_Id]}
+	})) {
+		Thrower('Users is not follower');
+	}
 	await MongooseUserModel.bulkWrite([
 		{
 			updateOne: {
@@ -219,12 +223,8 @@ async function UNFOLLOW_USER(
 				update: {$pull: {followers: currentUserB_Id}},
 			},
 		},
-	] as any).then((result) => {
-		if (result && result.ok) {
-			console.log('Bulk write operation successful');
-			callback(null, new Empty());
-		} else {
-			throw new Error('Failed to update users');
-		}
-	});
+	] as any).then(r => (r && r.ok) ? callback(null, new Empty())
+		: Thrower('Failed to update users')
+	);
 }
+

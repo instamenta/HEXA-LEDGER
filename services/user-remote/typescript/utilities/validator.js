@@ -3,22 +3,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ValidateRegister = exports.ValidatePassword = exports.CovertToObjectId = exports.ValidateId = exports.ValidateFilters = exports.ValidateUser = void 0;
+exports.Thrower = exports.ValidateRegister = exports.ValidatePassword = exports.CovertToObjectId = exports.ValidateId = exports.ValidateFilters = exports.ValidateUser = void 0;
 const bson_1 = require("bson");
 const mongoose_1 = require("mongoose");
 const user_schema_1 = __importDefault(require("../models/user-schema"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 /**
- * @param id
  * @param page
  * @param limit
  * @throws
  */
-function VALIDATE_FILTERS(id, page, limit) {
-    if (!id || !mongoose_1.Types.ObjectId.isValid(id)
-        || !page || page > 0 || Number.isNaN(page)
-        || !limit || limit > 0 || Number.isNaN(limit)) {
-        throw new Error('Invalid User id');
+function VALIDATE_FILTERS(page, limit) {
+    if (!page || page < 0 || Number.isNaN(page)
+        || !limit || limit <= 0 || Number.isNaN(limit)) {
+        throw new Error(`Invalid filters - page : ${page} ${typeof page}, limit : ${limit} ${typeof limit}`);
     }
 }
 exports.ValidateFilters = VALIDATE_FILTERS;
@@ -27,7 +25,7 @@ exports.ValidateFilters = VALIDATE_FILTERS;
  * @throws
  */
 function VALIDATE_USER(u) {
-    if (!u) {
+    if (!u == null) {
         throw new Error('User not found');
     }
 }
@@ -92,3 +90,12 @@ async function VALIDATE_REGISTER(username, email, password) {
     });
 }
 exports.ValidateRegister = VALIDATE_REGISTER;
+/**
+ * @param message
+ * @param error
+ * @throws
+ */
+function THROWER(message, error = '!') {
+    throw new Error(message, error);
+}
+exports.Thrower = THROWER;

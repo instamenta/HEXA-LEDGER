@@ -31,6 +31,7 @@ const empty_pb_1 = require("google-protobuf/google/protobuf/empty_pb");
 const user_schema_1 = __importDefault(require("../models/user-schema"));
 const grpc_tools_1 = require("../utilities/grpc-tools");
 const Validator = __importStar(require("../utilities/validator"));
+const validator_1 = require("../utilities/validator");
 /**
  * @param call
  * @throws
@@ -44,9 +45,8 @@ async function GET_USERS(call) {
         });
     }
     pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
-    const UserArray = await user_schema_1.default.aggregate(pipeline).exec();
-    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
-    call.end();
+    await user_schema_1.default.aggregate(pipeline).exec()
+        .then((arr) => arr.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u))));
 }
 exports.GET_USERS = GET_USERS;
 /**
@@ -55,10 +55,9 @@ exports.GET_USERS = GET_USERS;
  * @async
  */
 async function GET_ALL_USERS(call) {
-    const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, UserArray = await user_schema_1.default
-        .find().skip((page - 1) * limit).limit(limit);
-    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
-    call.end();
+    const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1;
+    await user_schema_1.default.find().skip((page - 1) * limit).limit(limit)
+        .then((arr) => arr.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u))));
 }
 exports.GET_ALL_USERS = GET_ALL_USERS;
 /**
@@ -82,18 +81,14 @@ exports.GET_USER_BY_ID = GET_USER_BY_ID;
  */
 async function GET_USER_FOLLOWERS(call) {
     const r = call.request, id = r.hasId() ? r.getId().getValue() : null, page = r.hasPage() ? r.getPage().getValue() : 1, limit = r.getLimit() ? r.getLimit().getValue() : 5;
-    Validator.ValidateFilters(id, page, limit);
+    Validator.ValidateId(id);
+    Validator.ValidateFilters(page, limit);
     const u = await user_schema_1.default.findById(id);
-    Validator.ValidateUser(u);
-    const UserArray = await user_schema_1.default.aggregate([
-        { $match: { _id: id } },
-        { $lookup: { from: 'users', localField: 'followers', foreignField: '_id', as: 'followers' } },
-        { $unwind: 'followers' },
-        { $skip: (page - 1) * limit },
-        { $limit: limit },
-    ]).exec();
-    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
-    call.end();
+    if (!u) {
+        (0, validator_1.Thrower)(`Ivalid user._id : ${id}`);
+    }
+    await user_schema_1.default.find({ _id: { $in: u.following } })
+        .then(arr => arr.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u))));
 }
 exports.GET_USER_FOLLOWERS = GET_USER_FOLLOWERS;
 /**
@@ -103,18 +98,14 @@ exports.GET_USER_FOLLOWERS = GET_USER_FOLLOWERS;
  */
 async function GET_USER_FOLLOWING(call) {
     const r = call.request, id = r.hasId() ? r.getId().getValue() : null, page = r.hasPage() ? r.getPage().getValue() : 1, limit = r.getLimit() ? r.getLimit().getValue() : 5;
-    Validator.ValidateFilters(id, page, limit);
+    Validator.ValidateId(id);
+    Validator.ValidateFilters(page, limit);
     const u = await user_schema_1.default.findById(id);
-    Validator.ValidateUser(u);
-    const UserArray = await user_schema_1.default.aggregate([
-        { $match: { _id: id } },
-        { $lookup: { from: 'users', localField: 'following', foreignField: '_id', as: 'following' } },
-        { $unwind: '$following' },
-        { $skip: (page - 1) * limit },
-        { $limit: limit },
-    ]).exec();
-    UserArray.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u)));
-    call.end();
+    if (!u) {
+        (0, validator_1.Thrower)(`Ivalid user._id : ${id}`);
+    }
+    await user_schema_1.default.find({ _id: { $in: u.following } })
+        .then(arr => arr.forEach(u => call.write((0, grpc_tools_1.convertUserModel)(u))));
 }
 exports.GET_USER_FOLLOWING = GET_USER_FOLLOWING;
 /**
@@ -125,6 +116,15 @@ exports.GET_USER_FOLLOWING = GET_USER_FOLLOWING;
  */
 async function FOLLOW_USER(call, callback) {
     const r = call.request, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null, userId = r.hasId() ? r.getId().getValue() : null, currentUserB_Id = Validator.CovertToObjectId(currentUserId), userB_Id = Validator.CovertToObjectId(userId);
+    if (userId === currentUserId) {
+        (0, validator_1.Thrower)('Users _id\'s are equal');
+    }
+    if (await user_schema_1.default.exists({
+        _id: currentUserB_Id,
+        following: { $in: [userB_Id] }
+    })) {
+        (0, validator_1.Thrower)('Users is already follower');
+    }
     await user_schema_1.default.collection.bulkWrite([
         {
             updateOne: {
@@ -138,15 +138,8 @@ async function FOLLOW_USER(call, callback) {
                 update: { $addToSet: { followers: currentUserB_Id } },
             },
         },
-    ]).then((result) => {
-        if (result && result.ok) {
-            console.log('Bulk write operation successful');
-            callback(null, new empty_pb_1.Empty());
-        }
-        else {
-            throw new Error('Failed to update users');
-        }
-    });
+    ]).then(r => (r && r.ok) ? callback(null, new empty_pb_1.Empty())
+        : (0, validator_1.Thrower)('Failed to update users'));
 }
 exports.FOLLOW_USER = FOLLOW_USER;
 /**
@@ -157,6 +150,15 @@ exports.FOLLOW_USER = FOLLOW_USER;
  */
 async function UNFOLLOW_USER(call, callback) {
     const r = call.request, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null, userId = r.hasId() ? r.getId().getValue() : null, currentUserB_Id = Validator.CovertToObjectId(currentUserId), userB_Id = Validator.CovertToObjectId(userId);
+    if (userId === currentUserId) {
+        (0, validator_1.Thrower)('Users _id\'s are equal');
+    }
+    if (!await user_schema_1.default.exists({
+        _id: currentUserB_Id,
+        following: { $in: [userB_Id] }
+    })) {
+        (0, validator_1.Thrower)('Users is not follower');
+    }
     await user_schema_1.default.bulkWrite([
         {
             updateOne: {
@@ -170,14 +172,7 @@ async function UNFOLLOW_USER(call, callback) {
                 update: { $pull: { followers: currentUserB_Id } },
             },
         },
-    ]).then((result) => {
-        if (result && result.ok) {
-            console.log('Bulk write operation successful');
-            callback(null, new empty_pb_1.Empty());
-        }
-        else {
-            throw new Error('Failed to update users');
-        }
-    });
+    ]).then(r => (r && r.ok) ? callback(null, new empty_pb_1.Empty())
+        : (0, validator_1.Thrower)('Failed to update users'));
 }
 exports.UNFOLLOW_USER = UNFOLLOW_USER;

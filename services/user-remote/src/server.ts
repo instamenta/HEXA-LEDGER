@@ -2,6 +2,12 @@ import * as GRPC from '@grpc/grpc-js';
 import connectDatabase from './mongodb';
 import {connectProducer, disconnectProducer} from './producer';
 import {
+	grpc_disconnect_log,
+	grpc_start_log,
+	kafka_disconnect_log,
+	process_disconnect_log
+} from './utilities/logger';
+import {
 	getUserById,
 	login, register,
 	getUsers, getAllUsers,
@@ -24,16 +30,11 @@ const {UserServiceService} = require('./generated/users_grpc_pb');
 		GRPC.ServerCredentials.createInsecure(),
 		async (error, port) => {
 			if (error) {
-				console.log(`================================================================
-				GRPC Server ran into Error, Port: ${port}
-				================================================================`, error);
+				grpc_disconnect_log(port, error);
 				process.exit(1);
 			}
 			Server.start();
-			console.log(`
-				================================================================
-				GRPC Server is running on port: ${port}
-				================================================================`);
+			grpc_start_log(port);
 			await connectDatabase();
 			await connectProducer();
 		});
@@ -42,10 +43,7 @@ const {UserServiceService} = require('./generated/users_grpc_pb');
 ['unhandledRejection', 'uncaughtException'].forEach(type => {
 	process.on(type, async (error: Error) => {
 		try {
-			console.log(`================================================================
-				Process.on ${type}: ${error.message}
-				================================================================`
-			, error);
+			process_disconnect_log(type, error);
 			await disconnectProducer();
 		} catch {
 			console.log('Exit...');
@@ -57,15 +55,11 @@ const {UserServiceService} = require('./generated/users_grpc_pb');
 ['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
 	process.once(type, async (error: Error) => {
 		try {
-			console.log(`================================================================
-				Process.on ${type}: ${error.message}
-				================================================================`, error);
+			process_disconnect_log(type, error);
 			process.exit(0);
 		} finally {
 			await disconnectProducer();
-			console.log(`================================================================
-				Kafka Producer disconnected: ${error.message}
-				================================================================`);
+			kafka_disconnect_log(error);
 			process.kill(process.pid, type);
 		}
 	});

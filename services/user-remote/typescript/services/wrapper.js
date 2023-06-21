@@ -56,6 +56,7 @@ async function getUsers(call) {
         await (0, logger_1.log)('debug', 'CALLING GET_USERS...');
         await (0, user_service_1.GET_USERS)(call);
         await (0, logger_1.log)('info', 'FINISHED GET_USERS');
+        call.end();
     }
     catch (error) {
         await (0, logger_1.log)('error', error);
@@ -75,6 +76,7 @@ async function getAllUsers(call) {
         await (0, logger_1.log)('debug', 'CALLING GET_ALL_USERS...');
         await (0, user_service_1.GET_ALL_USERS)(call);
         await (0, logger_1.log)('info', 'FINISHED GET_ALL_USERS');
+        call.end();
     }
     catch (error) {
         await (0, logger_1.log)('error', error);
@@ -114,6 +116,7 @@ async function getUserFollowers(call) {
         await (0, logger_1.log)('debug', 'CALLING GET_USER_FOLLOWERS...');
         await (0, user_service_1.GET_USER_FOLLOWERS)(call);
         await (0, logger_1.log)('info', 'FINISHED GET_USER_FOLLOWERS');
+        call.end();
     }
     catch (error) {
         await (0, logger_1.log)('error', error);
@@ -133,6 +136,7 @@ async function getUserFollowing(call) {
         await (0, logger_1.log)('debug', 'CALLING GET_USER_FOLLOWING...');
         await (0, user_service_1.GET_USER_FOLLOWING)(call);
         await (0, logger_1.log)('info', 'FINISHED GET_USER_FOLLOWING');
+        call.end();
     }
     catch (error) {
         await (0, logger_1.log)('error', error);

@@ -1,20 +1,25 @@
-import { Kafka, Producer as KafkaProducer } from 'kafkajs';
+import {Kafka, Producer as KafkaProducer, CompressionTypes, CompressionCodecs} from 'kafkajs';
+import {kafka_error_log, kafka_start_log} from './utilities/logger';
 
-const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0';
-const BROKER_PORT: string = process.env.BROKER_PORT || '9092';
+const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0'
+	, BROKER_PORT: string = process.env.BROKER_PORT || '9092'
+	, SnappyCodec = require('kafkajs-snappy')
+	, Redpanda: Kafka = new Kafka({brokers: ['redpanda-0:9092']})
+	, Producer: KafkaProducer = Redpanda.producer()
+;
+CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
 
-const Redpanda: Kafka = new Kafka({ brokers: ['redpanda-0:9092'] });
-const Producer: KafkaProducer = Redpanda.producer();
+export {connectProducer, disconnectProducer, sendLogMessage};
 
 /**
- * @returns
+ * Connects kafka producer
  */
 async function connectProducer(): Promise<void> {
 	try {
 		await Producer.connect();
-		console.log(`Producer connected: ${BROKER_URL}:${BROKER_PORT}`);
+		kafka_start_log(BROKER_URL, BROKER_PORT);
 	} catch (error) {
-		console.error('Error:', error);
+		kafka_error_log(BROKER_URL, BROKER_PORT, error);
 	}
 }
 
@@ -23,14 +28,14 @@ async function connectProducer(): Promise<void> {
  * @param event
  * @returns
  */
-async function sendMessage(message: object, event = 'default'): Promise<void> {
+async function sendLogMessage(message: object | string, event = 'UNDEFINED'): Promise<void> {
 	await Producer.send({
-		topic: 'user_events_topic',
-		// compression: CompressionTypes.GZIP,
+		topic: 'logger_topic',
+		compression: CompressionTypes.Snappy,
 		messages: [
 			{
-				headers: { event: event },
-				value: JSON.stringify({ message }),
+				headers: {event: event},
+				value: JSON.stringify({message}),
 			},
 		],
 	});
@@ -42,7 +47,6 @@ async function sendMessage(message: object, event = 'default'): Promise<void> {
 async function disconnectProducer(): Promise<void> {
 	await Producer.disconnect()
 		.then(() => console.log('Disconnected producer'))
-		.catch((error: Error) => console.error('Error:', error));
+		.catch((error: Error) => console.error('Kafka Producer Error:', error));
 }
 
-export { connectProducer, disconnectProducer, sendMessage };

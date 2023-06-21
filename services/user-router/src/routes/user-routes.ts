@@ -43,9 +43,9 @@ USER_ROUTER.route('/:id/following')
 	.get(getUserFollowing);
 
 USER_ROUTER.route('/:id/follow')
-	.post(isAuthenticated as any, followUser as any);
+	.put(isAuthenticated as any, followUser as any);
 
 USER_ROUTER.route('/:id/unfollow')
-	.post(isAuthenticated as any, unfollowUser as any);
+	.put(isAuthenticated as any, unfollowUser as any);
 
 export default USER_ROUTER;

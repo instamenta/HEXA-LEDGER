@@ -9,25 +9,23 @@ export {
 	VALIDATE_ID as ValidateId,
 	CONVERT_TO_OBJECT_ID as CovertToObjectId,
 	VALIDATE_PASSWORD as ValidatePassword,
-	VALIDATE_REGISTER as ValidateRegister
+	VALIDATE_REGISTER as ValidateRegister,
+	THROWER as Thrower,
 };
 
 /**
- * @param id
  * @param page
  * @param limit
  * @throws
  */
 function VALIDATE_FILTERS(
-	id: ObjectId | string | null,
 	page: number | null,
 	limit: number | null
 ): Error | void {
-	if (!id || !Types.ObjectId.isValid(id)
-        || !page || page > 0 || Number.isNaN(page)
-        || !limit || limit > 0 || Number.isNaN(limit)
+	if (!page || page < 0 || Number.isNaN(page)
+        || !limit || limit <= 0 || Number.isNaN(limit)
 	) {
-		throw new Error('Invalid User id');
+		throw new Error(`Invalid filters - page : ${page} ${typeof page}, limit : ${limit} ${typeof limit}`);
 	}
 }
 
@@ -37,8 +35,8 @@ function VALIDATE_FILTERS(
  */
 function VALIDATE_USER(
 	u: IUser | null | undefined | any
-): Error | void {
-	if (!u) {
+): void {
+	if (!u == null) {
 		throw new Error('User not found');
 	}
 }
@@ -49,7 +47,7 @@ function VALIDATE_USER(
  */
 function VALIDATE_ID(
 	_id: ObjectId | string | null
-): Error | void {
+): void {
 	if (!_id || !Types.ObjectId.isValid(_id)) {
 		throw new Error(`Invalid _id : ${_id}`);
 	}
@@ -62,7 +60,7 @@ function VALIDATE_ID(
  */
 function CONVERT_TO_OBJECT_ID(
 	_id: ObjectId | string | null
-): Error | ObjectId {
+): ObjectId {
 	if (!_id || !Types.ObjectId.isValid(_id)) {
 		throw new Error('Invalid User id');
 	} else {
@@ -79,7 +77,7 @@ function CONVERT_TO_OBJECT_ID(
 async function VALIDATE_PASSWORD(
 	password: string | null,
 	u: IUser | any
-): Promise<void | null> {
+): Promise<void> {
 	if (!u || !password || !(await BCRYPT.compare(password, u.password))) {
 		throw new Error('Login Error');
 	}
@@ -113,4 +111,13 @@ async function VALIDATE_REGISTER(
 		.catch(error => {
 			throw new Error('Register error: ', error);
 		});
+}
+
+/**
+ * @param message
+ * @param error
+ * @throws
+ */
+function THROWER(message: string, error: Error | any = '!'): never {
+	throw new Error(message, error);
 }

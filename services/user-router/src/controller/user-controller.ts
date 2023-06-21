@@ -87,11 +87,7 @@ async function getUserFollowing(request: Request, response: Response): Promise<v
 async function followUser(request: iRequestWithUser, response: Response): Promise<void> {
 	try {
 		const { id } = request.params;
-		// const currentUser = request.userData;
-		const currentUser = {
-			_id: 'a'
-		};
-		currentUser._id = '64883331211d88a6a796cc85';
+		const currentUser = request.userData;
 		await USER_CLIENT.followUser(currentUser._id, id);
 		response.status(200).end();
 	} catch (error: Error | any) {
@@ -107,12 +103,7 @@ async function followUser(request: iRequestWithUser, response: Response): Promis
 async function unfollowUser(request: iRequestWithUser, response: Response): Promise<void> {
 	try {
 		const { id } = request.params;
-		// const currentUser = request.userData;
-		const currentUser = {
-			_id: 'a'
-		};
-		currentUser._id = '64883331211d88a6a796cc85';
-
+		const currentUser = request.userData;
 		await USER_CLIENT.unfollowUser(currentUser._id, id);
 		response.status(200).end();
 	} catch (error: Error | any) {

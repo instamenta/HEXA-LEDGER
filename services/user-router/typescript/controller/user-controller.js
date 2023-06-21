@@ -114,11 +114,7 @@ exports.getUserFollowing = getUserFollowing;
 async function followUser(request, response) {
     try {
         const { id } = request.params;
-        // const currentUser = request.userData;
-        const currentUser = {
-            _id: 'a'
-        };
-        currentUser._id = '64883331211d88a6a796cc85';
+        const currentUser = request.userData;
         await USER_CLIENT.followUser(currentUser._id, id);
         response.status(200).end();
     }
@@ -135,11 +131,7 @@ exports.followUser = followUser;
 async function unfollowUser(request, response) {
     try {
         const { id } = request.params;
-        // const currentUser = request.userData;
-        const currentUser = {
-            _id: 'a'
-        };
-        currentUser._id = '64883331211d88a6a796cc85';
+        const currentUser = request.userData;
         await USER_CLIENT.unfollowUser(currentUser._id, id);
         response.status(200).end();
     }

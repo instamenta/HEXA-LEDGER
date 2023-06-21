@@ -27,6 +27,7 @@
     "google-protobuf": "^3.21.2",
     "jsonwebtoken": "^9.0.0",
     "kafkajs": "^2.2.4",
+    "kafkajs-snappy": "^1.1.0",
     "mongoose": "^7.2.4"
   },
   "devDependencies": {

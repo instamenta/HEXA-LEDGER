@@ -8,7 +8,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function errorMiddleware(error, request, response) {
     console.error(error.stack);
     console.error('Non-existing Uri:', request.url);
-    response.status(500)
+    response
+        .status(500)
         .json({ error: 'Path not existing' })
         .send('Path not existing')
         .end();

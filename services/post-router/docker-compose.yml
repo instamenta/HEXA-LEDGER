@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: post-router
+    ports:
+      - '5095:5095'
+    env_file: .env
+    environment:
+      - ROUTER_PORT=5095
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda-network
+networks:
+  redpanda-network:
+    external:
+      name: redpanda-quickstart_redpanda_network

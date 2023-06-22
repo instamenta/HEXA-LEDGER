@@ -1,4 +1,4 @@
-import {decodeToken} from '../utilities/token-tools';
+import {decodeToken} from '../utility/token-tools';
 import {Request, Response, NextFunction} from 'express';
 
 export type ITokenData = {

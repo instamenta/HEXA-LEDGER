@@ -10,7 +10,7 @@ interface UserData {
 	token: string | null;
 }
 
-export default class UserClass {
+export default class UserGrpcModel {
 	_id: string | null;
 	username: string | null;
 	email: string | null;
@@ -28,8 +28,8 @@ export default class UserClass {
 		} = userData);
 	}
 
-	static fromUserGRPCMessage(m: UserModel): UserClass {
-		return new UserClass({
+	static fromUserGRPCMessage(m: UserModel): UserGrpcModel {
+		return new UserGrpcModel({
 			_id: m.hasId() ? m.getId()!.getValue() : null,
 			username: m.hasUsername() ? m.getUsername()!.getValue() : null,
 			email: m.hasEmail() ? m.getEmail()!.getValue() : null,

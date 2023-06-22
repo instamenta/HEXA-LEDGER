@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import {register, login} from '../controller/auth-controller';
 import {loginValidator, registerValidator} from '../validator/auth-validator';
-import {isGuest} from '../middlewares/auth-middleware';
+import {isGuest} from '../middleware/auth-middleware';
 
 const AUTH_ROUTER: Router = Router();
 

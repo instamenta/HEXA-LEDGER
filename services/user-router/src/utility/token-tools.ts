@@ -1,5 +1,5 @@
 import {verify} from 'jsonwebtoken';
-import {ITokenData} from '../middlewares/auth-middleware';
+import {ITokenData} from '../middleware/auth-middleware';
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 
 /**

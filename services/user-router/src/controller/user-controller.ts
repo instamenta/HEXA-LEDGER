@@ -1,21 +1,34 @@
-import { Request, Response } from 'express';
-import { iRequestWithUser } from '../middlewares/auth-middleware';
-import * as USER_CLIENT from '../client/user';
+import {Request, Response} from 'express';
+import {iRequestWithUser} from '../middleware/auth-middleware';
+import * as USER_CLIENT from '../client/user-client';
+
+export {
+    getUsers,
+    getAllUsers,
+    getUserById,
+
+    getUserFollowers,
+    getUserFollowing,
+    followUser,
+    unfollowUser,
+};
 
 /**
  * @param request
  * @param response
  */
 async function getUsers(request: Request, response: Response): Promise<void> {
-	try {
-		// let { page = 1 , limit = 5, filter } = request.query;
-		const users = await USER_CLIENT.getUsers(1, 5,);
-
-		response.json(users).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const r = request.query
+            , page: number = parseInt(<string>r.page) || 1
+            , limit: number = parseInt(<string>r.limit) || 10
+            , filter: string = <string>r.filter || ''
+            , userList = await USER_CLIENT.getUsers(page, limit, filter);
+        response.json(userList).status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
 
 /**
@@ -23,14 +36,16 @@ async function getUsers(request: Request, response: Response): Promise<void> {
  * @param response
  */
 async function getAllUsers(request: Request, response: Response): Promise<void> {
-	try {
-		// const { page, limit } = request.query;
-		const users = await USER_CLIENT.getAllUsers(1, 5);
-		response.json(users).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const r = request.query
+            , page: number = parseInt(<string>r.page) || 1
+            , limit: number = parseInt(<string>r.limit) || 10
+            , userList = await USER_CLIENT.getAllUsers(page, limit)
+        response.json(userList).status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
 
 /**
@@ -38,14 +53,14 @@ async function getAllUsers(request: Request, response: Response): Promise<void> 
  * @param response
  */
 async function getUserById(request: Request, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		const user = await USER_CLIENT.getUserById(id);
-		response.json(user).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const {id} = request.params;
+        const user = await USER_CLIENT.getUserById(id);
+        response.json(user).status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
 
 
@@ -54,15 +69,17 @@ async function getUserById(request: Request, response: Response): Promise<void> 
  * @param response
  */
 async function getUserFollowers(request: Request, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		// const { page, limit } = request.query;
-		const followers = await USER_CLIENT.getUserFollowers(id, 1, 5);
-		response.json(followers).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const r = request
+            , {id} = r.params
+            , page: number = parseInt(<string>r.query.page) || 1
+            , limit: number = parseInt(<string>r.query.limit) || 10
+            , followers = await USER_CLIENT.getUserFollowers(id, page, limit)
+        response.json(followers).status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
 
 /**
@@ -70,30 +87,34 @@ async function getUserFollowers(request: Request, response: Response): Promise<v
  * @param response
  */
 async function getUserFollowing(request: Request, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		// const { page, limit } = request.query;
-		const following = await USER_CLIENT.getUserFollowing(id, 1, 5);
-		response.json(following).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const r = request
+            , {id} = r.params
+            , page: number = parseInt(<string>r.query.page) || 1
+            , limit: number = parseInt(<string>r.query.limit) || 10
+            , following = await USER_CLIENT.getUserFollowing(id, page, limit)
+        response.json(following).status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
+
 /**
  * @param request
  * @param response
  */
 async function followUser(request: iRequestWithUser, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		const currentUser = request.userData;
-		await USER_CLIENT.followUser(currentUser._id, id);
-		response.status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const {id} = request.params
+            , currentUser = request.userData
+        ;
+        await USER_CLIENT.followUser(currentUser._id, id);
+        response.status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
 
 /**
@@ -101,16 +122,18 @@ async function followUser(request: iRequestWithUser, response: Response): Promis
  * @param response
  */
 async function unfollowUser(request: iRequestWithUser, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		const currentUser = request.userData;
-		await USER_CLIENT.unfollowUser(currentUser._id, id);
-		response.status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
+    try {
+        const {id} = request.params
+            , currentUser = request.userData
+        ;
+        await USER_CLIENT.unfollowUser(currentUser._id, id);
+        response.status(200).end();
+    } catch (error: Error | any) {
+        console.error(error);
+        response.json({message: error.message}).status(500).end();
+    }
 }
+
 // /**
 //  *
 //  * @param request
@@ -143,14 +166,3 @@ async function unfollowUser(request: iRequestWithUser, response: Response): Prom
 // 	}
 // }
 
-export {
-	getUsers,
-	getAllUsers,
-	getUserById,
-	// getUserPosts,
-	// getUserComments,
-	getUserFollowers,
-	getUserFollowing,
-	followUser,
-	unfollowUser,
-};

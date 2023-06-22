@@ -1,31 +1,31 @@
-import { Router } from 'express';
-import {isAuthenticated} from '../middlewares/auth-middleware';
-// import { isAuthenticated, notOwner, isOwner} from '../middlewares/auth-middleware';
+import {Router} from 'express';
+import {isAuthenticated, notOwner} from '../middleware/auth-middleware';
+import {pageLimit, pageLimitFilter} from "../validator/user-validator";
 import {
-	getAllUsers,
-	getUserById,
-	getUsers,
-	// updateUserById,
-	// deleteUserById,
-	// getUserPosts,
-	// createUserPost,
-	// getUserComments,
-	getUserFollowers,
-	getUserFollowing,
-	followUser,
-	unfollowUser,
+    getAllUsers,
+    getUserById,
+    getUsers,
+    // updateUserById,
+    // deleteUserById,
+    // getUserPosts,
+    // createUserPost,
+    // getUserComments,
+    getUserFollowers,
+    getUserFollowing,
+    followUser,
+    unfollowUser,
 } from '../controller/user-controller';
 
 const USER_ROUTER: Router = Router();
 
 USER_ROUTER.route('/')
-	.get(getAllUsers);
+    .get(pageLimit, getAllUsers);
 
 USER_ROUTER.route('/find')
-	.get(getUsers);
+    .get(pageLimitFilter,getUsers);
 
 USER_ROUTER.route('/:id')
-	.get(getUserById);
+    .get(getUserById);
 // .put(updateUserById)
 // .delete(deleteUserById);
 //
@@ -37,15 +37,15 @@ USER_ROUTER.route('/:id')
 // 	.get(getUserComments);
 
 USER_ROUTER.route('/:id/followers')
-	.get(getUserFollowers);
+    .get(pageLimit, getUserFollowers);
 
 USER_ROUTER.route('/:id/following')
-	.get(getUserFollowing);
+    .get(pageLimit, getUserFollowing);
 
 USER_ROUTER.route('/:id/follow')
-	.put(isAuthenticated as any, followUser as any);
+    .put(<any>isAuthenticated, <any>notOwner, <any>followUser);
 
 USER_ROUTER.route('/:id/unfollow')
-	.put(isAuthenticated as any, unfollowUser as any);
+    .put(<any>isAuthenticated, <any>notOwner, <any>unfollowUser);
 
 export default USER_ROUTER;

@@ -1,4 +1,4 @@
-import * as AUTH_CLIENT from '../client/auth';
+import * as AUTH_CLIENT from '../client/auth-client';
 import {Request, Response} from 'express';
 
 /**

@@ -2,7 +2,7 @@ import * as GRPC from '@grpc/grpc-js';
 import CLIENT from '../grpc-client';
 import {UserModel} from '../generated/types/users_pb';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
-import UserClass from '../models/userClass';
+import UserGrpcModel from '../model/user-grpc-model';
 
 const {LoginForm, RegisterForm} = require('../generated/users_pb');
 
@@ -11,7 +11,7 @@ const {LoginForm, RegisterForm} = require('../generated/users_pb');
  * @param password
  * @returns
  */
-function loginUser(email: string, password: string): Promise<UserClass> {
+function loginUser(email: string, password: string): Promise<UserGrpcModel> {
 	return new Promise((resolve, reject) => {
 		const m = new LoginForm();
 		m.setEmail(new StringValue().setValue(email));
@@ -19,7 +19,7 @@ function loginUser(email: string, password: string): Promise<UserClass> {
 
 		CLIENT.login(m, (err: GRPC.ServiceError, response: UserModel) => {
 			err ? reject(err.message)
-				: resolve(UserClass.fromUserGRPCMessage(response));
+				: resolve(UserGrpcModel.fromUserGRPCMessage(response));
 		});
 	});
 }
@@ -30,7 +30,7 @@ function loginUser(email: string, password: string): Promise<UserClass> {
  * @param password
  * @returns
  */
-function registerUser(username: string, email: string, password: string,): Promise<UserClass> {
+function registerUser(username: string, email: string, password: string,): Promise<UserGrpcModel> {
 	return new Promise((resolve, reject) => {
 		const m = new RegisterForm();
 		m.setUsername(new StringValue().setValue(username));
@@ -39,7 +39,7 @@ function registerUser(username: string, email: string, password: string,): Promi
 
 		CLIENT.register(m, (err: GRPC.ServiceError, response: UserModel) => {
 			err ? reject(err.message)
-				: resolve(UserClass.fromUserGRPCMessage(response));
+				: resolve(UserGrpcModel.fromUserGRPCMessage(response));
 		});
 	});
 }

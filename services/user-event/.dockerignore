@@ -1,0 +1,21 @@
+npm-debug.log
+.dockerignore
+.git
+.gitignore
+
+# Uncompiled Typescript files
+src/
+
+# Dependency directories
+node_modules/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+*.swp
+
+# Logs
+logs/
+*.log
+npm-debug.log*

@@ -4,6 +4,7 @@ const DEBUG_CONSOLE = process.env.DEBUG_CONSOLE || false;
 
 /**
  * Send Kafka messages & optionally console.logs
+ * ( on/off with env.DEBUG_CONSOLE
  * @param type
  * @param message
  */
@@ -47,6 +48,7 @@ export async function log(
 
 /**
  * Handles Console.logging in terminal
+ * if DEBUG_CONSOLE == true
  * @param message
  * @param type
  * @param status
@@ -65,7 +67,7 @@ function Console(
 	}
 	if (type.toLowerCase() === 'error') {
 		console.log(symbol.repeat(length));
-		console.error(`${type} :`, message);
+		console.error(`❌ ${type} :`, message);
 		console.log(symbol.repeat(length));
 		return;
 	}
@@ -84,7 +86,7 @@ function Console(
 }
 
 /**
- *
+ * Console.logger
  */
 export function mongo_start_log() {
 	console.log(
@@ -93,7 +95,7 @@ export function mongo_start_log() {
 }
 
 /**
- *
+ * Console.logger
  * @param MONGODB_URI
  * @param error
  */
@@ -108,7 +110,7 @@ ERROR MESSAGE: ${error.message}
 }
 
 /**
- *
+ * Console.logger
  * @param BROKER_URL
  * @param BROKER_PORT
  */
@@ -118,19 +120,19 @@ export function kafka_start_log(BROKER_URL: string, BROKER_PORT: string | number
 }
 
 /**
- *
+ * Console.logger
  * @param error
  */
 export function kafka_disconnect_log(error: Error) {
 	console.error(
 		`================================================================
 ❌ Kafka Producer disconnected: ${error.message} ❌
-================================================================`,
-		error);
+================================================================
+`, error);
 }
 
 /**
- *
+ * Console.logger
  * @param BROKER_URL
  * @param BROKER_PORT
  * @param error
@@ -144,20 +146,20 @@ export function kafka_error_log(BROKER_URL: string, BROKER_PORT: string | number
 }
 
 /**
- *
+ * Console.logger
  * @param type
  * @param error
  */
 export function process_disconnect_log(type: string, error: Error) {
 	console.error(`================================================================
 ❌ Process.on ${type}: ${error.message} ❌
-================================================================`
-	, error);
+================================================================
+`, error);
 }
 
 
 /**
- *
+ * Console.logger
  * @param port
  */
 export function grpc_start_log(port: string | number) {
@@ -168,12 +170,13 @@ export function grpc_start_log(port: string | number) {
 }
 
 /**
- *
+ * Console.logger
  * @param port
  * @param error
  */
 export function grpc_disconnect_log(port: string | number, error: Error) {
 	console.log(`================================================================
 ❌ GRPC Server ran into Error, Port: ${port} ❌
-================================================================`, error);
+================================================================
+`, error);
 }

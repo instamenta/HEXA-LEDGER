@@ -1,0 +1,86 @@
+env:
+  browser: true
+  commonjs: true
+  es2022: true
+  node: true
+  jest: true
+extends:
+  - eslint:recommended
+  - "plugin:@typescript-eslint/recommended"
+  - plugin:import/errors
+  - plugin:import/warnings
+  - plugin:import/typescript
+  - plugin:jest/recommended
+  - plugin:jsdoc/recommended-typescript
+  - plugin:lodash/recommended
+  - plugin:node/recommended
+  - plugin:promise/recommended
+  - plugin:security/recommended
+  - plugin:sonarjs/recommended
+  - plugin:unicorn/recommended
+overrides:
+  - files: [ '*.test.ts' ]
+    extends:
+      - "plugin:jest/recommended"
+parser: "@typescript-eslint/parser"
+parserOptions:
+  ecmaVersion: 2022
+  sourceType: module
+  project: ./tsconfig.json
+  tsconfigRootDir: ./
+rules:
+  indent: [ "error", "tab" ]
+  linebreak-style: [ "error", "windows" ]
+  quotes: [ "error", "single" ]
+  semi: [ "error", "always" ]
+  jsdoc/require-param-description: off
+  jsdoc/require-returns-description: off
+  jsdoc/require-property-description: off
+  no-unused-vars: off
+  no-process-exit: off
+  node/no-unsupported-features/node-builtins: off
+  node/no-unsupported-features/es-syntax: off
+  unicorn/prevent-abbreviation: off
+  unicorn/no-empty-file: off
+  unicorn/prefer-top-level-await: off
+  unicorn/prevent-abbreviations: off
+  unicorn/no-null: off
+  unicorn/no-process-exit: off
+  unicorn/filename-case: off
+  unicorn/no-array-for-each: off
+  lodash/prefer-lodash-method: off
+  unicorn/prefer-module: off
+  node/no-missing-import: off
+  import/no-unresolved: off
+  "@typescript-eslint/no-var-requires": off
+  "@typescript-eslint/no-explicit-any": off
+  "@typescript-eslint/no-non-null-assertion": off
+  promise/always-return: off
+  lodash/prefer-lodash-typecheck: off
+  no-prototype-builtins: off
+  sonarjs/no-duplicate-string: off
+  promise/no-callback-in-promise: off
+  no-unexpected-multiline: off
+  "@typescript-eslint/ban-ts-comment": off
+  sonarjs/cognitive-complexity: off
+  sonarjs/no-identical-functions: off
+  "@typescript-eslint/no-unused-vars": off
+  node/no-unpublished-import: off
+plugins:
+  - "@typescript-eslint"
+  - import
+  - jest
+  - jsdoc
+  - lodash
+  - node
+  - promise
+  - security
+  - sonarjs
+  - unicorn
+
+ignorePatterns: [
+  "generated/"
+]
+settings:
+  jest:
+    version: 27.2.1

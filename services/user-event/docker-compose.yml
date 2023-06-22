@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: user-event
+    ports:
+      - '4747:4747'
+    env_file: .env
+    environment:
+      - PORT=4747
+    volumes:
+     - ./:/var/data
+    networks:
+      - redpanda-network
+networks:
+  redpanda-network:
+    external:
+      name: redpanda-quickstart_redpanda_network

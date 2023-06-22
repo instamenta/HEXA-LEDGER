@@ -2,28 +2,28 @@ import {sendUnaryData, ServerUnaryCall, ServerWritableStream} from '@grpc/grpc-j
 import {log} from '../utilities/logger';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {
-	GetUserByIdRequest,
-	UserModel as IUserModel,
-	LoginForm as ILoginForm,
-	RegisterForm as IRegisterForm,
-	GetAllUsersRequest, GetUsersRequest,
-	FollowUserRequest, UnfollowUserRequest,
-	GetUserFollowersRequest, GetUserFollowingRequest,
+    GetUserByIdRequest,
+    UserModel as IUserModel,
+    LoginForm as ILoginForm,
+    RegisterForm as IRegisterForm,
+    GetAllUsersRequest, GetUsersRequest,
+    FollowUserRequest, UnfollowUserRequest,
+    GetUserFollowersRequest, GetUserFollowingRequest,
 } from '../generated/types/users_pb';
 import {LOGIN, REGISTER} from './auth-service';
 import {
-	GET_USER_BY_ID,
-	GET_USERS, GET_ALL_USERS,
-	FOLLOW_USER, UNFOLLOW_USER,
-	GET_USER_FOLLOWERS, GET_USER_FOLLOWING,
+    GET_USER_BY_ID,
+    GET_USERS, GET_ALL_USERS,
+    FOLLOW_USER, UNFOLLOW_USER,
+    GET_USER_FOLLOWERS, GET_USER_FOLLOWING,
 } from './user-service';
 
 export {
-	getUserById,
-	login, register,
-	getUsers, getAllUsers,
-	followUser, unfollowUser,
-	getUserFollowers, getUserFollowing,
+    getUserById,
+    login, register,
+    getUsers, getAllUsers,
+    followUser, unfollowUser,
+    getUserFollowers, getUserFollowing,
 };
 
 /**
@@ -35,17 +35,17 @@ export {
  * @async
  */
 async function login(
-	call: ServerUnaryCall<ILoginForm, IUserModel>,
-	callback: sendUnaryData<IUserModel>
+    call: ServerUnaryCall<ILoginForm, IUserModel>,
+    callback: sendUnaryData<IUserModel>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING LOGIN...');
-		await LOGIN(call, callback);
-		await log('info', 'FINISHED LOGIN');
-	} catch (error: Error | any) {
-		await log('error', error);
-		callback(error);
-	}
+    try {
+        await log('debug', 'CALLING LOGIN...');
+        await LOGIN(call, callback);
+        await log('info', '☕ FINISHED LOGIN');
+    } catch (error: Error | any) {
+        await log('error', error);
+        callback(error);
+    }
 }
 
 /**
@@ -57,17 +57,17 @@ async function login(
  * @async
  */
 async function register(
-	call: ServerUnaryCall<IRegisterForm, IUserModel>,
-	callback: sendUnaryData<IUserModel>
+    call: ServerUnaryCall<IRegisterForm, IUserModel>,
+    callback: sendUnaryData<IUserModel>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING REGISTER...');
-		await REGISTER(call, callback);
-		await log('info', 'FINISHED REGISTER');
-	} catch (error: Error | any) {
-		await log('error', error);
-		callback(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING REGISTER...');
+        await REGISTER(call, callback);
+        await log('info', '☕ FINISHED REGISTER');
+    } catch (error: Error | any) {
+        await log('error', error);
+        callback(error);
+    }
 }
 
 /**
@@ -78,17 +78,17 @@ async function register(
  * @async
  */
 async function getUsers(
-	call: ServerWritableStream<GetUsersRequest, IUserModel>,
+    call: ServerWritableStream<GetUsersRequest, IUserModel>,
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING GET_USERS...');
-		await GET_USERS(call);
-		await log('info', 'FINISHED GET_USERS');
-		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
-		call.emit(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING GET_USERS...');
+        await GET_USERS(call);
+        await log('info', '☕ FINISHED GET_USERS');
+        call.end();
+    } catch (error: Error | any) {
+        await log('error', error);
+        call.emit(error);
+    }
 }
 
 /**
@@ -99,17 +99,17 @@ async function getUsers(
  * @async
  */
 async function getAllUsers(
-	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
+    call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING GET_ALL_USERS...');
-		await GET_ALL_USERS(call);
-		await log('info', 'FINISHED GET_ALL_USERS');
-		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
-		call.emit(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING GET_ALL_USERS...');
+        await GET_ALL_USERS(call);
+        await log('info', '☕ FINISHED GET_ALL_USERS');
+        call.end();
+    } catch (error: Error | any) {
+        await log('error', error);
+        call.emit(error);
+    }
 }
 
 /**
@@ -121,17 +121,17 @@ async function getAllUsers(
  * @async
  */
 async function getUserById(
-	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
-	callback: sendUnaryData<IUserModel>
+    call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
+    callback: sendUnaryData<IUserModel>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING GET_USER_BY_ID...');
-		await GET_USER_BY_ID(call, callback);
-		await log('info', 'FINISHED GET_USER_BY_ID');
-	} catch (error: Error | any) {
-		await log('error', error);
-		callback(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING GET_USER_BY_ID...');
+        await GET_USER_BY_ID(call, callback);
+        await log('info', '☕ FINISHED GET_USER_BY_ID');
+    } catch (error: Error | any) {
+        await log('error', error);
+        callback(error);
+    }
 }
 
 
@@ -143,17 +143,17 @@ async function getUserById(
  * @async
  */
 async function getUserFollowers(
-	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
+    call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING GET_USER_FOLLOWERS...');
-		await GET_USER_FOLLOWERS(call);
-		await log('info', 'FINISHED GET_USER_FOLLOWERS');
-		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
-		call.emit(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING GET_USER_FOLLOWERS...');
+        await GET_USER_FOLLOWERS(call);
+        await log('info', '☕ FINISHED GET_USER_FOLLOWERS');
+        call.end();
+    } catch (error: Error | any) {
+        await log('error', error);
+        call.emit(error);
+    }
 }
 
 /**
@@ -164,17 +164,17 @@ async function getUserFollowers(
  * @async
  */
 async function getUserFollowing(
-	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
+    call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING GET_USER_FOLLOWING...');
-		await GET_USER_FOLLOWING(call);
-		await log('info', 'FINISHED GET_USER_FOLLOWING');
-		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
-		call.emit(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING GET_USER_FOLLOWING...');
+        await GET_USER_FOLLOWING(call);
+        await log('info', '☕ FINISHED GET_USER_FOLLOWING');
+        call.end();
+    } catch (error: Error | any) {
+        await log('error', error);
+        call.emit(error);
+    }
 }
 
 /**
@@ -185,17 +185,17 @@ async function getUserFollowing(
  * @async
  */
 async function followUser(
-	call: ServerUnaryCall<FollowUserRequest, Empty>,
-	callback: sendUnaryData<Empty>
+    call: ServerUnaryCall<FollowUserRequest, Empty>,
+    callback: sendUnaryData<Empty>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING FOLLOW_USER...');
-		await FOLLOW_USER(call, callback);
-		await log('info', 'FINISHED FOLLOW_USER');
-	} catch (error: Error | any) {
-		await log('error', error);
-		callback(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING FOLLOW_USER...');
+        await FOLLOW_USER(call, callback);
+        await log('info', '☕ FINISHED FOLLOW_USER');
+    } catch (error: Error | any) {
+        await log('error', error);
+        callback(error);
+    }
 }
 
 /**
@@ -206,15 +206,15 @@ async function followUser(
  * @async
  */
 async function unfollowUser(
-	call: ServerUnaryCall<UnfollowUserRequest, Empty>,
-	callback: sendUnaryData<Empty>
+    call: ServerUnaryCall<UnfollowUserRequest, Empty>,
+    callback: sendUnaryData<Empty>
 ): Promise<void> {
-	try {
-		await log('debug', 'CALLING UNFOLLOW_USER...');
-		await UNFOLLOW_USER(call, callback);
-		await log('info', 'FINISHED UNFOLLOW_USER');
-	} catch (error: Error | any) {
-		await log('error', error);
-		callback(error);
-	}
+    try {
+        await log('debug', '⌛ CALLING UNFOLLOW_USER...');
+        await UNFOLLOW_USER(call, callback);
+        await log('info', '☕ FINISHED UNFOLLOW_USER');
+    } catch (error: Error | any) {
+        await log('error', error);
+        callback(error);
+    }
 }

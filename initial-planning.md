@@ -96,4 +96,12 @@
 # Notes
 ```
 enable.idempotence property must be set to true in your producer configuration
+
+pay to promote
+
+caching
+
+global chat
+
+
 ```

@@ -8,8 +8,9 @@ const cors_1 = __importDefault(require("cors"));
 const auth_routes_1 = __importDefault(require("./routes/auth-routes"));
 const user_routes_1 = __importDefault(require("./routes/user-routes"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
-const error_middleware_1 = __importDefault(require("./middlewares/error-middleware"));
-const API_PORT = process.env.ROUTER_PORT || '5065';
+const error_middleware_1 = __importDefault(require("./middleware/error-middleware"));
+const API_PORT = process.env.ROUTER_PORT || '5085';
+const SERVICE_NAME = process.env.SERVICE_NAME || 'User-Router-Service';
 const API = (0, express_1.default)();
 API.use((0, cors_1.default)());
 API.use((0, cookie_parser_1.default)());
@@ -19,7 +20,7 @@ API.use('/user', user_routes_1.default);
 API.use(error_middleware_1.default);
 (async function initializeService() {
     await API.listen(Number(API_PORT), () => {
-        console.log(`Server is running on port: ${API_PORT}`);
+        console.log(`${SERVICE_NAME}  is running on port: ${API_PORT}`);
     });
     API.on('error', (error) => {
         console.log('API ran into Error:', error);
@@ -28,7 +29,7 @@ API.use(error_middleware_1.default);
 ['unhandledRejection', 'uncaughtException'].forEach(type => {
     process.on(type, (error) => {
         try {
-            console.error(`process.on ${type}`);
+            console.error(`${SERVICE_NAME} - process.on ${type}`);
             console.error(error);
         }
         catch {
@@ -39,7 +40,7 @@ API.use(error_middleware_1.default);
 ['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
     process.once(type, (error) => {
         try {
-            console.error(`process.on ${type}`, error);
+            console.error(`${SERVICE_NAME} - process.on ${type}`, error);
             process.exit(0);
         }
         finally {

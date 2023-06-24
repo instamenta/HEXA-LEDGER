@@ -6,16 +6,18 @@ import {
 	grpc_start_log,
 	kafka_disconnect_log,
 	process_disconnect_log
-} from './utilities/logger';
+} from './utility/logger';
 import {
 	getUserById,
 	login, register,
 	getUsers, getAllUsers,
 	followUser, unfollowUser,
 	getUserFollowers, getUserFollowing,
-} from './services/wrapper';
+} from './service/wrapper';
 
-const {UserServiceService} = require('./generated/users_grpc_pb');
+const {UserServiceService} = require('./protos/generated/users_grpc_pb')
+	, GRPC_PORT = process.env.GRPC_PORT || 50_051
+;
 
 (async function StartService() {
 	const Server = new GRPC.Server();
@@ -26,7 +28,7 @@ const {UserServiceService} = require('./generated/users_grpc_pb');
 		followUser, unfollowUser,
 		getUserFollowers, getUserFollowing,
 	});
-	Server.bindAsync('0.0.0.0:50051',
+	Server.bindAsync(`0.0.0.0:${GRPC_PORT}`,
 		GRPC.ServerCredentials.createInsecure(),
 		async (error, port) => {
 			if (error) {

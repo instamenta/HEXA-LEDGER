@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register = exports.login = void 0;
-const AUTH_CLIENT = __importStar(require("../client/auth"));
+const AUTH_CLIENT = __importStar(require("../client/auth-client"));
 /**
  * @param request
  * @param response

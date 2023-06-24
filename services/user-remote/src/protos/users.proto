@@ -45,7 +45,6 @@ message GetUsersRequest {
   google.protobuf.StringValue filter = 3;
   google.protobuf.StringValue match = 4;
   repeated google.protobuf.StringValue _ids = 5;
-
 }
 
 message GetUserByIdRequest {
@@ -94,22 +93,9 @@ service UserService {
   rpc GetAllUsers(GetAllUsersRequest) returns (stream UserModel);
   rpc GetUserFollowers(GetUserFollowersRequest) returns (stream UserModel);
   rpc GetUserFollowing(GetUserFollowingRequest) returns (stream UserModel);
-  //  rpc GetUserPosts(GetUserPostsRequest) returns (stream GetUserPostsResponse);
   //  rpc GetUserComments(GetUserCommentsRequest) returns (stream GetUserCommentsResponse);
 }
 
-//
-//message GetUserPostsRequest {
-//  google.protobuf.StringValue id = 1;
-//}
-
-//message GetUserPostsResponse {
-//  repeated PostModel posts = 1;
-//}
-
-//message GetUserCommentsRequest {
-//  google.protobuf.StringValue id = 1;
-//}
 
 //message GetUserCommentsResponse {
 //  repeated CommentModel comments = 1;

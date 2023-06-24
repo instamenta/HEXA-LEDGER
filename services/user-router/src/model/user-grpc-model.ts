@@ -1,5 +1,5 @@
 'use strict';
-import {UserModel} from '../generated/types/users_pb';
+import {UserModel} from '../protos/generated/types/users_pb';
 
 interface UserData {
 	_id: string | null;

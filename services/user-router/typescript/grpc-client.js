@@ -24,6 +24,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const GRPC = __importStar(require("@grpc/grpc-js"));
-const users_grpc_pb_1 = require("./generated/users_grpc_pb");
+const users_grpc_pb_1 = require("./protos/generated/users_grpc_pb");
 const CLIENT = new users_grpc_pb_1.UserServiceClient('user-remote:50051', GRPC.credentials.createInsecure());
 exports.default = CLIENT;

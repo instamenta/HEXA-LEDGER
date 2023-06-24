@@ -1,6 +1,6 @@
 import * as GRPC from '@grpc/grpc-js';
 import CLIENT from '../grpc-client';
-import {UserModel,} from '../generated/types/users_pb';
+import {UserModel,} from '../protos/generated/types/users_pb';
 import {StringValue, Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import UserGrpcModel from '../model/user-grpc-model';
 
@@ -12,7 +12,7 @@ const {
 	GetUserFollowingRequest,
 	FollowUserRequest,
 	UnfollowUserRequest
-} = require('../generated/users_pb');
+} = require('../protos/generated/users_pb');
 
 
 /**

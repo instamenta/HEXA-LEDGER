@@ -29,9 +29,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const mongodb_1 = __importDefault(require("./mongodb"));
 const producer_1 = require("./producer");
-const logger_1 = require("./utilities/logger");
-const wrapper_1 = require("./services/wrapper");
-const { UserServiceService } = require('./generated/users_grpc_pb');
+const logger_1 = require("./utility/logger");
+const wrapper_1 = require("./service/wrapper");
+const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC_PORT = process.env.GRPC_PORT || 50051;
 (async function StartService() {
     const Server = new GRPC.Server();
     Server.addService(UserServiceService, {
@@ -41,7 +41,7 @@ const { UserServiceService } = require('./generated/users_grpc_pb');
         followUser: wrapper_1.followUser, unfollowUser: wrapper_1.unfollowUser,
         getUserFollowers: wrapper_1.getUserFollowers, getUserFollowing: wrapper_1.getUserFollowing,
     });
-    Server.bindAsync('0.0.0.0:50051', GRPC.ServerCredentials.createInsecure(), async (error, port) => {
+    Server.bindAsync(`0.0.0.0:${GRPC_PORT}`, GRPC.ServerCredentials.createInsecure(), async (error, port) => {
         if (error) {
             (0, logger_1.grpc_disconnect_log)(port, error);
             process.exit(1);

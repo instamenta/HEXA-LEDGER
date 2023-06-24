@@ -1,10 +1,10 @@
 import * as GRPC from '@grpc/grpc-js';
 import CLIENT from '../grpc-client';
-import {UserModel} from '../generated/types/users_pb';
+import {UserModel} from '../protos/generated/types/users_pb';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import UserGrpcModel from '../model/user-grpc-model';
 
-const {LoginForm, RegisterForm} = require('../generated/users_pb');
+const {LoginForm, RegisterForm} = require('../protos/generated/users_pb');
 
 /**
  * @param email

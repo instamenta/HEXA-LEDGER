@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendLogMessage = exports.disconnectProducer = exports.connectProducer = void 0;
 const kafkajs_1 = require("kafkajs");
-const logger_1 = require("./utilities/logger");
-const BROKER_URL = process.env.BROKER_URL || 'redpanda-0', BROKER_PORT = process.env.BROKER_PORT || '9092', Redpanda = new kafkajs_1.Kafka({ brokers: ['redpanda-0:9092'] }), Producer = Redpanda.producer();
+const logger_1 = require("./utility/logger");
+const BROKER_URL = process.env.BROKER_URL || 'redpanda-0', BROKER_PORT = process.env.BROKER_PORT || '9092', SnappyCodec = require('kafkajs-snappy'), Redpanda = new kafkajs_1.Kafka({ brokers: ['redpanda-0:9092'] }), Producer = Redpanda.producer();
+kafkajs_1.CompressionCodecs[kafkajs_1.CompressionTypes.Snappy] = SnappyCodec;
 /**
  * Connects kafka producer
  */
@@ -25,7 +26,7 @@ exports.connectProducer = connectProducer;
 async function sendLogMessage(message, event = 'UNDEFINED') {
     await Producer.send({
         topic: 'logger_topic',
-        // compression: CompressionTypes.GZIP,
+        compression: kafkajs_1.CompressionTypes.Snappy,
         messages: [
             {
                 headers: { event: event },

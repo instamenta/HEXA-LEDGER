@@ -8,7 +8,6 @@ import {
 	// updateUserById,
 	// deleteUserById,
 	// getUserPosts,
-	// createUserPost,
 	// getUserComments,
 	getUserFollowers,
 	getUserFollowing,
@@ -28,11 +27,10 @@ USER_ROUTER.route('/:id')
 	.get(getUserById);
 // .put(updateUserById)
 // .delete(deleteUserById);
-//
+
 // USER_ROUTER.route('/:id/posts')
 // 	.get(getUserPosts);
-// // .post(createUserPost);
-//
+
 // USER_ROUTER.route('/:id/comments')
 // 	.get(getUserComments);
 

@@ -1,5 +1,5 @@
 import * as GRPC from '@grpc/grpc-js';
-import CLIENT from '../grpc-client';
+import CLIENT from './grpc-client';
 import {UserModel,} from '../protos/generated/types/users_pb';
 import {StringValue, Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import PostGrpcModel from '../model/post-grpc-model';

@@ -6,7 +6,7 @@ export {
 	getUsers,
 	getAllUsers,
 	getUserById,
-
+	// getUserPosts,
 	getUserFollowers,
 	getUserFollowing,
 	followUser,
@@ -135,21 +135,20 @@ async function unfollowUser(request: iRequestWithUser, response: Response): Prom
 }
 
 // /**
-//  *
 //  * @param request
 //  * @param response
 //  */
-// async function getUserPosts(request: Request, response: Response): Promise<void> {
+// async function getUserPosts(request: Request, response: Response) {
 // 	try {
-// 		const { id } = request.params;
-// 		const posts = await USER_CLIENT.getUserPosts(id);
-// 		response.json(posts).status(200).end();
-// 	} catch (error: Error | any) {
-// 		console.error(error);
-// 		response.json({ message: error.message }).status(500).end();
+// 		const userId = request.params.userId;
+// 		const posts = await USER_CLIENT.getUserPosts(userId);
+// 		response.json(posts).end();
+// 	} catch {
+// 		response.status(500).json({ message: 'Failed to get user posts' }).end();
 // 	}
 // }
-//
+
+
 // /**
 //  *
 //  * @param request

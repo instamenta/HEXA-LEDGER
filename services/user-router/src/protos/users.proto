@@ -15,6 +15,7 @@ message UserModel {
   UserWallet userWallet = 7;
   repeated google.protobuf.StringValue followers = 8;
   repeated google.protobuf.StringValue following = 9;
+  repeated google.protobuf.StringValue posts = 10;
 }
 
 message LoginForm {

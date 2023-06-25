@@ -1,51 +1,42 @@
 import { Router } from 'express';
-import {isAuthenticated} from '../middleware/auth-middleware';
-// import { isAuthenticated, notOwner, isOwner} from '../middlewares/auth-middleware';
+import { isAuthenticated, notOwner, isOwner} from '../middleware/auth-middleware';
 import {
-	getAllUsers,
-	getUserById,
-	getUsers,
-	// updateUserById,
-	// deleteUserById,
-	// getUserPosts,
-	// createUserPost,
-	// getUserComments,
-	getUserFollowers,
-	getUserFollowing,
-	followUser,
-	unfollowUser,
+	createPost,
+	updatePost,
+	deletePost,
+	createComment,
+	updateComment,
+	deleteComment,
+	getPostById,
+	getPosts,
+	getPostComments,
+	upvotePost,
+	downvotePost,
 } from '../controller/post-controller';
 
-const USER_ROUTER: Router = Router();
+const POST_ROUTER: Router = Router();
 
-USER_ROUTER.route('/')
-	.get(getAllUsers);
+POST_ROUTER.route('/')
+	.get(getPosts)
+	.post(<any>isAuthenticated, <any>createPost);
 
-USER_ROUTER.route('/find')
-	.get(getUsers);
+POST_ROUTER.route('/:id')
+	.get(getPostById)
+	.put(<any>isAuthenticated, <any>isOwner, <any>updatePost)
+	.delete(<any>isAuthenticated, <any>isOwner, <any>deletePost);
 
-USER_ROUTER.route('/:id')
-	.get(getUserById);
-// .put(updateUserById)
-// .delete(deleteUserById);
-//
-// USER_ROUTER.route('/:id/posts')
-// 	.get(getUserPosts);
-// // .post(createUserPost);
-//
-// USER_ROUTER.route('/:id/comments')
-// 	.get(getUserComments);
+POST_ROUTER.route('/:postId/comments')
+	.get(getPostComments)
+	.post(<any>isAuthenticated, <any>createComment);
 
-USER_ROUTER.route('/:id/followers')
-	.get(getUserFollowers);
+POST_ROUTER.route('/:postId/comments/:commentId')
+	.put(<any>isAuthenticated, <any>isOwner, <any>updateComment)
+	.delete(<any>isAuthenticated, <any>isOwner, <any>deleteComment);
 
-USER_ROUTER.route('/:id/following')
-	.get(getUserFollowing);
+POST_ROUTER.route('/:id/upvote')
+	.post(<any>isAuthenticated, <any>notOwner, <any>upvotePost);
 
-USER_ROUTER.route('/:id/follow')
-	.put(isAuthenticated as any, followUser as any);
+POST_ROUTER.route('/:id/downvote')
+	.post(<any>isAuthenticated, <any>notOwner, <any>downvotePost);
 
-USER_ROUTER.route('/:id/unfollow')
-	.put(isAuthenticated as any, unfollowUser as any);
-
-export default USER_ROUTER;
+export default POST_ROUTER;

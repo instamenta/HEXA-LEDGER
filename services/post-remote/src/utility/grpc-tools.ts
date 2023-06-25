@@ -1,7 +1,7 @@
 import {UserModel as IUserModel} from '../protos/generated/types/users_pb';
 import {ServerUnaryCall} from '@grpc/grpc-js';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
-import {IUser} from '../model/schema/user-schema';
+import {IUser} from './types/basic-types';
 
 const {UserModel} = require('../protos/generated/users_pb');
 

@@ -11,6 +11,7 @@ export interface IUser extends Document {
     followers: Array<ObjectId>;
     following: Array<ObjectId>;
     comments: Array<ObjectId>;
+	posts: Array<ObjectId>;
 }
 
 const UserSchema: Schema<IUser> = new Schema<IUser>({
@@ -55,6 +56,12 @@ const UserSchema: Schema<IUser> = new Schema<IUser>({
 		{
 			type: MONGOOSE.Schema.Types.ObjectId,
 			ref: 'Comment'
+		}
+	],
+	posts: [
+		{
+			type: MONGOOSE.Schema.Types.ObjectId,
+			ref: 'Post'
 		}
 	]
 });

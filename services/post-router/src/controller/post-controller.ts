@@ -1,156 +1,213 @@
 import { Request, Response } from 'express';
-import { iRequestWithUser } from '../middleware/auth-middleware';
-import * as USER_CLIENT from '../client/post-client';
-
-/**
- * @param request
- * @param response
- */
-async function getUsers(request: Request, response: Response): Promise<void> {
-	try {
-		// let { page = 1 , limit = 5, filter } = request.query;
-		const users = await USER_CLIENT.getUsers(1, 5,);
-
-		response.json(users).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-
-/**
- * @param request
- * @param response
- */
-async function getAllUsers(request: Request, response: Response): Promise<void> {
-	try {
-		// const { page, limit } = request.query;
-		const users = await USER_CLIENT.getAllUsers(1, 5);
-		response.json(users).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-
-/**
- * @param request
- * @param response
- */
-async function getUserById(request: Request, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		const user = await USER_CLIENT.getUserById(id);
-		response.json(user).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-
-
-/**
- * @param request
- * @param response
- */
-async function getUserFollowers(request: Request, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		// const { page, limit } = request.query;
-		const followers = await USER_CLIENT.getUserFollowers(id, 1, 5);
-		response.json(followers).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-
-/**
- * @param request
- * @param response
- */
-async function getUserFollowing(request: Request, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		// const { page, limit } = request.query;
-		const following = await USER_CLIENT.getUserFollowing(id, 1, 5);
-		response.json(following).status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-/**
- * @param request
- * @param response
- */
-async function followUser(request: iRequestWithUser, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		const currentUser = request.userData;
-		await USER_CLIENT.followUser(currentUser._id, id);
-		response.status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-
-/**
- * @param request
- * @param response
- */
-async function unfollowUser(request: iRequestWithUser, response: Response): Promise<void> {
-	try {
-		const { id } = request.params;
-		const currentUser = request.userData;
-		await USER_CLIENT.unfollowUser(currentUser._id, id);
-		response.status(200).end();
-	} catch (error: Error | any) {
-		console.error(error);
-		response.json({ message: error.message }).status(500).end();
-	}
-}
-// /**
-//  *
-//  * @param request
-//  * @param response
-//  */
-// async function getUserPosts(request: Request, response: Response): Promise<void> {
-// 	try {
-// 		const { id } = request.params;
-// 		const posts = await USER_CLIENT.getUserPosts(id);
-// 		response.json(posts).status(200).end();
-// 	} catch (error: Error | any) {
-// 		console.error(error);
-// 		response.json({ message: error.message }).status(500).end();
-// 	}
-// }
-//
-// /**
-//  *
-//  * @param request
-//  * @param response
-//  */
-// async function getUserComments(request: Request, response: Response): Promise<void> {
-// 	try {
-// 		const { id } = request.params;
-// 		const comments = await USER_CLIENT.getUserComments(id);
-// 		response.json(comments).status(200).end();
-// 	} catch (error: Error | any) {
-// 		console.error(error);
-// 		response.json({ message: error.message }).status(500).end();
-// 	}
-// }
+import { iRequestWithUser } from '../utility/types/basic-types';
+import * as POST_CLIENT from '../client/post-client';
 
 export {
-	getUsers,
-	getAllUsers,
-	getUserById,
-	// getUserPosts,
-	// getUserComments,
-	getUserFollowers,
-	getUserFollowing,
-	followUser,
-	unfollowUser,
+	getPosts,
+	createPost,
+	getPostById,
+	updatePost,
+	deletePost,
+	getPostComments,
+	createComment,
+	updateComment,
+	deleteComment,
+	upvotePost,
+	downvotePost,
 };
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function getPosts(request: Request, response: Response) {
+	try {
+		const posts = await POST_CLIENT.getPosts();
+		response.json(posts).end();
+	} catch {
+		response.status(500).json({ message: 'Failed to get posts' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function createPost(request: iRequestWithUser, response: Response) {
+	try {
+		const { title, description } = request.body;
+		const post = await POST_CLIENT.createPost(title, description);
+		response.status(201).json(post);
+	} catch {
+		response.status(500).json({ message: 'Failed to create post' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function getPostById(request: Request, response: Response) {
+	try {
+		const postId = request.params.id;
+		const post = await POST_CLIENT.getPostById(postId);
+		if (post) {
+			response.json(post).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to get post' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function updatePost(request: iRequestWithUser, response: Response) {
+	try {
+		const postId = request.params.id;
+		const { title, description } = request.body;
+		const updatedPost = await POST_CLIENT.updatePost(postId, title, description);
+		if (updatedPost) {
+			response.json(updatedPost).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to update post' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function deletePost(request: iRequestWithUser, response: Response) {
+	try {
+		const postId = request.params.id;
+		const deletedPost = await POST_CLIENT.deletePost(postId);
+		if (deletedPost) {
+			response.json({ message: 'Post deleted successfully' }).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to delete post' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function getPostComments(request: Request, response: Response) {
+	try {
+		const postId = request.params.postId;
+		const comments = await POST_CLIENT.getPostComments(postId);
+		response.json(comments).end();
+	} catch {
+		response.status(500).json({ message: 'Failed to get post comments' }).end();
+	}
+}
+
+/**
+ * @param request
+ * @param response
+ */
+async function createComment(request: iRequestWithUser, response: Response) {
+	try {
+		const postId = request.params.postId;
+		const { content } = request.body;
+		const comment = await POST_CLIENT.createComment(postId, content);
+		response.status(201).json(comment).end();
+	} catch {
+		response.status(500).json({ message: 'Failed to create comment' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function updateComment(request: iRequestWithUser, response: Response) {
+	try {
+		const commentId = request.params.commentId;
+		const { content } = request.body;
+		const updatedComment = await POST_CLIENT.updateComment(commentId, content);
+		if (updatedComment) {
+			response.json(updatedComment).end();
+		} else {
+			response.status(404).json({ message: 'Comment not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to update comment' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function deleteComment(request: iRequestWithUser, response: Response) {
+	try {
+		const commentId = request.params.commentId;
+		const deletedComment = await POST_CLIENT.deleteComment(commentId);
+		if (deletedComment) {
+			response.json({ message: 'Comment deleted successfully' }).end();
+		} else {
+			response.status(404).json({ message: 'Comment not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to delete comment' }).end();
+	}
+}
+
+
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function upvotePost(request: iRequestWithUser, response: Response) {
+	try {
+		const postId = request.params.id;
+		const upvotedPost = await POST_CLIENT.upvotePost(postId);
+		if (upvotedPost) {
+			response.json(upvotedPost).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to upvote post' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function downvotePost(request: iRequestWithUser, response: Response) {
+	try {
+		const postId = request.params.id;
+		const downvotedPost = await POST_CLIENT.downvotePost(postId);
+		if (downvotedPost) {
+			response.json(downvotedPost).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to downvote post' }).end();
+	}
+}

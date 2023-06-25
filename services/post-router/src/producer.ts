@@ -7,7 +7,7 @@ const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0'
 	, Redpanda: Kafka = new Kafka({brokers: ['redpanda-0:9092']})
 	, Producer: KafkaProducer = Redpanda.producer()
 ;
-CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec
+CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec;
 
 export {connectProducer, disconnectProducer, sendLogMessage};
 

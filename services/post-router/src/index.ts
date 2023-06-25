@@ -3,7 +3,7 @@ import CORS from 'cors';
 import POST_ROUTER from './routes/post-routes';
 import COOKIER_PARSER from 'cookie-parser';
 import ERROR_MIDDLEWARE from './middleware/error-middleware';
-import {connectProducer} from "./producer";
+import {connectProducer} from './producer';
 
 const API_PORT: string = process.env.ROUTER_PORT || '5095';
 const SERVICE_NAME: string = process.env.SERVICE_NAME || 'Post-Router-Service';
@@ -19,7 +19,7 @@ API.use(ERROR_MIDDLEWARE);
 (async function initializeService(): Promise<void> {
 	await API.listen(Number(API_PORT), async () => {
 		console.log(`${SERVICE_NAME} is running on port: ${API_PORT}`);
-		await connectProducer()
+		await connectProducer();
 	});
 	API.on('error', (error: Error | any) => {
 		console.log('API ran into Error:', error);

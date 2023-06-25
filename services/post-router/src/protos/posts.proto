@@ -30,6 +30,8 @@ message PostModel {
   google.protobuf.Int64Value comments_count = 18;
   google.protobuf.Int64Value upvotes_count = 19;
   google.protobuf.Int64Value downvotes_count = 20;
+
+  google.protobuf.StringValue _id = 21;
 }
 
 message PostForm {
@@ -114,7 +116,7 @@ service PostService {
   rpc GetPostById(GetByObjectId) returns (PostModel);
   rpc GetPost(GetPostsRequest) returns (stream PostModel);
 
-  rpc GetPostComments(GetCommentsRequest) returns (stream Comments);
+  rpc GetPostComments(GetCommentsRequest) returns (stream CommentModel);
 
   rpc GetUserPosts(GetUserPostsRequest) returns (stream PostModel);
   // INTERACT

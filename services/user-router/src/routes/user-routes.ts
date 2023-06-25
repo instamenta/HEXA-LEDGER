@@ -28,9 +28,6 @@ USER_ROUTER.route('/:id')
 // .put(updateUserById)
 // .delete(deleteUserById);
 
-// USER_ROUTER.route('/:id/posts')
-// 	.get(getUserPosts);
-
 // USER_ROUTER.route('/:id/comments')
 // 	.get(getUserComments);
 

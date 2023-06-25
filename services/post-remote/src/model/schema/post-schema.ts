@@ -17,7 +17,7 @@ interface IPost extends Document {
     tronTransaction: Array<string>;
     ethereumTransaction: Array<string>;
     donations: Array<Schema.Types.ObjectId>;
-    pictures: Array<string> | [];
+    pictures: Array<string>;
 
     transactionsCount: number;
     donationsCount: number;

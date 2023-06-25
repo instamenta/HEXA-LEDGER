@@ -211,3 +211,54 @@ async function downvotePost(request: iRequestWithUser, response: Response) {
 		response.status(500).json({ message: 'Failed to downvote post' }).end();
 	}
 }
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function upvoteComment(request: iRequestWithUser, response: Response) {
+	try {
+		const CommentId = request.params.id;
+		const upvotedPost = await POST_CLIENT.upvoteComment(CommentId);
+		if (upvotedPost) {
+			response.json(upvotedPost).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to upvote post' }).end();
+	}
+}
+
+/**
+ *
+ * @param request
+ * @param response
+ */
+async function downvoteComment(request: iRequestWithUser, response: Response) {
+	try {
+		const CommentId = request.params.id;
+		const downvotedPost = await POST_CLIENT.downvoteComment(CommentId);
+		if (downvotedPost) {
+			response.json(downvotedPost).end();
+		} else {
+			response.status(404).json({ message: 'Post not found' }).end();
+		}
+	} catch {
+		response.status(500).json({ message: 'Failed to downvote post' }).end();
+	}
+}
+
+/**
+ * @param request
+ * @param response
+ */
+async function getUserPosts(request: Request, response: Response) {
+	try {
+		const userId = request.params.userId;
+		const posts = await POST_CLIENT.getUserPosts(userId);
+		response.json(posts).end();
+	} catch {
+		response.status(500).json({ message: 'Failed to get user posts' }).end();
+	}
+}

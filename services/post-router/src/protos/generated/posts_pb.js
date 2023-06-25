@@ -335,7 +335,8 @@ proto.post.PostModel.toObject = function(includeInstance, msg) {
     donationsCount: (f = msg.getDonationsCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f),
     commentsCount: (f = msg.getCommentsCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f),
     upvotesCount: (f = msg.getUpvotesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f),
-    downvotesCount: (f = msg.getDownvotesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    downvotesCount: (f = msg.getDownvotesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f),
+    id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -471,6 +472,11 @@ proto.post.PostModel.deserializeBinaryFromReader = function(msg, reader) {
       var value = new google_protobuf_wrappers_pb.Int64Value;
       reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
       msg.setDownvotesCount(value);
+      break;
+    case 21:
+      var value = new google_protobuf_wrappers_pb.StringValue;
+      reader.readMessage(value,google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+      msg.setId(value);
       break;
     default:
       reader.skipField();
@@ -659,6 +665,14 @@ proto.post.PostModel.serializeBinaryToWriter = function(message, writer) {
       20,
       f,
       google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+    );
+  }
+  f = message.getId();
+  if (f != null) {
+    writer.writeMessage(
+      21,
+      f,
+      google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter
     );
   }
 };
@@ -1409,6 +1423,43 @@ proto.post.PostModel.prototype.clearDownvotesCount = function() {
  */
 proto.post.PostModel.prototype.hasDownvotesCount = function() {
   return jspb.Message.getField(this, 20) != null;
+};
+
+
+/**
+ * optional google.protobuf.StringValue _id = 21;
+ * @return {?proto.google.protobuf.StringValue}
+ */
+proto.post.PostModel.prototype.getId = function() {
+  return /** @type{?proto.google.protobuf.StringValue} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.StringValue, 21));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.StringValue|undefined} value
+ * @return {!proto.post.PostModel} returns this
+*/
+proto.post.PostModel.prototype.setId = function(value) {
+  return jspb.Message.setWrapperField(this, 21, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.post.PostModel} returns this
+ */
+proto.post.PostModel.prototype.clearId = function() {
+  return this.setId(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.post.PostModel.prototype.hasId = function() {
+  return jspb.Message.getField(this, 21) != null;
 };
 
 

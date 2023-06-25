@@ -103,6 +103,11 @@ export class PostModel extends jspb.Message {
     getDownvotesCount(): google_protobuf_wrappers_pb.Int64Value | undefined;
     setDownvotesCount(value?: google_protobuf_wrappers_pb.Int64Value): PostModel;
 
+    hasId(): boolean;
+    clearId(): void;
+    getId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setId(value?: google_protobuf_wrappers_pb.StringValue): PostModel;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PostModel.AsObject;
     static toObject(includeInstance: boolean, msg: PostModel): PostModel.AsObject;
@@ -135,6 +140,7 @@ export namespace PostModel {
         commentsCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
         upvotesCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
         downvotesCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        Id?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }
 

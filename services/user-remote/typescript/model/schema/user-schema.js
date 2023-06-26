@@ -71,6 +71,12 @@ const UserSchema = new mongoose_1.Schema({
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'Comment'
         }
+    ],
+    posts: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'Post'
+        }
     ]
 });
 /**

@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 /**
  * Description: Converts process.env variables to Number, Object, Array, Boolean
  * @class Configurator
@@ -7,15 +5,20 @@ require('dotenv').config();
 class Configurator {
     constructor($variables) {
         this.cache = {};
-
         for (const $key in $variables) {
             let $var = $variables[$key];
 
             switch (true) {
-                case ($var.toLowerCase() === 'false' || $var.toLowerCase() === 'off'):
+                case ($var.toLowerCase() === 'false'
+                    || $var.toLowerCase() === 'off'
+                    || $var.toLowerCase() === 'no'
+                ):
                     $var = false;
                     break;
-                case ($var.toLowerCase() === 'true' || $var.toLowerCase() === 'on'):
+                case ($var.toLowerCase() === 'true'
+                    || $var.toLowerCase() === 'on'
+                    || $var.toLowerCase() === 'yes'
+                ):
                     $var = true;
                     break;
                 case ($var.includes('{') && $var.includes('}')):
@@ -36,12 +39,15 @@ class Configurator {
                     $var = Number($var);
                     break;
             }
-            if ($var !== 'PARSING_ERROR') {
-                this.cache[$key] = $var;
-            }
+            if ($var !== 'PARSING_ERROR') this.cache[$key] = $var;
         }
     }
 
+    /**
+     * Description: Takes name of a variable and returns the value
+     * @param {string} $name
+     * @returns {*}
+     */
     get($name) {
         if (this.cache.hasOwnProperty($name)) {
             return this.cache[$name]

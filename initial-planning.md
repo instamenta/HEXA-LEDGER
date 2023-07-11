@@ -66,7 +66,8 @@
  
 ## Databases
 
- - MongoDB
+ - PRISMA
+ - MongoDB / Mongoose / Realm
  - PostgrSQL
  - Redis ( Cache )
  - ElasticSearch

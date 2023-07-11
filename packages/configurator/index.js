@@ -48,7 +48,7 @@ class Configurator {
      * @param {string} $name
      * @returns {*}
      */
-    get($name) {
+    GET($name) {
         if (this.cache.hasOwnProperty($name)) {
             return this.cache[$name]
         } else {

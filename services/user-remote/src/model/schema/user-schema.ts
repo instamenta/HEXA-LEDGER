@@ -1,18 +1,6 @@
-import MONGOOSE, {Document, Schema} from 'mongoose';
+import MONGOOSE, {Schema} from 'mongoose';
 import BCRYPT from 'bcrypt';
-import {ObjectId} from 'bson';
-
-export interface IUser extends Document {
-    _id: ObjectId;
-    username: string;
-    email: string;
-    password: string;
-    picture: string;
-    followers: Array<ObjectId>;
-    following: Array<ObjectId>;
-    comments: Array<ObjectId>;
-	posts: Array<ObjectId>;
-}
+import {IUser, IError} from '../../utility/types/base-types';
 
 const UserSchema: Schema<IUser> = new Schema<IUser>({
 	username: {
@@ -74,15 +62,13 @@ UserSchema.pre<IUser>('save', async function (next) {
 		if (!this.isModified('password')) {
 			return next();
 		}
-
 		const SALT = await BCRYPT.genSalt(10);
 		this.password = await BCRYPT.hash(this.password, SALT);
 		return next();
-	} catch (error: Error | any) {
+	} catch (error: IError) {
 		return next(error);
 	}
 });
-
-const UserModel = MONGOOSE.model<IUser>('User', UserSchema);
+const UserModel = MONGOOSE.model('User', UserSchema);
 
 export default UserModel;

@@ -1,8 +1,9 @@
 import {Kafka, Producer as KafkaProducer, CompressionTypes, CompressionCodecs} from 'kafkajs';
-import {kafka_error_log, kafka_start_log} from './utility/logger';
+import Log from './utility/logger';
 
 const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0'
 	, BROKER_PORT: string = process.env.BROKER_PORT || '9092'
+	, KAFKA_PRODUCER_TOPIC: string = process.env.KAFKA_PRODUCER_TOPIC || 'logger_topic'
 	, SnappyCodec = require('kafkajs-snappy')
 	, Redpanda: Kafka = new Kafka({brokers: ['redpanda-0:9092']})
 	, Producer: KafkaProducer = Redpanda.producer()
@@ -11,15 +12,13 @@ CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec;
 
 export {connectProducer, disconnectProducer, sendLogMessage};
 
-/**
- * Connects kafka producer
- */
+/** Connects kafka producer */
 async function connectProducer(): Promise<void> {
 	try {
 		await Producer.connect();
-		kafka_start_log(BROKER_URL, BROKER_PORT);
+		Log['kafka_start_log'](BROKER_URL, BROKER_PORT);
 	} catch (error) {
-		kafka_error_log(BROKER_URL, BROKER_PORT, error);
+		Log['kafka_error_log'](BROKER_URL, BROKER_PORT, error);
 	}
 }
 
@@ -30,20 +29,18 @@ async function connectProducer(): Promise<void> {
  */
 async function sendLogMessage(message: object | string, event = 'UNDEFINED'): Promise<void> {
 	await Producer.send({
-		topic: 'logger_topic',
+		topic: KAFKA_PRODUCER_TOPIC,
 		compression: CompressionTypes.Snappy,
 		messages: [
 			{
 				headers: {event: event},
 				value: JSON.stringify({message}),
-			},
-		],
+			}
+		]
 	});
 }
 
-/**
- * @returns
- */
+/** On Producer Disconnection */
 async function disconnectProducer(): Promise<void> {
 	await Producer.disconnect()
 		.then(() => console.log('Disconnected producer'))

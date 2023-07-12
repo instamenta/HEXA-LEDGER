@@ -1,6 +1,7 @@
 import {sendUnaryData, ServerUnaryCall, ServerWritableStream} from '@grpc/grpc-js';
-import {log} from '../utility/logger';
+import Log from '../utility/logger';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
+import {IError} from '../utility/types/base-types';
 import {
 	GetUserByIdRequest,
 	UserModel as IUserModel,
@@ -39,11 +40,11 @@ async function login(
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
 	try {
-		await log('debug', 'CALLING LOGIN...');
+		await Log['log']('debug', 'CALLING LOGIN...');
 		await LOGIN(call, callback);
-		await log('info', '☕ FINISHED LOGIN');
-	} catch (error: Error | any) {
-		await log('error', error);
+		await Log['log']('info', '☕ FINISHED LOGIN');
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		callback(error);
 	}
 }
@@ -61,11 +62,11 @@ async function register(
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING REGISTER...');
+		await Log['log']('debug', '⌛ CALLING REGISTER...');
 		await REGISTER(call, callback);
-		await log('info', '☕ FINISHED REGISTER');
-	} catch (error: Error | any) {
-		await log('error', error);
+		await Log['log']('info', '☕ FINISHED REGISTER');
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		callback(error);
 	}
 }
@@ -81,12 +82,12 @@ async function getUsers(
 	call: ServerWritableStream<GetUsersRequest, IUserModel>,
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING GET_USERS...');
+		await Log['log']('debug', '⌛ CALLING GET_USERS...');
 		await GET_USERS(call);
-		await log('info', '☕ FINISHED GET_USERS');
+		await Log['log']('info', '☕ FINISHED GET_USERS');
 		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		call.emit(error);
 	}
 }
@@ -102,12 +103,12 @@ async function getAllUsers(
 	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING GET_ALL_USERS...');
+		await Log['log']('debug', '⌛ CALLING GET_ALL_USERS...');
 		await GET_ALL_USERS(call);
-		await log('info', '☕ FINISHED GET_ALL_USERS');
+		await Log['log']('info', '☕ FINISHED GET_ALL_USERS');
 		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		call.emit(error);
 	}
 }
@@ -125,11 +126,11 @@ async function getUserById(
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING GET_USER_BY_ID...');
+		await Log['log']('debug', '⌛ CALLING GET_USER_BY_ID...');
 		await GET_USER_BY_ID(call, callback);
-		await log('info', '☕ FINISHED GET_USER_BY_ID');
-	} catch (error: Error | any) {
-		await log('error', error);
+		await Log['log']('info', '☕ FINISHED GET_USER_BY_ID');
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		callback(error);
 	}
 }
@@ -146,12 +147,12 @@ async function getUserFollowers(
 	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING GET_USER_FOLLOWERS...');
+		await Log['log']('debug', '⌛ CALLING GET_USER_FOLLOWERS...');
 		await GET_USER_FOLLOWERS(call);
-		await log('info', '☕ FINISHED GET_USER_FOLLOWERS');
+		await Log['log']('info', '☕ FINISHED GET_USER_FOLLOWERS');
 		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		call.emit(error);
 	}
 }
@@ -167,12 +168,12 @@ async function getUserFollowing(
 	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING GET_USER_FOLLOWING...');
+		await Log['log']('debug', '⌛ CALLING GET_USER_FOLLOWING...');
 		await GET_USER_FOLLOWING(call);
-		await log('info', '☕ FINISHED GET_USER_FOLLOWING');
+		await Log['log']('info', '☕ FINISHED GET_USER_FOLLOWING');
 		call.end();
-	} catch (error: Error | any) {
-		await log('error', error);
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		call.emit(error);
 	}
 }
@@ -189,11 +190,11 @@ async function followUser(
 	callback: sendUnaryData<Empty>
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING FOLLOW_USER...');
+		await Log['log']('debug', '⌛ CALLING FOLLOW_USER...');
 		await FOLLOW_USER(call, callback);
-		await log('info', '☕ FINISHED FOLLOW_USER');
-	} catch (error: Error | any) {
-		await log('error', error);
+		await Log['log']('info', '☕ FINISHED FOLLOW_USER');
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		callback(error);
 	}
 }
@@ -210,11 +211,11 @@ async function unfollowUser(
 	callback: sendUnaryData<Empty>
 ): Promise<void> {
 	try {
-		await log('debug', '⌛ CALLING UNFOLLOW_USER...');
+		await Log['log']('debug', '⌛ CALLING UNFOLLOW_USER...');
 		await UNFOLLOW_USER(call, callback);
-		await log('info', '☕ FINISHED UNFOLLOW_USER');
-	} catch (error: Error | any) {
-		await log('error', error);
+		await Log['log']('info', '☕ FINISHED UNFOLLOW_USER');
+	} catch (error: IError) {
+		await Log['log']('error', error);
 		callback(error);
 	}
 }

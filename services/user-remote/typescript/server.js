@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const mongodb_1 = __importDefault(require("./mongodb"));
 const producer_1 = require("./producer");
-const logger_1 = require("./utility/logger");
+const logger_1 = __importDefault(require("./utility/logger"));
 const wrapper_1 = require("./service/wrapper");
 const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC_PORT = process.env.GRPC_PORT || 50051;
 (async function StartService() {
@@ -43,11 +43,11 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
     });
     Server.bindAsync(`0.0.0.0:${GRPC_PORT}`, GRPC.ServerCredentials.createInsecure(), async (error, port) => {
         if (error) {
-            (0, logger_1.grpc_disconnect_log)(port, error);
+            logger_1.default['grpc_disconnect_log'](port, error);
             process.exit(1);
         }
         Server.start();
-        (0, logger_1.grpc_start_log)(port);
+        logger_1.default['grpc_start_log'](port);
         await (0, mongodb_1.default)();
         await (0, producer_1.connectProducer)();
     });
@@ -55,7 +55,7 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
 ['unhandledRejection', 'uncaughtException'].forEach(type => {
     process.on(type, async (error) => {
         try {
-            (0, logger_1.process_disconnect_log)(type, error);
+            logger_1.default['process_disconnect_log'](type, error);
             await (0, producer_1.disconnectProducer)();
         }
         catch {
@@ -67,12 +67,12 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
 ['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
     process.once(type, async (error) => {
         try {
-            (0, logger_1.process_disconnect_log)(type, error);
+            logger_1.default['process_disconnect_log'](type, error);
             process.exit(0);
         }
         finally {
             await (0, producer_1.disconnectProducer)();
-            (0, logger_1.kafka_disconnect_log)(error);
+            logger_1.default['kafka_disconnect_log'](error);
             process.kill(process.pid, type);
         }
     });

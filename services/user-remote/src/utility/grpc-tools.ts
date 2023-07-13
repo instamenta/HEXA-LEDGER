@@ -2,7 +2,7 @@ import {UserModel as IUserModel} from '../protos/generated/types/users_pb';
 import {ServerUnaryCall} from '@grpc/grpc-js';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import {IExtractedUserModel, IUser} from './types/base-types';
-import {UAttr} from './enumerations/base-enumartions';
+import {UAttr} from './enumerations/base-enumerations';
 
 const {UserModel} = require('../protos/generated/users_pb');
 

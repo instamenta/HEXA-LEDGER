@@ -1,18 +1,5 @@
-import mongoose, {Schema, Document} from 'mongoose';
-import {ObjectId} from 'bson';
-
-export interface IComment extends Document {
-    _id: ObjectId;
-    ownerId: ObjectId;
-    postId: ObjectId;
-    upvotes: Array<ObjectId>;
-    downvotes: Array<ObjectId>;
-    subcomments: Array<ObjectId>;
-    content: string;
-    createdAt: Date;
-    updatedAt: Date;
-    wasEdited: boolean;
-}
+import mongoose, {Schema} from 'mongoose';
+import {IComment} from "../../utility/types/base-types";
 
 const CommentSchema: Schema<IComment> = new Schema<IComment>({
     content: {

@@ -1,5 +1,8 @@
-import {Kafka, Producer as KafkaProducer, CompressionTypes, CompressionCodecs} from 'kafkajs';
-import {kafka_error_log, kafka_start_log} from './utility/logger';
+import {
+    Kafka, Producer as KafkaProducer,
+    CompressionTypes, CompressionCodecs
+} from 'kafkajs';
+import Log from './utility/logger';
 
 const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0'
     , BROKER_PORT: string = process.env.BROKER_PORT || '9092'
@@ -17,9 +20,9 @@ export {connectProducer, disconnectProducer, sendLogMessage};
 async function connectProducer(): Promise<void> {
     try {
         await Producer.connect();
-        kafka_start_log(BROKER_URL, BROKER_PORT);
+        Log['kafka_start_log'](BROKER_URL, BROKER_PORT);
     } catch (error) {
-        kafka_error_log(BROKER_URL, BROKER_PORT, error);
+        Log['kafka_error_log'](BROKER_URL, BROKER_PORT, error);
     }
 }
 
@@ -32,12 +35,10 @@ async function sendLogMessage(message: object | string, event = 'UNDEFINED'): Pr
     await Producer.send({
         topic: 'logger_topic',
         compression: CompressionTypes.Snappy,
-        messages: [
-            {
-                headers: {event: event},
-                value: JSON.stringify({message}),
-            },
-        ],
+        messages: [{
+            headers: {event: event},
+            value: JSON.stringify({message}),
+        }]
     });
 }
 

@@ -1,6 +1,6 @@
 import {decodeToken} from '../utility/token-tools';
 import {Request, Response, NextFunction} from 'express';
-import {iRequestWithUser} from '../utility/types/basic-types';
+import {iRequestWithUser} from '../utility/types/base-types';
 
 /**
  * Middleware: isAuthenticated

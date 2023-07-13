@@ -1,30 +1,5 @@
-import mongoose, {Schema, Document} from 'mongoose';
-
-interface IPost extends Document {
-    title: string;
-    description: string;
-    author: Schema.Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
-    upvotes: Array<Schema.Types.ObjectId>;
-    downvotes: Array<Schema.Types.ObjectId>;
-    comments: Array<Schema.Types.ObjectId>;
-    tags: Array<string>;
-
-    isPromoted: boolean;
-    promotionAmount: number;
-
-    tronTransaction: Array<string>;
-    ethereumTransaction: Array<string>;
-    donations: Array<Schema.Types.ObjectId>;
-    pictures: Array<string>;
-
-    transactionsCount: number;
-    donationsCount: number;
-    commentsCount: number;
-    upvotesCount: number;
-    downvotesCount: number;
-}
+import mongoose, {Schema} from 'mongoose';
+import {IPost} from '../../utility/types/base-types'
 
 const postSchema: Schema<IPost> = new Schema<IPost>({
     title: {
@@ -124,4 +99,4 @@ const postSchema: Schema<IPost> = new Schema<IPost>({
 
 const PostModel = mongoose.model<IPost>('Post', postSchema);
 
-export {PostModel};
+export default PostModel;

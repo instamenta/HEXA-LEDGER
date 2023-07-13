@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { iRequestWithUser } from '../utility/types/basic-types';
+import { iRequestWithUser } from '../utility/types/base-types';
 import * as POST_CLIENT from '../client/post-client';
 
 export {

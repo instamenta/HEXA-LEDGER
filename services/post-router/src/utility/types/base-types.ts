@@ -11,7 +11,7 @@ export type ITokenData = {
 }
 
 export interface iRequestWithUser extends Request {
-    userData: ITokenData
+    userData: ITokenData;
 }
 
 export interface IPostData {

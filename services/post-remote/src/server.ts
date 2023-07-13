@@ -1,12 +1,7 @@
 import * as GRPC from '@grpc/grpc-js';
 import connectDatabase from './mongodb';
 import {connectProducer, disconnectProducer} from './producer';
-import {
-	grpc_disconnect_log,
-	grpc_start_log,
-	kafka_disconnect_log,
-	process_disconnect_log
-} from './utility/logger';
+import Log from './utility/logger';
 import {
 	getUserById,
 	login, register,
@@ -32,11 +27,11 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 		GRPC.ServerCredentials.createInsecure(),
 		async (error, port) => {
 			if (error) {
-				grpc_disconnect_log(port, error);
+				Log['grpc_disconnect_log'](port, error);
 				process.exit(1);
 			}
 			Server.start();
-			grpc_start_log(port);
+			Log['grpc_start_log'](port);
 			await connectDatabase();
 			await connectProducer();
 		});
@@ -45,7 +40,7 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 ['unhandledRejection', 'uncaughtException'].forEach(type => {
 	process.on(type, async (error: Error) => {
 		try {
-			process_disconnect_log(type, error);
+			Log['process_disconnect_log'](type, error);
 			await disconnectProducer();
 		} catch {
 			console.log('Exit...');
@@ -57,11 +52,11 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 ['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
 	process.once(type, async (error: Error) => {
 		try {
-			process_disconnect_log(type, error);
+			Log['process_disconnect_log'](type, error);
 			process.exit(0);
 		} finally {
 			await disconnectProducer();
-			kafka_disconnect_log(error);
+			Log['kafka_disconnect_log'](error);
 			process.kill(process.pid, type);
 		}
 	});

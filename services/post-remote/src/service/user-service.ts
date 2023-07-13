@@ -1,9 +1,10 @@
 import {ServerUnaryCall, sendUnaryData, ServerWritableStream} from '@grpc/grpc-js';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
-import MongooseUserModel, {IUser} from '../model/user-schema';
-import {convertUserModel} from '../utility/grpc-tools';
-import * as Validator from '../utility/validator';
-import {Thrower} from '../utility/validator';
+import MongoosePostModel from '../model/schema/post-schema';
+import GrpcTools from '../utility/grpc-tools';
+import Validator from '../utility/validator';
+import {ObjectId} from 'bson';
+import {IUser} from '../utility/types/base-types';
 import {
 	UserModel as IUserModel,
 	GetAllUsersRequest,
@@ -14,7 +15,6 @@ import {
 	GetUserFollowersRequest,
 	GetUserFollowingRequest,
 } from '../protos/generated/types/users_pb';
-import {ObjectId} from 'bson';
 
 export {
 	GET_USERS,
@@ -34,23 +34,28 @@ export {
 async function GET_USERS(
 	call: ServerWritableStream<GetUsersRequest, IUserModel>,
 ): Promise<void> {
-
 	const r = call.request
 		, limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
 		, filter = r.hasFilter() ? r.getFilter()!.getValue() : null
 		, pipeline = []
-    ;
+	;
 	if (filter) {
-		pipeline.push({
-			$match: {fieldToFilter: {$regex: filter}}
-		});
+		pipeline.push(
+			{
+				$match: {
+					fieldToFilter: {
+						$regex: filter
+					}
+				}
+			});
 	}
 	pipeline.push(
-		{$skip: (page - 1) * limit}, {$limit: limit}
+		{$skip: (page - 1) * limit},
+		{$limit: limit}
 	);
 	await MongooseUserModel.aggregate(pipeline).exec()
-		.then((arr) => arr.forEach(u => call.write(convertUserModel(u))));
+		.then((arr) => arr.forEach(u => call.write(GrpcTools.convertUserModel(u))));
 }
 
 /**
@@ -61,13 +66,12 @@ async function GET_USERS(
 async function GET_ALL_USERS(
 	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
 ): Promise<void> {
-
 	const r = call.request
 		, limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
-    ;
+	;
 	await MongooseUserModel.find().skip((page - 1) * limit).limit(limit)
-		.then((arr) => arr.forEach(u => call.write(convertUserModel(u))));
+		.then((arr) => arr.forEach(u => call.write(GrpcTools.convertUserModel(<IUser>u))));
 }
 
 /**
@@ -80,16 +84,14 @@ async function GET_USER_BY_ID(
 	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
-
 	const r = call.request
 		, id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-	Validator.ValidateId(id);
-	const u: IUser | null = await MongooseUserModel.findById(id);
-	Validator.ValidateUser(u);
-	callback(null, convertUserModel(u as IUser));
+	;
+	Validator['VALIDATE_ID'](id);
+	const u = <IUser>await MongooseUserModel.findById(id);
+	Validator['VALIDATE_USER'](u);
+	callback(null, GrpcTools.convertUserModel(<IUser>u));
 }
-
 
 /**
  * @param call
@@ -99,20 +101,19 @@ async function GET_USER_BY_ID(
 async function GET_USER_FOLLOWERS(
 	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
 ): Promise<void> {
-
 	const r = call.request
 		, id = r.hasId() ? r.getId()!.getValue() : null
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
 		, limit = r.getLimit() ? r.getLimit()!.getValue() : 5
-    ;
-	Validator.ValidateId(id);
-	Validator.ValidateFilters(page, limit);
-	const u: IUser | null = await MongooseUserModel.findById(id);
+	;
+	Validator['VALIDATE_ID'](id);
+	Validator['VALIDATE_FILTERS'](page, limit);
+	const u = <IUser>await MongooseUserModel.findById(id);
 	if (!u) {
-		Thrower(`Ivalid user._id : ${id}`);
+		Validator['THROWER'](`Invalid user._id : ${id}`);
 	}
 	await MongooseUserModel.find({_id: {$in: u.following}})
-		.then(arr => arr.forEach(u => call.write(convertUserModel(u))));
+		.then(arr => arr.forEach(u => call.write(GrpcTools.convertUserModel(<IUser>u))));
 }
 
 /**
@@ -123,20 +124,19 @@ async function GET_USER_FOLLOWERS(
 async function GET_USER_FOLLOWING(
 	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
 ): Promise<void> {
-
 	const r = call.request
 		, id = r.hasId() ? r.getId()!.getValue() : null
 		, page = r.hasPage() ? r.getPage()!.getValue() : 1
 		, limit = r.getLimit() ? r.getLimit()!.getValue() : 5
-    ;
-	Validator.ValidateId(id);
-	Validator.ValidateFilters(page, limit);
-	const u: IUser | null = await MongooseUserModel.findById(id);
+	;
+	Validator['VALIDATE_ID'](id);
+	Validator['VALIDATE_FILTERS'](page, limit);
+	const u = <IUser>await MongooseUserModel.findById(id);
 	if (!u) {
-		Thrower(`Ivalid user._id : ${id}`);
+		Validator['THROWER'](`Invalid user._id : ${id}`);
 	}
 	await MongooseUserModel.find({_id: {$in: u.following}})
-		.then(arr => arr.forEach(u => call.write(convertUserModel(u))));
+		.then(arr => arr.forEach(u => call.write(GrpcTools.convertUserModel(<IUser>u))));
 }
 
 
@@ -150,21 +150,22 @@ async function FOLLOW_USER(
 	call: ServerUnaryCall<FollowUserRequest, Empty>,
 	callback: sendUnaryData<Empty>
 ): Promise<void> {
-
 	const r = call.request
 		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null
 		, userId = r.hasId() ? r.getId()!.getValue() : null
-		, currentUserB_Id: ObjectId = Validator.CovertToObjectId(currentUserId)
-		, userB_Id: ObjectId = Validator.CovertToObjectId(userId)
-    ;
+		, currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId)
+		, userB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](userId)
+	;
 	if (userId === currentUserId) {
-		Thrower('Users _id\'s are equal');
+		Validator['THROWER']('Users _id\'s are equal');
 	}
 	if (await MongooseUserModel.exists({
 		_id: currentUserB_Id,
-		following: {$in: [userB_Id]}
+		following: {
+			$in: [userB_Id]
+		}
 	})) {
-		Thrower('Users is already follower');
+		Validator['THROWER']('Users is already follower');
 	}
 	await MongooseUserModel.collection.bulkWrite([
 		{
@@ -179,8 +180,9 @@ async function FOLLOW_USER(
 				update: {$addToSet: {followers: currentUserB_Id}},
 			},
 		},
-	] as any).then(r => (r && r.ok) ? callback(null, new Empty())
-		: Thrower('Failed to update users')
+	] as any).then(r => (r && r.ok)
+		? callback(null, new Empty())
+		: Validator['THROWER']('Failed to update users')
 	);
 }
 
@@ -194,37 +196,46 @@ async function UNFOLLOW_USER(
 	call: ServerUnaryCall<UnfollowUserRequest, Empty>,
 	callback: sendUnaryData<Empty>
 ): Promise<void> {
-
 	const r = call.request
 		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null
 		, userId = r.hasId() ? r.getId()!.getValue() : null
-		, currentUserB_Id: ObjectId = Validator.CovertToObjectId(currentUserId)
-		, userB_Id: ObjectId = Validator.CovertToObjectId(userId)
-    ;
+		, currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId)
+		, userB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](userId)
+	;
 	if (userId === currentUserId) {
-		Thrower('Users _id\'s are equal');
+		Validator['THROWER']('Users _id\'s are equal');
 	}
 	if (!await MongooseUserModel.exists({
-		_id: currentUserB_Id,
-		following: {$in: [userB_Id]}
+		_id: currentUserB_Id, following: {$in: [userB_Id]}
 	})) {
-		Thrower('Users is not follower');
+		Validator['THROWER']('Users is not follower');
 	}
 	await MongooseUserModel.bulkWrite([
 		{
 			updateOne: {
-				filter: {_id: currentUserB_Id},
-				update: {$pull: {following: userB_Id}},
+				filter: {
+					_id: currentUserB_Id
+				},
+				update: {
+					$pull: {following: userB_Id}
+				},
 			},
 		},
 		{
 			updateOne: {
-				filter: {_id: userB_Id},
-				update: {$pull: {followers: currentUserB_Id}},
+				filter: {
+					_id: userB_Id
+				},
+				update: {
+					$pull: {
+						followers: currentUserB_Id
+					}
+				},
 			},
 		},
-	] as any).then(r => (r && r.ok) ? callback(null, new Empty())
-		: Thrower('Failed to update users')
+	] as any).then(r => (r && r.ok)
+		? callback(null, new Empty())
+		: Validator['THROWER']('Failed to update users')
 	);
 }
 

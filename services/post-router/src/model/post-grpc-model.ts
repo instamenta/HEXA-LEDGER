@@ -1,6 +1,6 @@
 import {PostModel} from '../protos/generated/types/posts_pb';
 import {Timestamp} from 'google-protobuf/google/protobuf/timestamp_pb';
-import {IPostData} from '../utility/types/basic-types';
+import {IPostData} from '../utility/types/base-types';
 
 export default class PostGrpcModel {
 	_id: string | null;

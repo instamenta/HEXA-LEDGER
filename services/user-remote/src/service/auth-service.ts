@@ -6,9 +6,9 @@ import GrpcTools from '../utility/grpc-tools';
 import Validator from '../utility/validator';
 import {IUser} from '../utility/types/base-types';
 import {
-    LoginForm as ILoginForm,
-    RegisterForm as IRegisterForm,
-    UserModel as IUserModel
+	LoginForm as ILoginForm,
+	RegisterForm as IRegisterForm,
+	UserModel as IUserModel
 } from '../protos/generated/types/users_pb';
 
 export {LOGIN, REGISTER};
@@ -20,17 +20,17 @@ export {LOGIN, REGISTER};
  * @async
  */
 async function LOGIN(
-    call: ServerUnaryCall<ILoginForm, IUserModel>,
-    callback: sendUnaryData<IUserModel>
+	call: ServerUnaryCall<ILoginForm, IUserModel>,
+	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
-    const r = call.request
-        , email = r.hasEmail() ? r.getEmail()!.getValue() : null
-        , password = r.hasPassword() ? r.getPassword()!.getValue() : null
-        , u = <IUser>await MongooseUserModel.findOne({email})
+	const r = call.request
+		, email = r.hasEmail() ? r.getEmail()!.getValue() : null
+		, password = r.hasPassword() ? r.getPassword()!.getValue() : null
+		, u = <IUser>await MongooseUserModel.findOne({email})
     ;
-    await Validator['VALIDATE_PASSWORD'](password, u);
-    callback(null, GrpcTools.convertUserModel(u).setToken(new StringValue()
-        .setValue(await TokenTools['GENERATE_TOKEN'](u))));
+	await Validator['VALIDATE_PASSWORD'](password, u);
+	callback(null, GrpcTools.convertUserModel(u).setToken(new StringValue()
+		.setValue(await TokenTools['GENERATE_TOKEN'](u))));
 }
 
 /**
@@ -40,17 +40,17 @@ async function LOGIN(
  * @async
  */
 async function REGISTER(
-    call: ServerUnaryCall<IRegisterForm, IUserModel>,
-    callback: sendUnaryData<IUserModel>
+	call: ServerUnaryCall<IRegisterForm, IUserModel>,
+	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
-    const r = call.request
-        , username = r.hasUsername() ? r.getUsername()!.getValue() : null
-        , email = r.hasEmail() ? r.getEmail()!.getValue() : null
-        , password = r.hasPassword() ? r.getPassword()!.getValue() : null
-        , u: IUser | null = await Validator['VALIDATE_REGISTER'](username, email, password)
+	const r = call.request
+		, username = r.hasUsername() ? r.getUsername()!.getValue() : null
+		, email = r.hasEmail() ? r.getEmail()!.getValue() : null
+		, password = r.hasPassword() ? r.getPassword()!.getValue() : null
+		, u: IUser | null = await Validator['VALIDATE_REGISTER'](username, email, password)
     ;
-    callback(null, GrpcTools.convertUserModel(u).setToken(new StringValue()
-        .setValue(await TokenTools['GENERATE_TOKEN'](u))));
+	callback(null, GrpcTools.convertUserModel(u).setToken(new StringValue()
+		.setValue(await TokenTools['GENERATE_TOKEN'](u))));
 }
 
 

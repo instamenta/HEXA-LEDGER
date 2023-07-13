@@ -52,32 +52,24 @@ const UserSchema = new mongoose_1.Schema({
         type: String,
         default: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Anonymous_emblem.svg/1200px-Anonymous_emblem.svg.png'
     },
-    followers: [
-        {
+    followers: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'User',
             unique: true
-        }
-    ],
-    following: [
-        {
+        }],
+    following: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'User',
             unique: true
-        }
-    ],
-    comments: [
-        {
+        }],
+    comments: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'Comment'
-        }
-    ],
-    posts: [
-        {
+        }],
+    posts: [{
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: 'Post'
-        }
-    ]
+        }],
 });
 /**
  * Pre-save hook to hash the password before saving the user.

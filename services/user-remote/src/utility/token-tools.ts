@@ -1,5 +1,5 @@
 import {sign, verify} from 'jsonwebtoken';
-import {IUser} from './types/base-types';
+import {ObjectId} from 'bson';
 
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 
@@ -7,19 +7,21 @@ class TokenTools {
 
 	/**
 	 * @param u
+	 * @param u.username
+	 * @param u.email
+	 * @param u._id
+	 * @param u.picture
 	 * @returns
 	 */
-	public static GENERATE_TOKEN(u: IUser): Promise<string> {
-		const PAYLOAD = {
-			username: u.username,
-			email: u.email,
-			_id: u._id,
-			picture: u.picture,
-		};
+	public static GENERATE_TOKEN(
+		{username, email, _id, picture}
+            : { username: string, email: string, _id: ObjectId, picture: string }
+	): Promise<string> {
+		const PAYLOAD = {username, email, _id, picture};
 		return new Promise((resolve, reject) => {
-			sign(PAYLOAD, 'SECRET', {expiresIn: '60 days'}, (error, token) => error
-				? reject(error)
-				: resolve(token!)
+			sign(PAYLOAD, TOKEN_SECRET, {expiresIn: '60 days'},
+				(error, token) => error ? reject(error)
+					: resolve(<string>token)
 			);
 		});
 	}
@@ -30,9 +32,9 @@ class TokenTools {
 	 */
 	public static DECODE_TOKEN(token: string): Promise<string> {
 		return new Promise((resolve, reject) => {
-			verify(token, 'SECRET', (error, decoded) => error
-				? reject(error)
-				: resolve(<string>decoded)
+			verify(token, TOKEN_SECRET,
+				(error, decoded) => error ? reject(error)
+					: resolve(<string>decoded)
 			);
 		});
 	}

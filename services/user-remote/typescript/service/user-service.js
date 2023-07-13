@@ -17,7 +17,11 @@ async function GET_USERS(call) {
     const r = call.request, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1, filter = r.hasFilter() ? r.getFilter().getValue() : null, pipeline = [];
     if (filter) {
         pipeline.push({
-            $match: { fieldToFilter: { $regex: filter } }
+            $match: {
+                fieldToFilter: {
+                    $regex: filter
+                }
+            }
         });
     }
     pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
@@ -97,7 +101,9 @@ async function FOLLOW_USER(call, callback) {
     }
     if (await user_schema_1.default.exists({
         _id: currentUserB_Id,
-        following: { $in: [userB_Id] }
+        following: {
+            $in: [userB_Id]
+        }
     })) {
         validator_1.default['THROWER']('Users is already follower');
     }
@@ -131,22 +137,31 @@ async function UNFOLLOW_USER(call, callback) {
         validator_1.default['THROWER']('Users _id\'s are equal');
     }
     if (!await user_schema_1.default.exists({
-        _id: currentUserB_Id,
-        following: { $in: [userB_Id] }
+        _id: currentUserB_Id, following: { $in: [userB_Id] }
     })) {
         validator_1.default['THROWER']('Users is not follower');
     }
     await user_schema_1.default.bulkWrite([
         {
             updateOne: {
-                filter: { _id: currentUserB_Id },
-                update: { $pull: { following: userB_Id } },
+                filter: {
+                    _id: currentUserB_Id
+                },
+                update: {
+                    $pull: { following: userB_Id }
+                },
             },
         },
         {
             updateOne: {
-                filter: { _id: userB_Id },
-                update: { $pull: { followers: currentUserB_Id } },
+                filter: {
+                    _id: userB_Id
+                },
+                update: {
+                    $pull: {
+                        followers: currentUserB_Id
+                    }
+                },
             },
         },
     ]).then(r => (r && r.ok)

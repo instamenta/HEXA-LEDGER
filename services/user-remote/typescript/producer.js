@@ -28,12 +28,10 @@ async function sendLogMessage(message, event = 'UNDEFINED') {
     await Producer.send({
         topic: KAFKA_PRODUCER_TOPIC,
         compression: kafkajs_1.CompressionTypes.Snappy,
-        messages: [
-            {
+        messages: [{
                 headers: { event: event },
                 value: JSON.stringify({ message }),
-            }
-        ]
+            }]
     });
 }
 exports.sendLogMessage = sendLogMessage;

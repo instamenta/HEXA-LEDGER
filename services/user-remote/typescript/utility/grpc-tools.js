@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const wrappers_pb_1 = require("google-protobuf/google/protobuf/wrappers_pb");
-const base_enumartions_1 = require("./enumerations/base-enumartions");
+const base_enumerations_1 = require("./enumerations/base-enumerations");
 const { UserModel } = require('../protos/generated/users_pb');
 class GrpcTools {
     /**
@@ -35,31 +35,31 @@ class GrpcTools {
             };
             Object.keys(include).forEach((key) => {
                 switch (key) {
-                    case base_enumartions_1.UAttr._ID: {
+                    case base_enumerations_1.UAttr._ID: {
                         m._id = u.hasId() ? u.getId().getValue() : null;
                         break;
                     }
-                    case base_enumartions_1.UAttr.USER: {
+                    case base_enumerations_1.UAttr.USER: {
                         m.username = u.hasUsername() ? u.getUsername().getValue() : null;
                         break;
                     }
-                    case base_enumartions_1.UAttr.EMAIL: {
+                    case base_enumerations_1.UAttr.EMAIL: {
                         m.email = u.hasEmail() ? u.getEmail().getValue() : null;
                         break;
                     }
-                    case base_enumartions_1.UAttr.PASSWORD: {
+                    case base_enumerations_1.UAttr.PASSWORD: {
                         m.password = u.hasPassword() ? u.getPassword().getValue() : null;
                         break;
                     }
-                    case base_enumartions_1.UAttr.PICTURE: {
+                    case base_enumerations_1.UAttr.PICTURE: {
                         m.picture = u.hasPicture() ? u.getPicture().getValue() : null;
                         break;
                     }
-                    case base_enumartions_1.UAttr.FOLLOWERS: {
+                    case base_enumerations_1.UAttr.FOLLOWERS: {
                         m.followers = u.getFollowersList().map((f) => f.getValue().toString());
                         break;
                     }
-                    case base_enumartions_1.UAttr.FOLLOWING: {
+                    case base_enumerations_1.UAttr.FOLLOWING: {
                         m.following = u.getFollowingList().map((f) => f.getValue().toString());
                         break;
                     }

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const producer_1 = require("../producer");
+const base_enumerations_1 = require("./enumerations/base-enumerations");
 const DEBUG_CONSOLE = process.env.DEBUG_CONSOLE || false, SERVICE_NAME = process.env.SERVICE_NAME || 'User-Remote-Service';
 class Log {
     /**
@@ -9,31 +10,31 @@ class Log {
      * @param type
      * @param message
      */
-    static async log(type = 'ERROR', message) {
+    static async log(type = base_enumerations_1.LogAttr.DEFAULT, message) {
         switch (type.toUpperCase()) {
-            case 'ERROR': {
-                await (0, producer_1.sendLogMessage)(message, 'ERROR');
-                this.Console(message, 'ERROR', DEBUG_CONSOLE, '#');
+            case base_enumerations_1.LogAttr.ERROR: {
+                await (0, producer_1.sendLogMessage)(message, base_enumerations_1.LogAttr.ERROR);
+                this.Console(message, base_enumerations_1.LogAttr.ERROR, DEBUG_CONSOLE, '#');
                 break;
             }
-            case 'DEBUG': {
-                await (0, producer_1.sendLogMessage)(message, 'DEBUG');
-                this.Console(message, 'DEBUG', DEBUG_CONSOLE, '%');
+            case base_enumerations_1.LogAttr.DEBUG: {
+                await (0, producer_1.sendLogMessage)(message, base_enumerations_1.LogAttr.DEBUG);
+                this.Console(message, base_enumerations_1.LogAttr.DEBUG, DEBUG_CONSOLE, '%');
                 break;
             }
-            case 'COLLECT': {
-                await (0, producer_1.sendLogMessage)(message, 'COLLECT');
-                this.Console(message, 'COLLECT', DEBUG_CONSOLE, '-');
+            case base_enumerations_1.LogAttr.COLLECT: {
+                await (0, producer_1.sendLogMessage)(message, base_enumerations_1.LogAttr.COLLECT);
+                this.Console(message, base_enumerations_1.LogAttr.COLLECT, DEBUG_CONSOLE, '-');
                 break;
             }
-            case 'CRITICAL': {
-                await (0, producer_1.sendLogMessage)(message, 'CRITICAL');
-                this.Console(message, 'CRITICAL', DEBUG_CONSOLE, '');
+            case base_enumerations_1.LogAttr.CRITICAL: {
+                await (0, producer_1.sendLogMessage)(message, base_enumerations_1.LogAttr.CRITICAL);
+                this.Console(message, base_enumerations_1.LogAttr.CRITICAL, DEBUG_CONSOLE, '');
                 break;
             }
-            case 'INFO': {
-                await (0, producer_1.sendLogMessage)(message, 'INFO');
-                this.Console(message, 'INFO', DEBUG_CONSOLE, '@');
+            case base_enumerations_1.LogAttr.INFO: {
+                await (0, producer_1.sendLogMessage)(message, base_enumerations_1.LogAttr.INFO);
+                this.Console(message, base_enumerations_1.LogAttr.INFO, DEBUG_CONSOLE, '@');
                 break;
             }
             default: {

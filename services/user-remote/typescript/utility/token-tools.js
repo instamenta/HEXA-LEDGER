@@ -5,18 +5,16 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 class TokenTools {
     /**
      * @param u
+     * @param u.username
+     * @param u.email
+     * @param u._id
+     * @param u.picture
      * @returns
      */
-    static GENERATE_TOKEN(u) {
-        const PAYLOAD = {
-            username: u.username,
-            email: u.email,
-            _id: u._id,
-            picture: u.picture,
-        };
+    static GENERATE_TOKEN({ username, email, _id, picture }) {
+        const PAYLOAD = { username, email, _id, picture };
         return new Promise((resolve, reject) => {
-            (0, jsonwebtoken_1.sign)(PAYLOAD, 'SECRET', { expiresIn: '60 days' }, (error, token) => error
-                ? reject(error)
+            (0, jsonwebtoken_1.sign)(PAYLOAD, TOKEN_SECRET, { expiresIn: '60 days' }, (error, token) => error ? reject(error)
                 : resolve(token));
         });
     }
@@ -26,8 +24,7 @@ class TokenTools {
      */
     static DECODE_TOKEN(token) {
         return new Promise((resolve, reject) => {
-            (0, jsonwebtoken_1.verify)(token, 'SECRET', (error, decoded) => error
-                ? reject(error)
+            (0, jsonwebtoken_1.verify)(token, TOKEN_SECRET, (error, decoded) => error ? reject(error)
                 : resolve(decoded));
         });
     }

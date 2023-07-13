@@ -13,12 +13,10 @@ class Validator {
 	 */
 	public static VALIDATE_FILTERS(
 		page: number | null,
-		limit: number | null
+		limit: number | null,
 	): void {
-		if (!page || page < 0 ||
-            !limit || limit <= 0 ||
-            Number.isNaN(page) ||
-            Number.isNaN(limit)
+		if (!page || page < 0 || !limit || limit <= 0 ||
+            Number.isNaN(page) || Number.isNaN(limit)
 		) {
 			throw new Error(`Invalid filters - page : ${page} ${typeof page}, limit : ${limit} ${typeof limit}`);
 		}
@@ -71,7 +69,7 @@ class Validator {
 	 */
 	public static async VALIDATE_PASSWORD(
 		password: string | null,
-		u: IUser | any
+		u: IUser | any,
 	): Promise<void> {
 		if (!u || !password || !(await BCRYPT.compare(password, u.password))) {
 			throw new Error('Login Error');

@@ -15,4 +15,4 @@ export const LogAttr = {
 	COLLECT: 'COLLECT',
 	CRITICAL: 'CRITICAL',
 	INFO: 'INFO',
-}
+};

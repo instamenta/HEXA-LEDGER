@@ -14,10 +14,8 @@ class Validator {
      * @throws
      */
     static VALIDATE_FILTERS(page, limit) {
-        if (!page || page < 0 ||
-            !limit || limit <= 0 ||
-            Number.isNaN(page) ||
-            Number.isNaN(limit)) {
+        if (!page || page < 0 || !limit || limit <= 0 ||
+            Number.isNaN(page) || Number.isNaN(limit)) {
             throw new Error(`Invalid filters - page : ${page} ${typeof page}, limit : ${limit} ${typeof limit}`);
         }
     }

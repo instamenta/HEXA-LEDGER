@@ -1,0 +1,78 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: user-router-configmap
+#data:
+#  ROUTER_PORT: "5085"
+#  SERVICE_NAME: 'hexagots-user-router-api'
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: user-router-secret
+type: Opaque
+#data:
+#  - MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-router-service
+  labels:
+    app: user-router-api
+spec:
+  type: NodePort
+  selector:
+    app: user-router-api
+  ports:
+    - protocol: TCP
+      port: 5085
+      targetPort: 5085
+      nodePort: 30085
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-router-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-router-api
+  template:
+    metadata:
+      labels:
+        app: user-router-api
+    spec:
+      containers:
+        - name: user-router-api
+          image: janoopsi/user-router-api:latest
+          ports:
+            - containerPort: 5085
+#          env:
+#            - name: MONGODB_URI
+#              valueFrom:
+#                secretKeyRef:
+#                  name: user-router-secret
+#                  key: MONGODB_URI
+#            - name: TOKEN_SECRET
+#              valueFrom:
+#                secretKeyRef:
+#                  name: user-router-secret
+#                  key: TOKEN_SECRET
+#            - name: ROUTER_PORT
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: user-router-configmap
+#                  key: ROUTER_PORT
+#            - name: SERVICE_NAME
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: user-router-configmap
+#                  key: SERVICE_NAME

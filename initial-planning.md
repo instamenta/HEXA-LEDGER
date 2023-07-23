@@ -39,6 +39,9 @@
 2. JavaScript
 
  - React
+ - Nextjs
+ - React Query
+ - Zen
  - Redux
  - Vite
  - React Springs
@@ -66,7 +69,7 @@
  
 ## Databases
 
- - PRISMA
+ - Prisma
  - MongoDB / Mongoose / Realm
  - PostgrSQL
  - Redis ( Cache )

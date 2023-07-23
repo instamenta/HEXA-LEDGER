@@ -52,6 +52,10 @@ export class UserModel extends jspb.Message {
     getFollowingList(): Array<google_protobuf_wrappers_pb.StringValue>;
     setFollowingList(value: Array<google_protobuf_wrappers_pb.StringValue>): UserModel;
     addFollowing(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
+    clearPostsList(): void;
+    getPostsList(): Array<google_protobuf_wrappers_pb.StringValue>;
+    setPostsList(value: Array<google_protobuf_wrappers_pb.StringValue>): UserModel;
+    addPosts(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): UserModel.AsObject;
@@ -74,6 +78,7 @@ export namespace UserModel {
         userwallet?: UserWallet.AsObject,
         followersList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         followingList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
+        postsList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
     }
 }
 
@@ -135,6 +140,47 @@ export class RegisterForm extends jspb.Message {
 
 export namespace RegisterForm {
     export type AsObject = {
+        username?: google_protobuf_wrappers_pb.StringValue.AsObject,
+        email?: google_protobuf_wrappers_pb.StringValue.AsObject,
+        password?: google_protobuf_wrappers_pb.StringValue.AsObject,
+    }
+}
+
+export class UpdateForm extends jspb.Message { 
+
+    hasId(): boolean;
+    clearId(): void;
+    getId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setId(value?: google_protobuf_wrappers_pb.StringValue): UpdateForm;
+
+    hasUsername(): boolean;
+    clearUsername(): void;
+    getUsername(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setUsername(value?: google_protobuf_wrappers_pb.StringValue): UpdateForm;
+
+    hasEmail(): boolean;
+    clearEmail(): void;
+    getEmail(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setEmail(value?: google_protobuf_wrappers_pb.StringValue): UpdateForm;
+
+    hasPassword(): boolean;
+    clearPassword(): void;
+    getPassword(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setPassword(value?: google_protobuf_wrappers_pb.StringValue): UpdateForm;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): UpdateForm.AsObject;
+    static toObject(includeInstance: boolean, msg: UpdateForm): UpdateForm.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: UpdateForm, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): UpdateForm;
+    static deserializeBinaryFromReader(message: UpdateForm, reader: jspb.BinaryReader): UpdateForm;
+}
+
+export namespace UpdateForm {
+    export type AsObject = {
+        id?: google_protobuf_wrappers_pb.StringValue.AsObject,
         username?: google_protobuf_wrappers_pb.StringValue.AsObject,
         email?: google_protobuf_wrappers_pb.StringValue.AsObject,
         password?: google_protobuf_wrappers_pb.StringValue.AsObject,
@@ -443,5 +489,28 @@ export namespace UnfollowUserRequest {
     export type AsObject = {
         id?: google_protobuf_wrappers_pb.StringValue.AsObject,
         currentUserId?: google_protobuf_wrappers_pb.StringValue.AsObject,
+    }
+}
+
+export class idRequest extends jspb.Message { 
+
+    hasId(): boolean;
+    clearId(): void;
+    getId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setId(value?: google_protobuf_wrappers_pb.StringValue): idRequest;
+
+    serializeBinary(): Uint8Array;
+    toObject(includeInstance?: boolean): idRequest.AsObject;
+    static toObject(includeInstance: boolean, msg: idRequest): idRequest.AsObject;
+    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+    static serializeBinaryToWriter(message: idRequest, writer: jspb.BinaryWriter): void;
+    static deserializeBinary(bytes: Uint8Array): idRequest;
+    static deserializeBinaryFromReader(message: idRequest, reader: jspb.BinaryReader): idRequest;
+}
+
+export namespace idRequest {
+    export type AsObject = {
+        id?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }

@@ -10,7 +10,9 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 function decodeToken(token) {
     return new Promise((resolve, reject) => {
         (0, jsonwebtoken_1.verify)(token, 'SECRET', (error, decoded) => {
-            error ? reject(error) : resolve(decoded);
+            error
+                ? reject(error)
+                : resolve(decoded);
         });
     });
 }

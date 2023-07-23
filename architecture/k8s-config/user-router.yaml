@@ -1,11 +1,13 @@
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: user-router-configmap
-#data:
-#  ROUTER_PORT: "5085"
-#  SERVICE_NAME: 'hexagots-user-router-api'
+data:
+  ROUTER_PORT: "5085"
+  MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster.ltycehn.mongodb.net/?retryWrites=true&w=majority"
+  SERVICE_NAME: 'hexagots-user-router-api'
+  USER_REMOTE_REF: "user-remote-api"
+  USER_REMOTE_PORT: "50051"
 ---
 
 apiVersion: v1
@@ -53,8 +55,36 @@ spec:
       containers:
         - name: user-router-api
           image: janoopsi/user-router-api:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5085
+          env:
+            - name: ROUTER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: user-router-configmap
+                  key: ROUTER_PORT
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: user-router-configmap
+                  key: MONGODB_URI
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: user-router-configmap
+                  key: SERVICE_NAME
+            - name: USER_REMOTE_REF
+              valueFrom:
+                configMapKeyRef:
+                  name: user-router-configmap
+                  key: USER_REMOTE_REF
+            - name: USER_REMOTE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: user-router-configmap
+                  key: USER_REMOTE_PORT
+
 #          env:
 #            - name: MONGODB_URI
 #              valueFrom:

@@ -2,16 +2,19 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: user-router-configmap
-#data:
-#  ROUTER_PORT: "5085"
-#  SERVICE_NAME: 'hexagots-user-router-api'
+  name: user-remote-configmap
+data:
+  ROUTER_PORT: "50051"
+  SERVICE_NAME: 'hexagots-user-remote-api'
+  MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster.ltycehn.mongodb.net/?retryWrites=true&w=majority"
+  TOKEN_SECRET: "SECRET"
+  DEBUG_CONSOLE: "true"
 ---
 
 apiVersion: v1
 kind: Secret
 metadata:
-  name: user-router-secret
+  name: user-remote-secret
 type: Opaque
 #data:
 #  - MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster"
@@ -21,58 +24,65 @@ type: Opaque
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-router-service
+  name: user-remote-service
   labels:
-    app: user-router-api
+    app: user-remote-api
 spec:
   type: NodePort
   selector:
-    app: user-router-api
+    app: user-remote-api
   ports:
     - protocol: TCP
-      port: 5085
-      targetPort: 5085
-      nodePort: 30085
+      port: 50051
+      targetPort: 50051
+      nodePort: 30090
 
 ---
 
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-router-deployment
+  name: user-remote-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-router-api
+      app: user-remote-api
   template:
     metadata:
       labels:
-        app: user-router-api
+        app: user-remote-api
     spec:
       containers:
-        - name: user-router-api
-          image: janoopsi/user-router-api:latest
+        - name: user-remote-api
+          image: janoopsi/user-remote-api:latest
+          imagePullPolicy: Always
           ports:
-            - containerPort: 5085
-#          env:
-#            - name: MONGODB_URI
-#              valueFrom:
-#                secretKeyRef:
-#                  name: user-router-secret
-#                  key: MONGODB_URI
-#            - name: TOKEN_SECRET
-#              valueFrom:
-#                secretKeyRef:
-#                  name: user-router-secret
-#                  key: TOKEN_SECRET
-#            - name: ROUTER_PORT
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: user-router-configmap
-#                  key: ROUTER_PORT
-#            - name: SERVICE_NAME
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: user-router-configmap
-#                  key: SERVICE_NAME
+            - containerPort: 50051
+          env:
+            - name: ROUTER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: user-remote-configmap
+                  key: ROUTER_PORT
+            - name:  MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: user-remote-configmap
+                  key: MONGODB_URI
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: user-remote-configmap
+                  key: SERVICE_NAME
+            - name: TOKEN_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: user-remote-configmap
+                  key: TOKEN_SECRET
+            - name: DEBUG_CONSOLE
+              valueFrom:
+                configMapKeyRef:
+                  name: user-remote-configmap
+                  key: DEBUG_CONSOLE
+

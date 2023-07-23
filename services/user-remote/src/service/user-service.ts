@@ -28,8 +28,6 @@ export {
 
 /**
  * @param call
- * @throws
- * @async
  */
 async function GET_USERS(
 	call: ServerWritableStream<GetUsersRequest, IUserModel>,
@@ -60,8 +58,6 @@ async function GET_USERS(
 
 /**
  * @param call
- * @throws
- * @async
  */
 async function GET_ALL_USERS(
 	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
@@ -77,8 +73,6 @@ async function GET_ALL_USERS(
 /**
  * @param call
  * @param callback
- * @throws
- * @async
  */
 async function GET_USER_BY_ID(
 	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
@@ -95,8 +89,6 @@ async function GET_USER_BY_ID(
 
 /**
  * @param call
- * @throws
- * @async
  */
 async function GET_USER_FOLLOWERS(
 	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>

@@ -138,22 +138,6 @@ exports.unfollowUser = unfollowUser;
 //  * @param request
 //  * @param response
 //  */
-// async function getUserPosts(request: Request, response: Response): Promise<void> {
-// 	try {
-// 		const { id } = request.params;
-// 		const posts = await USER_CLIENT.getUserPosts(id);
-// 		response.json(posts).status(200).end();
-// 	} catch (error: Error | any) {
-// 		console.error(error);
-// 		response.json({ message: error.message }).status(500).end();
-// 	}
-// }
-//
-// /**
-//  *
-//  * @param request
-//  * @param response
-//  */
 // async function getUserComments(request: Request, response: Response): Promise<void> {
 // 	try {
 // 		const { id } = request.params;

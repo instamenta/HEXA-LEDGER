@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.getUserFollowers = exports.getUserById = exports.getAllUsers = exports.getUsers = void 0;
-const grpc_client_1 = __importDefault(require("../grpc-client"));
+const grpc_client_1 = __importDefault(require("./grpc-client"));
 const wrappers_pb_1 = require("google-protobuf/google/protobuf/wrappers_pb");
 const user_grpc_model_1 = __importDefault(require("../model/user-grpc-model"));
 const { GetUsersRequest, GetAllUsersRequest, GetUserByIdRequest, GetUserFollowersRequest, GetUserFollowingRequest, FollowUserRequest, UnfollowUserRequest } = require('../protos/generated/users_pb');
@@ -163,3 +163,54 @@ function unfollowUser(currentUserId, id) {
     });
 }
 exports.unfollowUser = unfollowUser;
+// function getUserPosts(id: string): Promise<PostClass[]> {
+//     return new Promise((resolve, reject) => {
+//         // Create a gRPC request message
+//         const m = new GetUserPostsRequest();
+//         m.setId(new StringValue().setValue(id));
+//
+//         const posts: PostClass[] = [];
+//
+//         const $stream = GRPC_CLIENT.getUserPosts(m);
+//
+//         // Handle the $stream events
+//         $stream.on("data", (response: PostModel) => {
+//             const post = PostClass.fromPostGRPCMessage(response);
+//             posts.push(post);
+//         });
+//
+//         $stream.on("error", (err: GRPC.ServiceError) => {
+//             reject(err.message);
+//         });
+//
+//         $stream.on("end", () => {
+//             resolve(posts);
+//         });
+//     });
+// }
+//
+// function getUserComments(id: string): Promise<CommentClass[]> {
+//     return new Promise((resolve, reject) => {
+//         // Create a gRPC request message
+//         const m = new GetUserCommentsRequest();
+//         m.setId(new StringValue().setValue(id));
+//
+//         const comments: CommentClass[] = [];
+//
+//         const $stream = GRPC_CLIENT.getUserComments(m);
+//
+//         // Handle the $stream events
+//         $stream.on("data", (response: CommentModel) => {
+//             const comment = CommentClass.fromCommentGRPCMessage(response);
+//             comments.push(comment);
+//         });
+//
+//         $stream.on("error", (err: GRPC.ServiceError) => {
+//             reject(err.message);
+//         });
+//
+//         $stream.on("end", () => {
+//             resolve(comments);
+//         });
+//     });
+// }

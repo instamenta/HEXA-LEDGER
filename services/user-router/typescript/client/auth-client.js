@@ -3,11 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.loginUser = exports.registerUser = void 0;
-const grpc_client_1 = __importDefault(require("../grpc-client"));
+exports.updateUserById = exports.deleteUserById = exports.registerUser = exports.loginUser = void 0;
+const grpc_client_1 = __importDefault(require("./grpc-client"));
 const wrappers_pb_1 = require("google-protobuf/google/protobuf/wrappers_pb");
 const user_grpc_model_1 = __importDefault(require("../model/user-grpc-model"));
-const { LoginForm, RegisterForm } = require('../protos/generated/users_pb');
+const { LoginForm, RegisterForm, UpdateForm, idRequest } = require('../protos/generated/users_pb');
 /**
  * @param email
  * @param password
@@ -18,9 +18,9 @@ function loginUser(email, password) {
         const m = new LoginForm();
         m.setEmail(new wrappers_pb_1.StringValue().setValue(email));
         m.setPassword(new wrappers_pb_1.StringValue().setValue(password));
-        grpc_client_1.default.login(m, (err, response) => {
+        grpc_client_1.default.login(m, (err, r) => {
             err ? reject(err.message)
-                : resolve(user_grpc_model_1.default.fromUserGRPCMessage(response));
+                : resolve(user_grpc_model_1.default.fromUserGRPCMessage(r));
         });
     });
 }
@@ -37,10 +37,47 @@ function registerUser(username, email, password) {
         m.setUsername(new wrappers_pb_1.StringValue().setValue(username));
         m.setEmail(new wrappers_pb_1.StringValue().setValue(email));
         m.setPassword(new wrappers_pb_1.StringValue().setValue(password));
-        grpc_client_1.default.register(m, (err, response) => {
+        grpc_client_1.default.register(m, (err, r) => {
             err ? reject(err.message)
-                : resolve(user_grpc_model_1.default.fromUserGRPCMessage(response));
+                : resolve(user_grpc_model_1.default.fromUserGRPCMessage(r));
         });
     });
 }
 exports.registerUser = registerUser;
+/**
+ * @param id
+ * @returns
+ */
+function deleteUserById(id) {
+    console.log('////////////////////////////');
+    return new Promise((resolve, reject) => {
+        const m = new idRequest().setId(new wrappers_pb_1.StringValue().setValue(id));
+        grpc_client_1.default.deleteUserById(m, (err) => {
+            err ? reject(err.message)
+                : resolve(true);
+        });
+    });
+}
+exports.deleteUserById = deleteUserById;
+/**
+ * @param id
+ * @param username
+ * @param email
+ * @param password
+ * @returns
+ */
+function updateUserById(id, username, email, password) {
+    console.log('////////////////////////////');
+    return new Promise((resolve, reject) => {
+        const m = new UpdateForm();
+        m.setId(new wrappers_pb_1.StringValue().setValue(id));
+        m.setUsername(new wrappers_pb_1.StringValue().setValue(username));
+        m.setEmail(new wrappers_pb_1.StringValue().setValue(email));
+        m.setPassword(new wrappers_pb_1.StringValue().setValue(password));
+        grpc_client_1.default.updateUserById(m, (err, r) => {
+            err ? reject(err.message)
+                : resolve(user_grpc_model_1.default.fromUserGRPCMessage(r));
+        });
+    });
+}
+exports.updateUserById = updateUserById;

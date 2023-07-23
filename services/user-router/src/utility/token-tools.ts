@@ -1,5 +1,6 @@
 import {verify} from 'jsonwebtoken';
 import {ITokenData} from '../middleware/auth-middleware';
+
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 
 /**
@@ -9,7 +10,9 @@ const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 function decodeToken(token: string): Promise<ITokenData> {
 	return new Promise((resolve, reject) => {
 		verify(token, 'SECRET', (error, decoded) => {
-			error ? reject(error) : resolve(decoded as ITokenData);
+			error
+				? reject(error)
+				: resolve(decoded as ITokenData);
 		});
 	});
 }

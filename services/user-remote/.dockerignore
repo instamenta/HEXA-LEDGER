@@ -1,10 +1,9 @@
 npm-debug.log
-.dockerignore
 .git
 .gitignore
 
 # Uncompiled Typescript files
-src/
+
 
 # Dependency directories
 node_modules/

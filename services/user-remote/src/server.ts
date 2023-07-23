@@ -1,6 +1,6 @@
 import * as GRPC from '@grpc/grpc-js';
 import connectDatabase from './mongodb';
-import {connectProducer, disconnectProducer} from './producer';
+// import {connectProducer, disconnectProducer} from './producer';
 import Log from './utility/logger';
 import {
 	getUserById,
@@ -8,6 +8,7 @@ import {
 	getUsers, getAllUsers,
 	followUser, unfollowUser,
 	getUserFollowers, getUserFollowing,
+	updateUserById, deleteUserById,
 } from './service/wrapper';
 
 const {UserServiceService} = require('./protos/generated/users_grpc_pb')
@@ -21,6 +22,7 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 		login, register,
 		getUsers, getAllUsers,
 		followUser, unfollowUser,
+		updateUserById, deleteUserById,
 		getUserFollowers, getUserFollowing,
 	});
 	Server.bindAsync(`0.0.0.0:${GRPC_PORT}`,
@@ -33,7 +35,7 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 			Server.start();
 			Log['grpc_start_log'](port);
 			await connectDatabase();
-			await connectProducer();
+			// await connectProducer();
 		});
 })();
 
@@ -41,7 +43,7 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 	process.on(type, async (error: Error) => {
 		try {
 			Log['process_disconnect_log'](type, error);
-			await disconnectProducer();
+			// await disconnectProducer();
 		} catch {
 			console.log('Exit...');
 			process.exit(1);
@@ -55,8 +57,8 @@ const {UserServiceService} = require('./protos/generated/users_grpc_pb')
 			Log['process_disconnect_log'](type, error);
 			process.exit(0);
 		} finally {
-			await disconnectProducer();
-			Log['kafka_disconnect_log'](error);
+			// await disconnectProducer();
+			// Log['kafka_disconnect_log'](error);
 			process.kill(process.pid, type);
 		}
 	});

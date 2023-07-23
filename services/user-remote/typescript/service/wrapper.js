@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getUserFollowing = exports.getUserFollowers = exports.unfollowUser = exports.followUser = exports.getAllUsers = exports.getUsers = exports.register = exports.login = exports.getUserById = void 0;
+exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.getUserFollowers = exports.getUserById = exports.getAllUsers = exports.getUsers = exports.updateUserById = exports.deleteUserById = exports.register = exports.login = void 0;
 const logger_1 = __importDefault(require("../utility/logger"));
 const auth_service_1 = require("./auth-service");
 const user_service_1 = require("./user-service");
@@ -47,6 +47,46 @@ async function register(call, callback) {
     }
 }
 exports.register = register;
+/**
+ * Handles the registration request
+ * ( takes username , password & e-mail
+ * @param call - The gRPC call object for the registration request.
+ * @param callback - The callback function to send the registration response.
+ * @throws - Emits an error if the input is invalid
+ * @async
+ */
+async function deleteUserById(call, callback) {
+    try {
+        await logger_1.default['log']('debug', '⌛ CALLING REGISTER...');
+        await (0, auth_service_1.REGISTER)(call, callback);
+        await logger_1.default['log']('info', '☕ FINISHED REGISTER');
+    }
+    catch (error) {
+        await logger_1.default['log']('error', error);
+        callback(error);
+    }
+}
+exports.deleteUserById = deleteUserById;
+/**
+ * Handles the registration request
+ * ( takes username , password & e-mail
+ * @param call - The gRPC call object for the registration request.
+ * @param callback - The callback function to send the registration response.
+ * @throws - Emits an error if the input is invalid
+ * @async
+ */
+async function updateUserById(call, callback) {
+    try {
+        await logger_1.default['log']('debug', '⌛ CALLING REGISTER...');
+        await (0, auth_service_1.REGISTER)(call, callback);
+        await logger_1.default['log']('info', '☕ FINISHED REGISTER');
+    }
+    catch (error) {
+        await logger_1.default['log']('error', error);
+        callback(error);
+    }
+}
+exports.updateUserById = updateUserById;
 /**
  * Retrieves a list of users based on the specified criteria.
  * ( optionally page & limit )

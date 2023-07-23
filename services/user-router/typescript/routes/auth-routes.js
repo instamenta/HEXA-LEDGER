@@ -9,4 +9,7 @@ AUTH_ROUTER.route('/login')
     .post(auth_middleware_1.isGuest, auth_validator_1.loginValidator, auth_controller_1.login);
 AUTH_ROUTER.route('/register')
     .post(auth_middleware_1.isGuest, auth_validator_1.registerValidator, auth_controller_1.register);
+AUTH_ROUTER.route('/:id')
+    .put(auth_middleware_1.isAuthenticated, auth_middleware_1.isOwner, auth_controller_1.updateUserById)
+    .delete(auth_middleware_1.isAuthenticated, auth_middleware_1.isOwner, auth_controller_1.deleteUserById);
 exports.default = AUTH_ROUTER;

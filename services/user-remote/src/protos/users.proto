@@ -29,6 +29,13 @@ message RegisterForm {
   google.protobuf.StringValue password = 3;
 }
 
+message UpdateForm {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue username = 2;
+  google.protobuf.StringValue email = 3;
+  google.protobuf.StringValue password = 4;
+}
+
 message UserWallet {
   google.protobuf.StringValue token = 1;
   google.protobuf.StringValue amount = 2;
@@ -82,9 +89,15 @@ message UnfollowUserRequest {
   google.protobuf.StringValue current_user_id = 2;
 }
 
+message idRequest {
+  google.protobuf.StringValue id = 1;
+}
+
 service UserService {
   rpc Login(LoginForm) returns (UserModel);
   rpc Register(RegisterForm) returns (UserModel);
+  rpc updateUserById(UpdateForm) returns (UserModel);
+  rpc deleteUserById(idRequest) returns (google.protobuf.Empty);
 
   rpc GetUserById(GetUserByIdRequest) returns (UserModel);
   rpc FollowUser(FollowUserRequest) returns (google.protobuf.Empty);

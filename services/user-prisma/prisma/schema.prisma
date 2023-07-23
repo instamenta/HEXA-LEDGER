@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+//---------------- POST RELATED ---------------- //
+model Post {
+  id        BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pictures String[]
+  title    String   @db.String(128)
+  content  String?
+
+  author   Profile @relation(fields: [authorId], references: [id])
+  authorId BigInt
+
+  likes      Int       @default(0)
+  dislikes   Int       @default(0)
+  likedBy    Profile[] @relation(name: "LikedPosts")
+  dislikedBy Profile[] @relation(name: "DislikedPosts")
+
+  comments     Comment[]
+  commentCount Int        @default(0)
+  categories   Category[]
+  tags         Tag[]
+
+  @@index([authorId])
+}
+
+model Tag {
+  id    BigInt @id @default(autoincrement())
+  name  String
+  posts Post[]
+}
+
+model Comment {
+  id        BigInt   @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId BigInt @unique
+
+  likes    Int @default(0)
+  dislikes Int @default(0)
+
+  likedBy    Profile[] @relation(name: "LikedComments")
+  dislikedBy Profile[] @relation(name: "DislikedComments")
+  author     Profile   @relation(fields: [authorId], references: [id])
+  authorId   BigInt    @unique
+}
+
+model Category {
+  id    BigInt @id @default(autoincrement())
+  name  String
+  posts Post[]
+}
+
+//---------------- USER RELATED ---------------- //
+model Profile {
+  id       BigInt   @id @default(autoincrement())
+  nickname String   @db.String(32)
+  bio      String
+  picture  String?
+  pictures String[]
+  user     User?
+
+  socials SocialLinks?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userPosts     Post[]
+  likedPosts    Post[] @relation("LikedPosts")
+  dislikedPosts Post[] @relation("DislikedPosts")
+
+  createdComment   Comment[]
+  likedComments    Comment[] @relation("LikedComments")
+  dislikedComments Comment[] @relation("DislikedComments")
+
+  followedBy Follows[] @relation("following")
+  following  Follows[] @relation("follower")
+}
+
+model Follows {
+  follower    Profile @relation("follower", fields: [followerId], references: [id])
+  followerId  BigInt
+  following   Profile @relation("following", fields: [followingId], references: [id])
+  followingId BigInt
+
+  @@id([followerId, followingId])
+}
+
+model User {
+  id       BigInt  @id @default(autoincrement())
+  email    String  @unique
+  username String? @unique
+  password String  @db.String(128)
+
+  profile   Profile? @relation(fields: [profileId], references: [id])
+  profileId BigInt   @unique
+}
+
+model SocialLinks {
+  id        BigInt  @id @default(autoincrement())
+  profileId BigInt  @unique
+  profile   Profile @relation(fields: [profileId], references: [id])
+  facebook  String?
+  twitter   String?
+  instagram String?
+  linkedIn  String?
+  website   String?
+}

@@ -11,13 +11,6 @@ USER_ROUTER.route('/find')
     .get(user_validator_1.pageLimitFilter, user_controller_1.getUsers);
 USER_ROUTER.route('/:id')
     .get(user_controller_1.getUserById);
-// .put(updateUserById)
-// .delete(deleteUserById);
-//
-// USER_ROUTER.route('/:id/posts')
-// 	.get(getUserPosts);
-// // .post(createUserPost);
-//
 // USER_ROUTER.route('/:id/comments')
 // 	.get(getUserComments);
 USER_ROUTER.route('/:id/followers')

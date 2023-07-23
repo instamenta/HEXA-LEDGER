@@ -5,8 +5,6 @@ import {
 	getAllUsers,
 	getUserById,
 	getUsers,
-	// updateUserById,
-	// deleteUserById,
 	// getUserPosts,
 	// getUserComments,
 	getUserFollowers,
@@ -25,8 +23,6 @@ USER_ROUTER.route('/find')
 
 USER_ROUTER.route('/:id')
 	.get(getUserById);
-// .put(updateUserById)
-// .delete(deleteUserById);
 
 // USER_ROUTER.route('/:id/comments')
 // 	.get(getUserComments);

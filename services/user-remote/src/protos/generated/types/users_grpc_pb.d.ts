@@ -12,6 +12,8 @@ import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty
 interface IUserServiceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
     login: IUserServiceService_ILogin;
     register: IUserServiceService_IRegister;
+    updateUserById: IUserServiceService_IupdateUserById;
+    deleteUserById: IUserServiceService_IdeleteUserById;
     getUserById: IUserServiceService_IGetUserById;
     followUser: IUserServiceService_IFollowUser;
     unfollowUser: IUserServiceService_IUnfollowUser;
@@ -38,6 +40,24 @@ interface IUserServiceService_IRegister extends grpc.MethodDefinition<users_pb.R
     requestDeserialize: grpc.deserialize<users_pb.RegisterForm>;
     responseSerialize: grpc.serialize<users_pb.UserModel>;
     responseDeserialize: grpc.deserialize<users_pb.UserModel>;
+}
+interface IUserServiceService_IupdateUserById extends grpc.MethodDefinition<users_pb.UpdateForm, users_pb.UserModel> {
+    path: "/user.UserService/updateUserById";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<users_pb.UpdateForm>;
+    requestDeserialize: grpc.deserialize<users_pb.UpdateForm>;
+    responseSerialize: grpc.serialize<users_pb.UserModel>;
+    responseDeserialize: grpc.deserialize<users_pb.UserModel>;
+}
+interface IUserServiceService_IdeleteUserById extends grpc.MethodDefinition<users_pb.idRequest, google_protobuf_empty_pb.Empty> {
+    path: "/user.UserService/deleteUserById";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<users_pb.idRequest>;
+    requestDeserialize: grpc.deserialize<users_pb.idRequest>;
+    responseSerialize: grpc.serialize<google_protobuf_empty_pb.Empty>;
+    responseDeserialize: grpc.deserialize<google_protobuf_empty_pb.Empty>;
 }
 interface IUserServiceService_IGetUserById extends grpc.MethodDefinition<users_pb.GetUserByIdRequest, users_pb.UserModel> {
     path: "/user.UserService/GetUserById";
@@ -108,6 +128,8 @@ export const UserServiceService: IUserServiceService;
 export interface IUserServiceServer {
     login: grpc.handleUnaryCall<users_pb.LoginForm, users_pb.UserModel>;
     register: grpc.handleUnaryCall<users_pb.RegisterForm, users_pb.UserModel>;
+    updateUserById: grpc.handleUnaryCall<users_pb.UpdateForm, users_pb.UserModel>;
+    deleteUserById: grpc.handleUnaryCall<users_pb.idRequest, google_protobuf_empty_pb.Empty>;
     getUserById: grpc.handleUnaryCall<users_pb.GetUserByIdRequest, users_pb.UserModel>;
     followUser: grpc.handleUnaryCall<users_pb.FollowUserRequest, google_protobuf_empty_pb.Empty>;
     unfollowUser: grpc.handleUnaryCall<users_pb.UnfollowUserRequest, google_protobuf_empty_pb.Empty>;
@@ -124,6 +146,12 @@ export interface IUserServiceClient {
     register(request: users_pb.RegisterForm, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     register(request: users_pb.RegisterForm, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     register(request: users_pb.RegisterForm, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    updateUserById(request: users_pb.UpdateForm, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    updateUserById(request: users_pb.UpdateForm, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    updateUserById(request: users_pb.UpdateForm, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    deleteUserById(request: users_pb.idRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
+    deleteUserById(request: users_pb.idRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
+    deleteUserById(request: users_pb.idRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
     getUserById(request: users_pb.GetUserByIdRequest, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     getUserById(request: users_pb.GetUserByIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     getUserById(request: users_pb.GetUserByIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
@@ -151,6 +179,12 @@ export class UserServiceClient extends grpc.Client implements IUserServiceClient
     public register(request: users_pb.RegisterForm, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     public register(request: users_pb.RegisterForm, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     public register(request: users_pb.RegisterForm, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    public updateUserById(request: users_pb.UpdateForm, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    public updateUserById(request: users_pb.UpdateForm, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    public updateUserById(request: users_pb.UpdateForm, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
+    public deleteUserById(request: users_pb.idRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
+    public deleteUserById(request: users_pb.idRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
+    public deleteUserById(request: users_pb.idRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
     public getUserById(request: users_pb.GetUserByIdRequest, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     public getUserById(request: users_pb.GetUserByIdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;
     public getUserById(request: users_pb.GetUserByIdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: users_pb.UserModel) => void): grpc.ClientUnaryCall;

@@ -9,23 +9,22 @@ import {
 	RegisterForm as IRegisterForm,
 	GetAllUsersRequest, GetUsersRequest,
 	FollowUserRequest, UnfollowUserRequest,
-	GetUserFollowersRequest, GetUserFollowingRequest,
+	GetUserFollowersRequest, GetUserFollowingRequest, UpdateForm, idRequest,
 } from '../protos/generated/types/users_pb';
-import {LOGIN, REGISTER} from './auth-service';
+
+import {
+	LOGIN,
+	REGISTER,
+	DELETE_USER_BY_ID,
+	UPDATE_USER_BY_ID,
+} from './auth-service';
+
 import {
 	GET_USER_BY_ID,
 	GET_USERS, GET_ALL_USERS,
 	FOLLOW_USER, UNFOLLOW_USER,
 	GET_USER_FOLLOWERS, GET_USER_FOLLOWING,
 } from './user-service';
-
-export {
-	getUserById,
-	login, register,
-	getUsers, getAllUsers,
-	followUser, unfollowUser,
-	getUserFollowers, getUserFollowing,
-};
 
 /**
  * Handles the login request
@@ -35,7 +34,7 @@ export {
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function login(
+export async function login(
 	call: ServerUnaryCall<ILoginForm, IUserModel>,
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
@@ -57,7 +56,7 @@ async function login(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function register(
+export async function register(
 	call: ServerUnaryCall<IRegisterForm, IUserModel>,
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
@@ -72,13 +71,57 @@ async function register(
 }
 
 /**
+ * Handles the registration request
+ * ( takes username , password & e-mail
+ * @param call - The gRPC call object for the registration request.
+ * @param callback - The callback function to send the registration response.
+ * @throws - Emits an error if the input is invalid
+ * @async
+ */
+export async function deleteUserById(
+	call: ServerUnaryCall<idRequest, Empty>,
+	callback: sendUnaryData<Empty>
+): Promise<void> {
+	try {
+		await Log['log']('debug', '⌛ CALLING DELETE USER...');
+		await DELETE_USER_BY_ID(call, callback);
+		await Log['log']('info', '☕ FINISHED DELETE USER');
+	} catch (error: IError) {
+		await Log['log']('error', error);
+		callback(error);
+	}
+}
+
+/**
+ * Handles the registration request
+ * ( takes username , password & e-mail
+ * @param call - The gRPC call object for the registration request.
+ * @param callback - The callback function to send the registration response.
+ * @throws - Emits an error if the input is invalid
+ * @async
+ */
+export async function updateUserById(
+	call: ServerUnaryCall<UpdateForm, IUserModel>,
+	callback: sendUnaryData<IUserModel>
+): Promise<void> {
+	try {
+		await Log['log']('debug', '⌛ CALLING UPDATE USER...');
+		await UPDATE_USER_BY_ID(call, callback);
+		await Log['log']('info', '☕ FINISHED UPDATE USER');
+	} catch (error: IError) {
+		await Log['log']('error', error);
+		callback(error);
+	}
+}
+
+/**
  * Retrieves a list of users based on the specified criteria.
  * ( optionally page & limit )
  * @param call - The call object for the gRPC writable stream.
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function getUsers(
+export async function getUsers(
 	call: ServerWritableStream<GetUsersRequest, IUserModel>,
 ): Promise<void> {
 	try {
@@ -99,7 +142,7 @@ async function getUsers(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function getAllUsers(
+export async function getAllUsers(
 	call: ServerWritableStream<GetAllUsersRequest, IUserModel>,
 ): Promise<void> {
 	try {
@@ -121,7 +164,7 @@ async function getAllUsers(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function getUserById(
+export async function getUserById(
 	call: ServerUnaryCall<GetUserByIdRequest, IUserModel>,
 	callback: sendUnaryData<IUserModel>
 ): Promise<void> {
@@ -143,7 +186,7 @@ async function getUserById(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function getUserFollowers(
+export async function getUserFollowers(
 	call: ServerWritableStream<GetUserFollowersRequest, IUserModel>
 ): Promise<void> {
 	try {
@@ -164,7 +207,7 @@ async function getUserFollowers(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function getUserFollowing(
+export async function getUserFollowing(
 	call: ServerWritableStream<GetUserFollowingRequest, IUserModel>
 ): Promise<void> {
 	try {
@@ -185,7 +228,7 @@ async function getUserFollowing(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function followUser(
+export async function followUser(
 	call: ServerUnaryCall<FollowUserRequest, Empty>,
 	callback: sendUnaryData<Empty>
 ): Promise<void> {
@@ -206,7 +249,7 @@ async function followUser(
  * @throws - Emits an error if the input is invalid
  * @async
  */
-async function unfollowUser(
+export async function unfollowUser(
 	call: ServerUnaryCall<UnfollowUserRequest, Empty>,
 	callback: sendUnaryData<Empty>
 ): Promise<void> {

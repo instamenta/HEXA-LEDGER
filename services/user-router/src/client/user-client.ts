@@ -1,5 +1,5 @@
 import * as GRPC from '@grpc/grpc-js';
-import CLIENT from './grpc-client';
+import GRPC_CLIENT from './grpc-client';
 import {UserModel,} from '../protos/generated/types/users_pb';
 import {StringValue, Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import UserGrpcModel from '../model/user-grpc-model';
@@ -21,7 +21,7 @@ const {
  * @param filter
  * @returns
  */
-function getUsers(page = 1, limit = 5, filter?: string): Promise<UserGrpcModel[]> {
+export function getUsers(page = 1, limit = 5, filter?: string): Promise<UserGrpcModel[]> {
 	return new Promise((resolve, reject) => {
 		const m = new GetUsersRequest();
 		m.setLimit(new Int32Value().setValue(limit));
@@ -30,7 +30,7 @@ function getUsers(page = 1, limit = 5, filter?: string): Promise<UserGrpcModel[]
 			m.setFilter(new StringValue().setValue(filter));
 
 		const users: UserGrpcModel[] = [];
-		const $stream = CLIENT.getUsers(m);
+		const $stream = GRPC_CLIENT.getUsers(m);
 		$stream.on('data', (response: UserModel) => {
 			users.push(UserGrpcModel.fromUserGRPCMessage(response));
 		});
@@ -49,14 +49,14 @@ function getUsers(page = 1, limit = 5, filter?: string): Promise<UserGrpcModel[]
  * @param limit
  * @returns
  */
-function getAllUsers(page = 1, limit = 5): Promise<UserGrpcModel[]> {
+export function getAllUsers(page = 1, limit = 5): Promise<UserGrpcModel[]> {
 	return new Promise((resolve, reject) => {
 		const m = new GetAllUsersRequest();
 		m.setLimit(new Int32Value().setValue(limit));
 		m.setPage(new Int32Value().setValue(page));
 
 		const users: UserGrpcModel[] = [];
-		const $stream = CLIENT.getAllUsers(m);
+		const $stream = GRPC_CLIENT.getAllUsers(m);
 		$stream.on('data', (response: UserModel) => {
 			users.push(UserGrpcModel.fromUserGRPCMessage(response));
 		});
@@ -74,12 +74,12 @@ function getAllUsers(page = 1, limit = 5): Promise<UserGrpcModel[]> {
  * @param id
  * @returns
  */
-function getUserById(id: string): Promise<UserGrpcModel> {
+export function getUserById(id: string): Promise<UserGrpcModel> {
 	return new Promise((resolve, reject) => {
 		const m = new GetUserByIdRequest();
 		m.setId(new StringValue().setValue(id));
 
-		CLIENT.getUserById(m, (err: GRPC.ServiceError, response: UserModel) => {
+		GRPC_CLIENT.getUserById(m, (err: GRPC.ServiceError, response: UserModel) => {
 			err ? reject(err.message)
 				: resolve(UserGrpcModel.fromUserGRPCMessage(response));
 		});
@@ -93,7 +93,7 @@ function getUserById(id: string): Promise<UserGrpcModel> {
  * @param limit
  * @returns
  */
-function getUserFollowers(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
+export function getUserFollowers(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
 	return new Promise((resolve, reject) => {
 		const m = new GetUserFollowersRequest();
 		m.setId(new StringValue().setValue(id));
@@ -101,7 +101,7 @@ function getUserFollowers(id: string, page = 1, limit = 5): Promise<UserGrpcMode
 		m.setLimit(new Int32Value().setValue(limit));
 
 		const followers: UserGrpcModel[] = [];
-		const $stream = CLIENT.getUserFollowers(m);
+		const $stream = GRPC_CLIENT.getUserFollowers(m);
 		$stream.on('data', (response: UserModel) => {
 			followers.push(UserGrpcModel.fromUserGRPCMessage(response));
 		});
@@ -120,7 +120,7 @@ function getUserFollowers(id: string, page = 1, limit = 5): Promise<UserGrpcMode
  * @param limit
  * @returns
  */
-function getUserFollowing(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
+export function getUserFollowing(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
 	return new Promise((resolve, reject) => {
 		const m = new GetUserFollowingRequest();
 		m.setId(new StringValue().setValue(id));
@@ -128,7 +128,7 @@ function getUserFollowing(id: string, page = 1, limit = 5): Promise<UserGrpcMode
 		m.setLimit(new Int32Value().setValue(limit));
 
 		const following: UserGrpcModel[] = [];
-		const $stream = CLIENT.getUserFollowing(m);
+		const $stream = GRPC_CLIENT.getUserFollowing(m);
 		$stream.on('data', (response: UserModel) => {
 			following.push(UserGrpcModel.fromUserGRPCMessage(response));
 		});
@@ -146,13 +146,13 @@ function getUserFollowing(id: string, page = 1, limit = 5): Promise<UserGrpcMode
  * @param id
  * @returns
  */
-function followUser(currentUserId: string, id: string): Promise<boolean> {
+export function followUser(currentUserId: string, id: string): Promise<boolean> {
 	return new Promise((resolve, reject) => {
 		const m = new FollowUserRequest();
 		m.setId(new StringValue().setValue(id));
 		m.setCurrentUserId(new StringValue().setValue(currentUserId));
 
-		CLIENT.followUser(m, (err: GRPC.ServiceError) => {
+		GRPC_CLIENT.followUser(m, (err: GRPC.ServiceError) => {
 			err ? reject(err.message)
 				: resolve(true);
 		});
@@ -165,13 +165,13 @@ function followUser(currentUserId: string, id: string): Promise<boolean> {
  * @param id
  * @returns
  */
-function unfollowUser(currentUserId: string, id: string): Promise<boolean> {
+export function unfollowUser(currentUserId: string, id: string): Promise<boolean> {
 	return new Promise((resolve, reject) => {
 		const m = new UnfollowUserRequest();
 		m.setId(new StringValue().setValue(id));
 		m.setCurrentUserId(new StringValue().setValue(currentUserId));
 
-		CLIENT.unfollowUser(m, (err: GRPC.ServiceError) => {
+		GRPC_CLIENT.unfollowUser(m, (err: GRPC.ServiceError) => {
 			err ? reject(err.message)
 				: resolve(true);
 		});
@@ -186,7 +186,7 @@ function unfollowUser(currentUserId: string, id: string): Promise<boolean> {
 //
 //         const posts: PostClass[] = [];
 //
-//         const $stream = CLIENT.getUserPosts(m);
+//         const $stream = GRPC_CLIENT.getUserPosts(m);
 //
 //         // Handle the $stream events
 //         $stream.on("data", (response: PostModel) => {
@@ -212,7 +212,7 @@ function unfollowUser(currentUserId: string, id: string): Promise<boolean> {
 //
 //         const comments: CommentClass[] = [];
 //
-//         const $stream = CLIENT.getUserComments(m);
+//         const $stream = GRPC_CLIENT.getUserComments(m);
 //
 //         // Handle the $stream events
 //         $stream.on("data", (response: CommentModel) => {
@@ -229,12 +229,3 @@ function unfollowUser(currentUserId: string, id: string): Promise<boolean> {
 //         });
 //     });
 // }
-export {
-	getUsers,
-	getAllUsers,
-	getUserById,
-	getUserFollowers,
-	getUserFollowing,
-	followUser,
-	unfollowUser,
-};

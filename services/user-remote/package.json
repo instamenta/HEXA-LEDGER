@@ -9,7 +9,11 @@
     "lint-fix": "npx eslint ./src/ --fix",
     "build": "tsc",
     "start": "npx nodemon ./typescript/server.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q typescript/server.js\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q typescript/server.js\"",
+    "migrate": "migrate-mongo up",
+    "create-migration": "migrate-mongo create",
+    "revert-migration": "migrate-mongo down"
+
   },
   "keywords": [],
   "author": "",
@@ -24,6 +28,7 @@
     "jsonwebtoken": "^9.0.0",
     "kafkajs": "^2.2.4",
     "kafkajs-snappy": "^1.1.0",
+    "migrate-mongo": "^10.0.0",
     "mongoose": "^7.3.0"
   },
   "devDependencies": {

@@ -1,4 +1,4 @@
-import {sendLogMessage} from '../producer';
+// import {sendLogMessage} from '../producer';
 import {IError} from './types/base-types';
 import {LogAttr} from './enumerations/base-enumerations';
 const DEBUG_CONSOLE = process.env.DEBUG_CONSOLE || false
@@ -18,32 +18,32 @@ class Log {
 	): Promise<void> {
 		switch (type.toUpperCase()) {
 		case LogAttr.ERROR: {
-			await sendLogMessage(message, LogAttr.ERROR);
+			// await sendLogMessage(message, LogAttr.ERROR);
 			this.Console(message, LogAttr.ERROR, DEBUG_CONSOLE, '#');
 			break;
 		}
 		case LogAttr.DEBUG: {
-			await sendLogMessage(message, LogAttr.DEBUG);
+			// await sendLogMessage(message, LogAttr.DEBUG);
 			this.Console(message, LogAttr.DEBUG, DEBUG_CONSOLE, '%');
 			break;
 		}
 		case LogAttr.COLLECT: {
-			await sendLogMessage(message, LogAttr.COLLECT);
+			// await sendLogMessage(message, LogAttr.COLLECT);
 			this.Console(message, LogAttr.COLLECT, DEBUG_CONSOLE, '-');
 			break;
 		}
 		case LogAttr.CRITICAL: {
-			await sendLogMessage(message, LogAttr.CRITICAL);
+			// await sendLogMessage(message, LogAttr.CRITICAL);
 			this.Console(message, LogAttr.CRITICAL, DEBUG_CONSOLE, '');
 			break;
 		}
 		case LogAttr.INFO: {
-			await sendLogMessage(message, LogAttr.INFO);
+			// await sendLogMessage(message, LogAttr.INFO);
 			this.Console(message, LogAttr.INFO, DEBUG_CONSOLE, '@');
 			break;
 		}
 		default: {
-			await sendLogMessage(message, type);
+			// await sendLogMessage(message, type);
 			this.Console(message, type, DEBUG_CONSOLE);
 			break;
 		}

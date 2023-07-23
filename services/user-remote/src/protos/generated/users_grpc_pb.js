@@ -116,6 +116,17 @@ function deserialize_user_UnfollowUserRequest(buffer_arg) {
   return users_pb.UnfollowUserRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_user_UpdateForm(arg) {
+  if (!(arg instanceof users_pb.UpdateForm)) {
+    throw new Error('Expected argument of type user.UpdateForm');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_UpdateForm(buffer_arg) {
+  return users_pb.UpdateForm.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_user_UserModel(arg) {
   if (!(arg instanceof users_pb.UserModel)) {
     throw new Error('Expected argument of type user.UserModel');
@@ -125,6 +136,17 @@ function serialize_user_UserModel(arg) {
 
 function deserialize_user_UserModel(buffer_arg) {
   return users_pb.UserModel.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_idRequest(arg) {
+  if (!(arg instanceof users_pb.idRequest)) {
+    throw new Error('Expected argument of type user.idRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_idRequest(buffer_arg) {
+  return users_pb.idRequest.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 
@@ -150,6 +172,28 @@ var UserServiceService = exports.UserServiceService = {
     requestDeserialize: deserialize_user_RegisterForm,
     responseSerialize: serialize_user_UserModel,
     responseDeserialize: deserialize_user_UserModel,
+  },
+  updateUserById: {
+    path: '/user.UserService/updateUserById',
+    requestStream: false,
+    responseStream: false,
+    requestType: users_pb.UpdateForm,
+    responseType: users_pb.UserModel,
+    requestSerialize: serialize_user_UpdateForm,
+    requestDeserialize: deserialize_user_UpdateForm,
+    responseSerialize: serialize_user_UserModel,
+    responseDeserialize: deserialize_user_UserModel,
+  },
+  deleteUserById: {
+    path: '/user.UserService/deleteUserById',
+    requestStream: false,
+    responseStream: false,
+    requestType: users_pb.idRequest,
+    responseType: google_protobuf_empty_pb.Empty,
+    requestSerialize: serialize_user_idRequest,
+    requestDeserialize: deserialize_user_idRequest,
+    responseSerialize: serialize_google_protobuf_Empty,
+    responseDeserialize: deserialize_google_protobuf_Empty,
   },
   getUserById: {
     path: '/user.UserService/GetUserById',

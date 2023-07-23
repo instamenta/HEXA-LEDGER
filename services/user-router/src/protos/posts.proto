@@ -24,12 +24,6 @@ message PostModel {
   repeated google.protobuf.StringValue ethereum_transaction = 13;
   repeated google.protobuf.StringValue donations = 14;
   repeated google.protobuf.StringValue pictures = 15;
-
-  google.protobuf.Int64Value transactions_count = 16;
-  google.protobuf.Int64Value donations_count = 17;
-  google.protobuf.Int64Value comments_count = 18;
-  google.protobuf.Int64Value upvotes_count = 19;
-  google.protobuf.Int64Value downvotes_count = 20;
 }
 
 message PostForm {
@@ -117,7 +111,7 @@ service PostService {
   rpc GetPostComments(GetCommentsRequest) returns (stream Comments);
 
   rpc GetUserPosts(GetUserPostsRequest) returns (stream PostModel);
-  // INTERACT
+  // UPVOTE POST AND COMMENT
   rpc UpvotePost(UpdateByObjectId) returns (google.protobuf.Empty);
   rpc DownvotePost(UpdateByObjectId) returns (google.protobuf.Empty);
 

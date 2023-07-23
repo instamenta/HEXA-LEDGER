@@ -3,12 +3,12 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/services/frontend/blog-app" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/services/frontend/chirper" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/services/frontend/example-app" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/services/frontend/hexa-gots" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/services/frontend/hexagots" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/services/kafkajs/src/producer/partitioners/default" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/secondaryUse/frontend/blog-app" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/secondaryUse/frontend/chirper" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/secondaryUse/frontend/example-app" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/secondaryUse/frontend/hexa-gots" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/services/secondaryUse/frontend/hexagots" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

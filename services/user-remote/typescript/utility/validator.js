@@ -16,7 +16,7 @@ class Validator {
     static VALIDATE_FILTERS(page, limit) {
         if (!page || page < 0 || !limit || limit <= 0 ||
             Number.isNaN(page) || Number.isNaN(limit)) {
-            throw new Error(`Invalid filters - page : ${page} ${typeof page}, limit : ${limit} ${typeof limit}`);
+            throw new Error(`INVALID FILTERS - PAGE : ${page} ${typeof page}, LIMIT : ${limit} ${typeof limit}`);
         }
     }
     /**
@@ -25,7 +25,7 @@ class Validator {
      */
     static VALIDATE_USER(u) {
         if (typeof u !== 'object') {
-            throw new TypeError('User not found');
+            throw new TypeError('USER NOT FOUND');
         }
     }
     /**
@@ -34,7 +34,7 @@ class Validator {
      */
     static VALIDATE_ID(_id) {
         if (!_id || !mongoose_1.Types.ObjectId.isValid(_id)) {
-            throw new Error(`Invalid _id : ${_id}`);
+            throw new Error(`INVALID ID _id : ${_id}`);
         }
     }
     /**
@@ -44,7 +44,7 @@ class Validator {
      */
     static CONVERT_TO_OBJECT_ID(_id) {
         if (!_id || !mongoose_1.Types.ObjectId.isValid(_id)) {
-            throw new Error('Invalid User id');
+            throw new Error('INVALID USER _id : ${_id}');
         }
         else {
             return new bson_1.ObjectId(_id);
@@ -58,7 +58,7 @@ class Validator {
      */
     static async VALIDATE_PASSWORD(password, u) {
         if (!u || !password || !(await bcrypt_1.default.compare(password, u.password))) {
-            throw new Error('Login Error');
+            throw new Error('ERROR WHILE LOGGING IN USER');
         }
     }
     /**
@@ -73,10 +73,10 @@ class Validator {
             !password || password.length <= 6 ||
             !email || email.length <= 6 ||
             !email.includes('@') || !email.includes('.')) {
-            throw new Error('Register Error');
+            throw new Error('ERROR WHILE REGISTERING USER: invalid input: ');
         }
         return user_schema_1.default.create({ username, email, password })
-            .catch(error => this['THROWER']('Register error: ', error));
+            .catch(error => this['THROWER']('ERROR WHILE REGISTERING USER: ', error));
     }
     /**
      * @param message
@@ -85,6 +85,21 @@ class Validator {
      */
     static THROWER(message, error = '!') {
         throw new Error(message, error);
+    }
+    /**
+     * @param username
+     * @param email
+     * @param password
+     * @returns
+     * @throws
+     */
+    static async VALIDATE_USER_DATA(username, email, password) {
+        if (!username || username.length <= 3 ||
+            !password || password.length <= 6 ||
+            !email || email.length <= 6 ||
+            !email.includes('@') || !email.includes('.')) {
+            throw new Error('ERROR WHILE UPDATING USER');
+        }
     }
 }
 exports.default = Validator;

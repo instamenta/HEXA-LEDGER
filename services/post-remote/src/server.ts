@@ -20,7 +20,7 @@ import {
 } from './service/wrapper';
 
 const {UserServiceService} = require('./protos/generated/users_grpc_pb')
-	, GRPC_PORT = process.env.GRPC_PORT || 50052
+	, GRPC_PORT = process.env.GRPC_PORT || 50_052
 ;
 
 (async function StartService() {

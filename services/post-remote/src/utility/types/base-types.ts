@@ -1,5 +1,5 @@
-import {Document, Schema} from "mongoose";
-import {ObjectId} from "bson";
+import {Document, Schema} from 'mongoose';
+import {ObjectId} from 'bson';
 
 export type IError = Error | any;
 

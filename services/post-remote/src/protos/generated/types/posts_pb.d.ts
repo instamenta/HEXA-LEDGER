@@ -280,28 +280,6 @@ export namespace CommentModel {
     }
 }
 
-export class Comments extends jspb.Message { 
-    clearCommentsList(): void;
-    getCommentsList(): Array<CommentModel>;
-    setCommentsList(value: Array<CommentModel>): Comments;
-    addComments(value?: CommentModel, index?: number): CommentModel;
-
-    serializeBinary(): Uint8Array;
-    toObject(includeInstance?: boolean): Comments.AsObject;
-    static toObject(includeInstance: boolean, msg: Comments): Comments.AsObject;
-    static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
-    static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-    static serializeBinaryToWriter(message: Comments, writer: jspb.BinaryWriter): void;
-    static deserializeBinary(bytes: Uint8Array): Comments;
-    static deserializeBinaryFromReader(message: Comments, reader: jspb.BinaryReader): Comments;
-}
-
-export namespace Comments {
-    export type AsObject = {
-        commentsList: Array<CommentModel.AsObject>,
-    }
-}
-
 export class GetByObjectId extends jspb.Message { 
 
     hasId(): boolean;

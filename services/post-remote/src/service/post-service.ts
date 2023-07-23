@@ -1,18 +1,24 @@
-import {sendUnaryData, ServerUnaryCall, ServerWritableStream} from "@grpc/grpc-js";
-import {IUser} from "../utility/types/base-types";
-import Validator from "../utility/validator";
-import GrpcTools from "../utility/grpc-tools";
-import {StringValue} from "google-protobuf/google/protobuf/wrappers_pb";
-import {Empty} from "google-protobuf/google/protobuf/empty_pb";
+import {sendUnaryData, ServerUnaryCall, ServerWritableStream} from '@grpc/grpc-js';
+import {IComment, IPost} from '../utility/types/base-types';
+import Validator from '../utility/validator';
+import GrpcTools from '../utility/grpc-tools';
+import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {
-    CommentForm, CommentModel,
-    Comments, DeleteByObjectId, GetByObjectId,
-    GetCommentsRequest, GetPostsRequest, GetUserPostsRequest, PostForm, PostModel,
-    PostModel as IPostModel, UpdateByObjectId, VoteCommentRequest
-} from "../protos/generated/types/posts_pb";
-import MongoosePostModel from '../model/schema/post-schema'
-import MongooseCommentModel from '../model/schema/comment-schema'
-import {ObjectId} from "bson";
+	CommentForm,
+	CommentModel,
+	DeleteByObjectId,
+	GetByObjectId,
+	GetCommentsRequest,
+	GetPostsRequest,
+	GetUserPostsRequest,
+	PostForm,
+	PostModel as IPostModel,
+	VoteCommentRequest,
+	VotePostRequest
+} from '../protos/generated/types/posts_pb';
+import MongoosePostModel from '../model/schema/post-schema';
+import MongooseCommentModel from '../model/schema/comment-schema';
+import {ObjectId} from 'bson';
 
 /**
  * @param call
@@ -20,23 +26,23 @@ import {ObjectId} from "bson";
  * @async
  */
 export async function GET_POSTS(
-    call: ServerWritableStream<GetPostsRequest, IPostModel>
+	call: ServerWritableStream<GetPostsRequest, IPostModel>
 ): Promise<void> {
-    const r = call.request
-        , ids = r.getIdsList() ? r.getIdsList().map((id) => id.toString()) : []
-        , limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
-        , page = r.hasPage() ? r.getPage()!.getValue() : 1
-        , filter = r.hasFilter() ? r.getFilter()!.getValue() : null
-        , match = r.hasMatch() ? r.getMatch()!.getValue() : null
-        , pipeline = []
+	const r = call.request
+		// , ids = r.getIdsList() ? r.getIdsList().map((id) => id.toString()) : []
+		, limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
+		, page = r.hasPage() ? r.getPage()!.getValue() : 1
+		// , filter = r.hasFilter() ? r.getFilter()!.getValue() : null
+		// , match = r.hasMatch() ? r.getMatch()!.getValue() : null
+		, pipeline = []
     ;
-    Validator['VALIDATE_FILTERS'](page, limit);
-    pipeline.push(
-        {$skip: (page - 1) * limit},
-        {$limit: limit}
-    );
-    await MongoosePostModel.aggregate(pipeline).exec()
-        .then((arr) => arr.forEach(p => call.write(GrpcTools.convertPostModel(p))));
+	Validator['VALIDATE_FILTERS'](page, limit);
+	pipeline.push(
+		{$skip: (page - 1) * limit},
+		{$limit: limit}
+	);
+	await MongoosePostModel.aggregate(pipeline).exec()
+		.then((arr) => arr.forEach(p => call.write(GrpcTools.convertPostModel(p))));
 }
 
 /**
@@ -45,24 +51,24 @@ export async function GET_POSTS(
  * @async
  */
 export async function GET_USER_POSTS(
-    call: ServerWritableStream<GetUserPostsRequest, IPostModel>
+	call: ServerWritableStream<GetUserPostsRequest, IPostModel>
 ): Promise<void> {
-    const r = call.request
-        , userId = r.hasUserId() ? r.getUserId()!.getValue() : null
-        , limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
-        , page = r.hasPage() ? r.getPage()!.getValue() : 1
-        , filter = r.hasFilter() ? r.getFilter()!.getValue() : null
-        , match = r.hasMatch() ? r.getMatch()!.getValue() : null
-        , pipeline = []
-    Validator['VALIDATE_ID'](userId);
-    Validator['VALIDATE_FILTERS'](page, limit);
-    pipeline.push(
-        {$match: {authorId: userId}},
-        {$skip: (page - 1) * limit},
-        {$limit: limit}
-    );
-    await MongoosePostModel.aggregate(pipeline).exec()
-        .then((arr) => arr.forEach(p => call.write(GrpcTools.convertPostModel(p))));
+	const r = call.request
+		, userId = r.hasUserId() ? r.getUserId()!.getValue() : null
+		, limit = r.hasLimit() ? r.getLimit()!.getValue() : 5
+		, page = r.hasPage() ? r.getPage()!.getValue() : 1
+		// , filter = r.hasFilter() ? r.getFilter()!.getValue() : null
+		// , match = r.hasMatch() ? r.getMatch()!.getValue() : null
+		, pipeline = [];
+	Validator['VALIDATE_ID'](userId);
+	Validator['VALIDATE_FILTERS'](page, limit);
+	pipeline.push(
+		{$match: {authorId: userId}},
+		{$skip: (page - 1) * limit},
+		{$limit: limit}
+	);
+	await MongoosePostModel.aggregate(pipeline).exec()
+		.then((arr) => arr.forEach(p => call.write(GrpcTools.convertPostModel(p))));
 }
 
 /**
@@ -71,183 +77,319 @@ export async function GET_USER_POSTS(
  * @async
  */
 export async function GET_POSTS_COMMENTS(
-    call: ServerWritableStream<GetCommentsRequest, Comments>
+	call: ServerWritableStream<GetCommentsRequest, CommentModel>
 ): Promise<void> {
-    const r = call.request
-        , postId = r.hasId() ? r.getId()!.getValue() : null
-        , page = r.hasPage() ? r.getPage()!.getValue() : 1
-        , limit = r.getLimit() ? r.getLimit()!.getValue() : 5
-        // , _id : ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id)
+	const r = call.request
+		, postId = r.hasId() ? r.getId()!.getValue() : null
+		, page = r.hasPage() ? r.getPage()!.getValue() : 1
+		, limit = r.getLimit() ? r.getLimit()!.getValue() : 5
     ;
-    Validator['VALIDATE_ID'](id);
-    Validator['VALIDATE_FILTERS'](page, limit);
-    await MongooseCommentModel.find({
-
-    })
+	Validator['VALIDATE_ID'](postId);
+	Validator['VALIDATE_FILTERS'](page, limit);
+	await MongoosePostModel.findById(postId)
+		.populate({
+			path: 'comments',
+			options: {
+				skip: (page - 1) * limit,
+				limit: limit,
+			}
+		}).exec().then((p) => p?.comments.forEach(
+			(c: any) => call.write(GrpcTools.convertCommentModel(c as IComment))));
 }
 
 /*---------------------------------------------------------*/
 /**
+ * @param call
+ * @param callback
  */
 export async function CREATE_POST(
-    call: ServerUnaryCall<PostForm, PostModel>,
-    callback: sendUnaryData<PostModel>
+	call: ServerUnaryCall<PostForm, IPostModel>,
+	callback: sendUnaryData<IPostModel>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, title = r.hasTitle() ? r.getTitle()!.getValue() : ''
+		, description = r.hasDescription() ? r.getDescription()!.getValue() : ''
+		, authorId = r.hasAuthorId() ? r.getAuthorId()!.getValue() : null
+		, pictures = r.getPicturesList() ? r.getPicturesList().map(pic => pic.toString()) : []
+		, isPromoted = r.hasIsPromoted() ? r.getIsPromoted()!.getValue() : false
+		, tags = r.getTagsList() ? r.getTagsList().map(t => t.toString()) : []
+		, authorB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](authorId);
+	const p: IPost = await Validator['VALIDATE_CREATE_POST'](
+		authorB_Id,
+		title,
+		description,
+		pictures,
+		isPromoted,
+		tags
+	);
+	callback(null, GrpcTools.convertPostModel(p));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function UPDATE_POST(
-    call: ServerUnaryCall<PostForm, PostModel>,
-    callback: sendUnaryData<PostModel>
+	call: ServerUnaryCall<PostForm, IPostModel>,
+	callback: sendUnaryData<IPostModel>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, id = r.hasId() ? r.getId()!.getValue() : null
+		, title = r.hasTitle() ? r.getTitle()!.getValue() : ''
+		, description = r.hasDescription() ? r.getDescription()!.getValue() : ''
+		, pictures = r.getPicturesList() ? r.getPicturesList().map(pic => pic.toString()) : []
+		, isPromoted = r.hasIsPromoted() ? r.getIsPromoted()!.getValue() : false
+		, tags = r.getTagsList() ? r.getTagsList().map(t => t.toString()) : []
+		, _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
+	Validator['VALIDATE_POST_DATA'](title);
+	await MongoosePostModel.findByIdAndUpdate(
+		{_id},
+		{
+			$set: {
+				title,
+				description,
+				pictures,
+				isPromoted,
+				tags
+			}
+		}).then((p: any) => callback(null, GrpcTools.convertPostModel(p as IPost)))
+		.catch((error) => Validator['THROWER']('ERROR WHILE UPDATING POST: ', error));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function DELETE_POST(
-    call: ServerUnaryCall<DeleteByObjectId, Empty>,
-    callback: sendUnaryData<Empty>
+	call: ServerUnaryCall<DeleteByObjectId, Empty>,
+	callback: sendUnaryData<Empty>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, id = r.hasId() ? r.getId()!.getValue() : null
+		, _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
+	await MongoosePostModel.deleteOne({_id})
+		.then(() => callback(null, new Empty()))
+		.catch((error) => Validator['THROWER']('ERROR WHILE DELETING USER: ', error));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function CREATE_COMMENT(
-    call: ServerUnaryCall<CommentForm, CommentModel>,
-    callback: sendUnaryData<CommentModel>
+	call: ServerUnaryCall<CommentForm, CommentModel>,
+	callback: sendUnaryData<CommentModel>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, authorId = r.hasAuthorId() ? r.getAuthorId()!.getValue() : null
+		, postId = r.hasPostId() ? r.getPostId()!.getValue() : null
+		, content = r.hasContent() ? r.getContent()!.getValue() : ''
+		, authorB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](authorId)
+		, postB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](postId);
+	const c: IComment = await Validator['VALIDATE_CREATE_COMMENT'](
+		content,
+		authorB_Id,
+		postB_Id,
+	);
+	callback(null, GrpcTools.convertCommentModel(c));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function UPDATE_COMMENT(
-    call: ServerUnaryCall<CommentForm, CommentModel>,
-    callback: sendUnaryData<CommentModel>
+	call: ServerUnaryCall<CommentForm, CommentModel>,
+	callback: sendUnaryData<CommentModel>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, id = r.hasId() ? r.getId()!.getValue() : null
+		, content = r.hasContent() ? r.getContent()!.getValue() : null
+		, _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
+	Validator['VALIDATE_COMMENT_DATA'](content);
+	await MongooseCommentModel.findByIdAndUpdate(
+		{_id}, {$set: {content}})
+		.then((c: any) => callback(null, GrpcTools.convertCommentModel(c as IComment)))
+		.catch((error) => Validator['THROWER']('ERROR WHILE UPDATING COMMENT: ', error));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function DELETE_COMMENT(
-    call: ServerUnaryCall<DeleteByObjectId, Empty>,
-    callback: sendUnaryData<Empty>
+	call: ServerUnaryCall<DeleteByObjectId, Empty>,
+	callback: sendUnaryData<Empty>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, id = r.hasId() ? r.getId()!.getValue() : null
+		, _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
+	await MongooseCommentModel.deleteOne({_id})
+		.then(() => callback(null, new Empty()))
+		.catch((error) => Validator['THROWER']('ERROR WHILE DELETING USER: ', error));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function GET_POST_BY_ID(
-    call: ServerUnaryCall<GetByObjectId, IPostModel>,
-    callback: sendUnaryData<IPostModel>
+	call: ServerUnaryCall<GetByObjectId, IPostModel>,
+	callback: sendUnaryData<IPostModel>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
+	const r = call.request
+		, id = r.hasId() ? r.getId()!.getValue() : null
     ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	Validator['VALIDATE_ID'](id);
+	const p = <IPost>await MongoosePostModel.findById(id);
+	Validator['VALIDATE_POST'](p);
+	callback(null, GrpcTools.convertPostModel(p));
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function UPVOTE_POST(
-    call: ServerUnaryCall<VotePostRequest, Empty>,
-    callback: sendUnaryData<Empty>
+	call: ServerUnaryCall<VotePostRequest, Empty>,
+	callback: sendUnaryData<Empty>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, postId = r.hasId() ? r.getId()!.getValue() : null
+		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null
+		, postB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](postId)
+		, currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId);
+	const result = await MongoosePostModel.aggregate([
+		{$match: {_id: postB_Id}},
+		{
+			$project: {
+				upvotes: {
+					$cond: [
+						{$in: [currentUserB_Id, '$upvotes']},
+						{$setDifference: ['$upvotes', [currentUserB_Id]]},
+						{$concatArrays: ['$upvotes', [currentUserB_Id]]}
+					]
+				}
+			}
+		},
+		{$limit: 1},
+		{$project: {upvotes: 1}}
+	]);
+	if (result.length === 0) {
+		Validator['THROWER'](`USER: ${currentUserId} FAILED TO UPVOTE POST: ${postId}`);
+	}
+	const {upvotes} = result[0];
+	await MongoosePostModel.updateOne({_id: postB_Id}, {upvotes});
+	callback(null, new Empty());
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function DOWNVOTE_POST(
-    call: ServerUnaryCall<VotePostRequest, Empty>,
-    callback: sendUnaryData<Empty>
+	call: ServerUnaryCall<VotePostRequest, Empty>,
+	callback: sendUnaryData<Empty>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, postId = r.hasId() ? r.getId()!.getValue() : null
+		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null
+		, postB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](postId)
+		, currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId);
+	const result = await MongoosePostModel.aggregate([
+		{$match: {_id: postB_Id}},
+		{
+			$project: {
+				downvotes: {
+					$cond: [
+						{$in: [currentUserB_Id, '$downvotes']},
+						{$setDifference: ['$downvotes', [currentUserB_Id]]},
+						'$downvotes'
+					]
+				}
+			}
+		},
+		{$limit: 1},
+		{$project: {downvotes: 1}}
+	]);
+	if (result.length === 0) {
+		Validator['THROWER'](`USER: ${currentUserId} FAILED TO DOWNVOTE POST: ${postId}`);
+	}
+	const {downvotes} = result[0];
+	await MongoosePostModel.updateOne({_id: postB_Id}, {downvotes});
+	callback(null, new Empty());
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function UPVOTE_COMMENT(
-    call: ServerUnaryCall<VoteCommentRequest, Empty>,
-    callback: sendUnaryData<Empty>
+	call: ServerUnaryCall<VoteCommentRequest, Empty>,
+	callback: sendUnaryData<Empty>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, commentId = r.hasId() ? r.getId()!.getValue() : null
+		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null
+		, commentB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](commentId)
+		, currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId);
+	const result = await MongooseCommentModel.aggregate([
+		{$match: {_id: commentB_Id}},
+		{
+			$project: {
+				upvotes: {
+					$cond: [
+						{$in: [currentUserB_Id, '$upvotes']},
+						{$setDifference: ['$upvotes', [currentUserB_Id]]},
+						{$concatArrays: ['$upvotes', [currentUserB_Id]]}
+					]
+				}
+			}
+		},
+		{$limit: 1},
+		{$project: {upvotes: 1}}
+	]);
+	if (result.length === 0) {
+		Validator['THROWER'](`USER: ${currentUserId} FAILED TO UPVOTE COMMENT: ${commentId}`);
+	}
+	const {upvotes} = result[0];
+	await MongooseCommentModel.updateOne({_id: commentB_Id}, {upvotes});
+	callback(null, new Empty());
 }
 
 /**
+ * @param call
+ * @param callback
  */
 export async function DOWNVOTE_COMMENT(
-    call: ServerUnaryCall<VoteCommentRequest, Empty>,
-    callback: sendUnaryData<Empty>
+	call: ServerUnaryCall<VoteCommentRequest, Empty>,
+	callback: sendUnaryData<Empty>
 ): Promise<void> {
-    const r = call.request
-        , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const u = <IUser>await MongooseUserModel.findById(id);
-    Validator['VALIDATE_USER'](u);
-    callback(null, GrpcTools.convertUserModel(<IUser>u));
+	const r = call.request
+		, commentId = r.hasId() ? r.getId()!.getValue() : null
+		, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null
+		, commentB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](commentId)
+		, currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId);
+	const result = await MongooseCommentModel.aggregate([
+		{$match: {_id: commentB_Id}},
+		{
+			$project: {
+				downvotes: {
+					$cond: [
+						{$in: [currentUserB_Id, '$downvotes']},
+						{$setDifference: ['$downvotes', [currentUserB_Id]]},
+						'$downvotes'
+					]
+				}
+			}
+		},
+		{$limit: 1},
+		{$project: {downvotes: 1}}
+	]);
+	if (result.length === 0) {
+		Validator['THROWER'](`USER: ${currentUserId} FAILED TO DOWNVOTE COMMENT: ${commentId}`);
+	}
+	const {downvotes} = result[0];
+	await MongooseCommentModel.updateOne({_id: commentB_Id}, {downvotes});
+	callback(null, new Empty());
 }

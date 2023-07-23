@@ -40,17 +40,6 @@ function deserialize_post_CommentModel(buffer_arg) {
   return posts_pb.CommentModel.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_post_Comments(arg) {
-  if (!(arg instanceof posts_pb.Comments)) {
-    throw new Error('Expected argument of type post.Comments');
-  }
-  return Buffer.from(arg.serializeBinary());
-}
-
-function deserialize_post_Comments(buffer_arg) {
-  return posts_pb.Comments.deserializeBinary(new Uint8Array(buffer_arg));
-}
-
 function serialize_post_DeleteByObjectId(arg) {
   if (!(arg instanceof posts_pb.DeleteByObjectId)) {
     throw new Error('Expected argument of type post.DeleteByObjectId');
@@ -186,7 +175,8 @@ createPost: {
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
   },
-  createComment: {
+  //  COMMENT
+createComment: {
     path: '/post.PostService/CreateComment',
     requestStream: false,
     responseStream: false,
@@ -242,18 +232,20 @@ getPostById: {
     responseSerialize: serialize_post_PostModel,
     responseDeserialize: deserialize_post_PostModel,
   },
-  getPostComments: {
+  // COMMENT
+getPostComments: {
     path: '/post.PostService/GetPostComments',
     requestStream: false,
     responseStream: true,
     requestType: posts_pb.GetCommentsRequest,
-    responseType: posts_pb.Comments,
+    responseType: posts_pb.CommentModel,
     requestSerialize: serialize_post_GetCommentsRequest,
     requestDeserialize: deserialize_post_GetCommentsRequest,
-    responseSerialize: serialize_post_Comments,
-    responseDeserialize: deserialize_post_Comments,
+    responseSerialize: serialize_post_CommentModel,
+    responseDeserialize: deserialize_post_CommentModel,
   },
-  getUserPosts: {
+  // USER
+getUserPosts: {
     path: '/post.PostService/GetUserPosts',
     requestStream: false,
     responseStream: true,
@@ -287,7 +279,8 @@ upvotePost: {
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
   },
-  upvoteComment: {
+  //  COMMENT
+upvoteComment: {
     path: '/post.PostService/UpvoteComment',
     requestStream: false,
     responseStream: false,

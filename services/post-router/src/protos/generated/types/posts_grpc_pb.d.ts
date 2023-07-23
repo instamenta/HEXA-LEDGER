@@ -99,14 +99,14 @@ interface IPostServiceService_IGetPost extends grpc.MethodDefinition<posts_pb.Ge
     responseSerialize: grpc.serialize<posts_pb.PostModel>;
     responseDeserialize: grpc.deserialize<posts_pb.PostModel>;
 }
-interface IPostServiceService_IGetPostComments extends grpc.MethodDefinition<posts_pb.GetCommentsRequest, posts_pb.Comments> {
+interface IPostServiceService_IGetPostComments extends grpc.MethodDefinition<posts_pb.GetCommentsRequest, posts_pb.CommentModel> {
     path: "/post.PostService/GetPostComments";
     requestStream: false;
     responseStream: true;
     requestSerialize: grpc.serialize<posts_pb.GetCommentsRequest>;
     requestDeserialize: grpc.deserialize<posts_pb.GetCommentsRequest>;
-    responseSerialize: grpc.serialize<posts_pb.Comments>;
-    responseDeserialize: grpc.deserialize<posts_pb.Comments>;
+    responseSerialize: grpc.serialize<posts_pb.CommentModel>;
+    responseDeserialize: grpc.deserialize<posts_pb.CommentModel>;
 }
 interface IPostServiceService_IGetUserPosts extends grpc.MethodDefinition<posts_pb.GetUserPostsRequest, posts_pb.PostModel> {
     path: "/post.PostService/GetUserPosts";
@@ -165,7 +165,7 @@ export interface IPostServiceServer {
     deleteComment: grpc.handleUnaryCall<posts_pb.DeleteByObjectId, google_protobuf_empty_pb.Empty>;
     getPostById: grpc.handleUnaryCall<posts_pb.GetByObjectId, posts_pb.PostModel>;
     getPost: grpc.handleServerStreamingCall<posts_pb.GetPostsRequest, posts_pb.PostModel>;
-    getPostComments: grpc.handleServerStreamingCall<posts_pb.GetCommentsRequest, posts_pb.Comments>;
+    getPostComments: grpc.handleServerStreamingCall<posts_pb.GetCommentsRequest, posts_pb.CommentModel>;
     getUserPosts: grpc.handleServerStreamingCall<posts_pb.GetUserPostsRequest, posts_pb.PostModel>;
     upvotePost: grpc.handleUnaryCall<posts_pb.VotePostRequest, google_protobuf_empty_pb.Empty>;
     downvotePost: grpc.handleUnaryCall<posts_pb.VotePostRequest, google_protobuf_empty_pb.Empty>;
@@ -197,8 +197,8 @@ export interface IPostServiceClient {
     getPostById(request: posts_pb.GetByObjectId, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: posts_pb.PostModel) => void): grpc.ClientUnaryCall;
     getPost(request: posts_pb.GetPostsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
     getPost(request: posts_pb.GetPostsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
-    getPostComments(request: posts_pb.GetCommentsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.Comments>;
-    getPostComments(request: posts_pb.GetCommentsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.Comments>;
+    getPostComments(request: posts_pb.GetCommentsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.CommentModel>;
+    getPostComments(request: posts_pb.GetCommentsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.CommentModel>;
     getUserPosts(request: posts_pb.GetUserPostsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
     getUserPosts(request: posts_pb.GetUserPostsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
     upvotePost(request: posts_pb.VotePostRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
@@ -240,8 +240,8 @@ export class PostServiceClient extends grpc.Client implements IPostServiceClient
     public getPostById(request: posts_pb.GetByObjectId, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: posts_pb.PostModel) => void): grpc.ClientUnaryCall;
     public getPost(request: posts_pb.GetPostsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
     public getPost(request: posts_pb.GetPostsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
-    public getPostComments(request: posts_pb.GetCommentsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.Comments>;
-    public getPostComments(request: posts_pb.GetCommentsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.Comments>;
+    public getPostComments(request: posts_pb.GetCommentsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.CommentModel>;
+    public getPostComments(request: posts_pb.GetCommentsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.CommentModel>;
     public getUserPosts(request: posts_pb.GetUserPostsRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
     public getUserPosts(request: posts_pb.GetUserPostsRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<posts_pb.PostModel>;
     public upvotePost(request: posts_pb.VotePostRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;

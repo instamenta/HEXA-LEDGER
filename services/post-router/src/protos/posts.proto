@@ -60,10 +60,6 @@ message CommentModel {
 
 }
 
-message Comments {
-  repeated CommentModel comments = 1;
-}
-
 message GetByObjectId {
   google.protobuf.StringValue _id = 1;
 }
@@ -120,7 +116,7 @@ service PostService {
   rpc GetPostById(GetByObjectId) returns (PostModel);
   rpc GetPost(GetPostsRequest) returns (stream PostModel);
   // COMMENT
-  rpc GetPostComments(GetCommentsRequest) returns (stream Comments);
+  rpc GetPostComments(GetCommentsRequest) returns (stream CommentModel);
   // USER
   rpc GetUserPosts(GetUserPostsRequest) returns (stream PostModel);
   // UPVOTE POST AND COMMENT

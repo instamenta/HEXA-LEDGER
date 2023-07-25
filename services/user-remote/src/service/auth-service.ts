@@ -1,3 +1,5 @@
+/** @file Service used for Auth related Server Endpoint Methods. */
+
 import {ServerUnaryCall, sendUnaryData} from '@grpc/grpc-js';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import MongooseUserModel from '../model/schema/user-schema';
@@ -6,21 +8,28 @@ import GrpcTools from '../utility/grpc-tools';
 import Validator from '../utility/validator';
 import {IUser} from '../utility/types/base-types';
 import {
-    idRequest,
     LoginForm as ILoginForm,
-    RegisterForm as IRegisterForm, UpdateForm,
-    UserModel as IUserModel
+    RegisterForm as IRegisterForm,
+    UserModel as IUserModel, UpdateForm,
+    idRequest
 } from '../protos/generated/types/users_pb';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {ObjectId} from 'bson';
 
+export {
+    LOGIN,
+    REGISTER,
+    UPDATE_USER_BY_ID,
+    DELETE_USER_BY_ID
+};
+
 /**
  * @param call
  * @param callback
- * @throws
  * @async
+ * @throws
  */
-export async function LOGIN(
+async function LOGIN(
     call: ServerUnaryCall<ILoginForm, IUserModel>,
     callback: sendUnaryData<IUserModel>
 ): Promise<void> {
@@ -37,10 +46,10 @@ export async function LOGIN(
 /**
  * @param call
  * @param callback
- * @throws
  * @async
+ * @throws
  */
-export async function REGISTER(
+async function REGISTER(
     call: ServerUnaryCall<IRegisterForm, IUserModel>,
     callback: sendUnaryData<IUserModel>
 ): Promise<void> {
@@ -57,10 +66,10 @@ export async function REGISTER(
 /**
  * @param call
  * @param callback
- * @throws
  * @async
+ * @throws
  */
-export async function DELETE_USER_BY_ID(
+async function DELETE_USER_BY_ID(
     call: ServerUnaryCall<idRequest, Empty>,
     callback: sendUnaryData<Empty>
 ): Promise<void> {
@@ -77,10 +86,10 @@ export async function DELETE_USER_BY_ID(
 /**
  * @param call
  * @param callback
- * @throws
  * @async
+ * @throws
  */
-export async function UPDATE_USER_BY_ID(
+async function UPDATE_USER_BY_ID(
     call: ServerUnaryCall<UpdateForm, IUserModel>,
     callback: sendUnaryData<IUserModel>
 ): Promise<void> {

@@ -7,14 +7,6 @@ exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.g
 const logger_1 = __importDefault(require("../utility/logger"));
 const auth_service_1 = require("./auth-service");
 const user_service_1 = require("./user-service");
-/**
- * Handles the login request
- * ( takes email $ password )
- * @param call - The gRPC call object for the login request.
- * @param callback - The callback function to send the login response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function login(call, callback) {
     try {
         await logger_1.default['log']('debug', 'CALLING LOGIN...');
@@ -27,14 +19,6 @@ async function login(call, callback) {
     }
 }
 exports.login = login;
-/**
- * Handles the registration request
- * ( takes username , password & e-mail
- * @param call - The gRPC call object for the registration request.
- * @param callback - The callback function to send the registration response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function register(call, callback) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING REGISTER...');
@@ -47,14 +31,6 @@ async function register(call, callback) {
     }
 }
 exports.register = register;
-/**
- * Handles the registration request
- * ( takes username , password & e-mail
- * @param call - The gRPC call object for the registration request.
- * @param callback - The callback function to send the registration response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function deleteUserById(call, callback) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING DELETE USER...');
@@ -67,14 +43,6 @@ async function deleteUserById(call, callback) {
     }
 }
 exports.deleteUserById = deleteUserById;
-/**
- * Handles the registration request
- * ( takes username , password & e-mail
- * @param call - The gRPC call object for the registration request.
- * @param callback - The callback function to send the registration response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function updateUserById(call, callback) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING UPDATE USER...');
@@ -87,13 +55,6 @@ async function updateUserById(call, callback) {
     }
 }
 exports.updateUserById = updateUserById;
-/**
- * Retrieves a list of users based on the specified criteria.
- * ( optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function getUsers(call) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING GET_USERS...');
@@ -107,13 +68,6 @@ async function getUsers(call) {
     }
 }
 exports.getUsers = getUsers;
-/**
- * Retrieves all users.
- * ( takes optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function getAllUsers(call) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING GET_ALL_USERS...');
@@ -127,14 +81,6 @@ async function getAllUsers(call) {
     }
 }
 exports.getAllUsers = getAllUsers;
-/**
- * Retrieves a user by their ID.
- * ( takes user _id )
- * @param call - The call object for the gRPC writable stream.
- * @param callback  - The callback function to send the response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function getUserById(call, callback) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING GET_USER_BY_ID...');
@@ -147,13 +93,6 @@ async function getUserById(call, callback) {
     }
 }
 exports.getUserById = getUserById;
-/**
- * Retrieves the followers of a user.
- * ( takes _id, and optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function getUserFollowers(call) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING GET_USER_FOLLOWERS...');
@@ -167,13 +106,6 @@ async function getUserFollowers(call) {
     }
 }
 exports.getUserFollowers = getUserFollowers;
-/**
- * Retrieves the users that a user is following
- * ( takes _id, and optionally page & limit )
- * @param call - The call object for the gRPC writable stream.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function getUserFollowing(call) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING GET_USER_FOLLOWING...');
@@ -187,13 +119,6 @@ async function getUserFollowing(call) {
     }
 }
 exports.getUserFollowing = getUserFollowing;
-/**
- * Follows a user ( takes 2 user _id's current and target )
- * @param call - The call object for the gRPC writable stream.
- * @param callback  - The callback function to send the response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function followUser(call, callback) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING FOLLOW_USER...');
@@ -206,13 +131,6 @@ async function followUser(call, callback) {
     }
 }
 exports.followUser = followUser;
-/**
- * Unfollows a user ( takes 2 user _id's current and target )
- * @param call - The call object for the gRPC writable stream.
- * @param callback  - The callback function to send the response.
- * @throws - Emits an error if the input is invalid
- * @async
- */
 async function unfollowUser(call, callback) {
     try {
         await logger_1.default['log']('debug', '⌛ CALLING UNFOLLOW_USER...');

@@ -23,6 +23,5 @@ module.exports = {
             .catch((error) => console.log('MIGRATION FAILED: PUPULATE USERS, ERROR: ', error));
     },
     async down(db, client) {
-        /* NOT NEEDED */
     }
 };

@@ -4,12 +4,6 @@ const wrappers_pb_1 = require("google-protobuf/google/protobuf/wrappers_pb");
 const base_enumerations_1 = require("./enumerations/base-enumerations");
 const { UserModel } = require('../protos/generated/users_pb');
 class GrpcTools {
-    /**
-     * @param call
-     * @param extractAll
-     * @param include
-     * @returns
-     */
     static extractUserModel(call, extractAll = true, include = {}) {
         const u = call.request;
         if (extractAll) {
@@ -68,10 +62,6 @@ class GrpcTools {
             return m;
         }
     }
-    /**
-     * @param u
-     * @returns
-     */
     static convertUserModel(u) {
         const m = new UserModel();
         const stringId = u._id.toString();

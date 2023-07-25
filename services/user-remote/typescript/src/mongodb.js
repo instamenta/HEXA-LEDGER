@@ -5,8 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const logger_1 = __importDefault(require("./utility/logger"));
-const MONGODB_URI = process.env.MONGODB_URI || 'NO URI';
-/** Connect MongoDB */
+const MONGODB_URI = process.env['MONGODB_URI'] || 'NO URI';
 function connectDatabase() {
     const options = {
         dbName: 'user-router',

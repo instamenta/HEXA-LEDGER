@@ -1,4 +1,3 @@
-// GENERATED CODE -- DO NOT EDIT!
 'use strict';
 var grpc = require('@grpc/grpc-js');
 var users_pb = require('./users_pb.js');
@@ -243,6 +242,5 @@ var UserServiceService = exports.UserServiceService = {
         responseSerialize: serialize_user_UserModel,
         responseDeserialize: deserialize_user_UserModel,
     },
-    //  rpc GetUserComments(GetUserCommentsRequest) returns (stream GetUserCommentsResponse);
 };
 exports.UserServiceClient = grpc.makeGenericClientConstructor(UserServiceService);

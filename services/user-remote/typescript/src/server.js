@@ -26,13 +26,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+require('dotenv').config();
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const mongodb_1 = __importDefault(require("./mongodb"));
-// import {connectProducer, disconnectProducer} from './producer';
 const logger_1 = __importDefault(require("./utility/logger"));
 const wrapper_1 = require("./service/wrapper");
-const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC_PORT = process.env.GRPC_PORT || 50051;
-(async function StartService() {
+const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC_PORT = process.env['GRPC_PORT'] || 50051;
+(function StartService() {
     const Server = new GRPC.Server();
     Server.addService(UserServiceService, {
         getUserById: wrapper_1.getUserById,
@@ -50,14 +50,12 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
         Server.start();
         logger_1.default['grpc_start_log'](port);
         await (0, mongodb_1.default)();
-        // await connectProducer();
     });
 })();
-['unhandledRejection', 'uncaughtException'].forEach(type => {
-    process.on(type, async (error) => {
+['unhandledRejection', 'uncaughtException'].forEach((type) => {
+    process.on(type, (error) => {
         try {
             logger_1.default['process_disconnect_log'](type, error);
-            // await disconnectProducer();
         }
         catch {
             console.log('Exit...');
@@ -65,15 +63,13 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
         }
     });
 });
-['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
-    process.once(type, async (error) => {
+['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
+    process.once(type, (error) => {
         try {
             logger_1.default['process_disconnect_log'](type, error);
             process.exit(0);
         }
         finally {
-            // await disconnectProducer();
-            // Log['kafka_disconnect_log'](error);
             process.kill(process.pid, type);
         }
     });

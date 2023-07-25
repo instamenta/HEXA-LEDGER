@@ -1,3 +1,5 @@
+/** @file Holds basic Typescript types and interfaces. */
+
 import {ObjectId} from 'bson';
 import {Document} from 'mongoose';
 

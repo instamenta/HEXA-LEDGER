@@ -71,10 +71,6 @@ const UserSchema = new mongoose_1.Schema({
             ref: 'Post'
         }],
 });
-/**
- * Pre-save hook to hash the password before saving the user.
- * @returns {Promise<void>}
- */
 UserSchema.pre('save', async function (next) {
     try {
         if (!this.isModified('password')) {

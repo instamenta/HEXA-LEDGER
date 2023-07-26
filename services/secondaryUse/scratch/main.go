@@ -34,7 +34,7 @@ func main() {
 		log.Fatal("dbURL is not found")
 	}
 
-	conn, err := sql.Open("posgres", dbURL)
+	conn, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatal("can't connect to DB")
 	}
@@ -59,9 +59,15 @@ func main() {
 	v1Router := chi.NewRouter()
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handleErr)
-	v1Router.Post("/err", handleErr)
-	
-	router.Mount("/users", apiCfg.handlerCreateUser)
+
+	v1Router.Post("/users", apiCfg.handlerCreateUser)
+	v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.handleGetUser))
+	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
+	v1Router.Post("/feed_follows", apiCfg.middlewareAuth(apiCfg.handlerCreateFeedFollows))
+	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
+	v1Router.Get("/feeds_follow", apiCfg.middlewareAuth(apiCfg.handlerGetFeedFollows))
+
+	router.Mount("/v1", v1Router)
 
 	srv := &http.Server{
 		Handler: router,

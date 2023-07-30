@@ -21,7 +21,6 @@ async function GET_POSTS(call) {
     // , filter = r.hasFilter() ? r.getFilter()!.getValue() : null
     // , match = r.hasMatch() ? r.getMatch()!.getValue() : null
     , pipeline = [];
-    console.log(limit, ' ', page);
     validator_1.default['VALIDATE_FILTERS'](page, limit);
     pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
     await post_schema_1.default.aggregate(pipeline).exec()
@@ -76,7 +75,7 @@ async function CREATE_POST(call, callback) {
         description: description,
         pictures: pictures,
         isPromoted: isPromoted,
-        tags: tags
+        tags: tags,
     });
     callback(null, grpc_tools_1.default.convertPostModel(p));
 }
@@ -107,12 +106,9 @@ exports.UPDATE_POST = UPDATE_POST;
 async function DELETE_POST(call, callback) {
     const r = call.request, id = r.hasId() ? r.getId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id), user_id = r.hasUserId() ? r.getUserId().getValue() : null, author = validator_1.default['CONVERT_TO_OBJECT_ID'](user_id);
     const result = await post_schema_1.default.deleteOne({ _id, author });
-    if (result.deletedCount > 0) {
-        callback(null, new empty_pb_1.Empty());
-    }
-    else {
-        validator_1.default['THROWER']('ERROR WHILE DELETING USER: RESOURCE NOT FOUND');
-    }
+    (result.deletedCount > 0)
+        ? callback(null, new empty_pb_1.Empty())
+        : validator_1.default['THROWER']('ERROR WHILE DELETING USER: RESOURCE NOT FOUND');
 }
 exports.DELETE_POST = DELETE_POST;
 /**
@@ -122,6 +118,10 @@ exports.DELETE_POST = DELETE_POST;
 async function CREATE_COMMENT(call, callback) {
     const r = call.request, authorId = r.hasAuthorId() ? r.getAuthorId().getValue() : null, postId = r.hasPostId() ? r.getPostId().getValue() : null, content = r.hasContent() ? r.getContent().getValue() : '', authorB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](authorId), postB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](postId);
     const c = await validator_1.default['VALIDATE_CREATE_COMMENT'](content, authorB_Id, postB_Id);
+    await post_schema_1.default.findOneAndUpdate({ _id: postB_Id }, { $push: { comments: c._id } }).catch(async (error) => {
+        await comment_schema_1.default.deleteOne({ _id: c._id });
+        validator_1.default["THROWER"](error, "Failed to Delete comment after Creation");
+    });
     callback(null, grpc_tools_1.default.convertCommentModel(c));
 }
 exports.CREATE_COMMENT = CREATE_COMMENT;
@@ -132,7 +132,7 @@ exports.CREATE_COMMENT = CREATE_COMMENT;
 async function UPDATE_COMMENT(call, callback) {
     const r = call.request, id = r.hasId() ? r.getId().getValue() : null, content = r.hasContent() ? r.getContent().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
     validator_1.default['VALIDATE_COMMENT_DATA'](content);
-    await comment_schema_1.default.findByIdAndUpdate({ _id }, { $set: { content } })
+    const result = await comment_schema_1.default.findByIdAndUpdate({ _id }, { $set: { content } }, { new: true })
         .then((c) => callback(null, grpc_tools_1.default.convertCommentModel(c)))
         .catch((error) => validator_1.default['THROWER']('ERROR WHILE UPDATING COMMENT: ', error));
 }
@@ -142,10 +142,11 @@ exports.UPDATE_COMMENT = UPDATE_COMMENT;
  * @param callback
  */
 async function DELETE_COMMENT(call, callback) {
-    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, user_id = r.hasUserId() ? r.getUserId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
-    await comment_schema_1.default.deleteOne({ _id })
-        .then(() => callback(null, new empty_pb_1.Empty()))
-        .catch((error) => validator_1.default['THROWER']('ERROR WHILE DELETING USER: ', error));
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
+    const result = await comment_schema_1.default.deleteOne({ _id });
+    (result.deletedCount > 0)
+        ? callback(null, new empty_pb_1.Empty())
+        : validator_1.default['THROWER']('ERROR WHILE DELETING USER: COMMENT NOT FOUND');
 }
 exports.DELETE_COMMENT = DELETE_COMMENT;
 /**
@@ -153,9 +154,8 @@ exports.DELETE_COMMENT = DELETE_COMMENT;
  * @param callback
  */
 async function GET_POST_BY_ID(call, callback) {
-    const r = call.request, id = r.hasId() ? r.getId().getValue() : null;
-    validator_1.default['VALIDATE_ID'](id);
-    const p = await post_schema_1.default.findById(id);
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
+    const p = await post_schema_1.default.findById(_id);
     validator_1.default['VALIDATE_POST'](p);
     callback(null, grpc_tools_1.default.convertPostModel(p));
 }
@@ -167,8 +167,7 @@ exports.GET_POST_BY_ID = GET_POST_BY_ID;
 async function UPVOTE_POST(call, callback) {
     const r = call.request, postId = r.hasId() ? r.getId().getValue() : null, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null, postB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](postId), currentUserB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](currentUserId);
     const result = await post_schema_1.default.aggregate([
-        { $match: { _id: postB_Id } },
-        {
+        { $match: { _id: postB_Id } }, {
             $project: {
                 upvotes: {
                     $cond: [
@@ -225,7 +224,7 @@ exports.DOWNVOTE_POST = DOWNVOTE_POST;
  * @param callback
  */
 async function UPVOTE_COMMENT(call, callback) {
-    const r = call.request, commentId = r.hasId() ? r.getId().getValue() : null, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null, commentB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](commentId), currentUserB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](currentUserId);
+    const r = call.request, commentId = r.hasId() ? r.getId().getValue() : null, currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId().getValue() : null, commentB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](commentId), currentUserB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](currentUserId);
     const result = await comment_schema_1.default.aggregate([
         { $match: { _id: commentB_Id } },
         {

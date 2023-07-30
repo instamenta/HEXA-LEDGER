@@ -49,7 +49,7 @@ class Validator {
      */
     public static CONVERT_TO_OBJECT_ID(_id: any): ObjectId {
         if (!_id || !Types.ObjectId.isValid(_id)) {
-            throw new Error('Invalid User id');
+            throw new Error('Invalid User id conversions');
         } else {
             return new ObjectId(_id);
         }

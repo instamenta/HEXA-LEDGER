@@ -29,19 +29,17 @@ class GrpcTools {
     public static convertPostModel(
         p: IPost,
     ): IPostModel {
-        const m = new PostModel();
-        const stringId: string = p._id.toString();
-        const authorId: string = p.author.toString();
-        m.setId(new StringValue().setValue(stringId));
-        m.setTitle(new StringValue().setValue(p.title));
-        m.setDescription(new StringValue().setValue(p.description));
-        m.setAuthorId(new StringValue().setValue(authorId));
-        m.setIsPromoted(new BoolValue().setValue(p.isPromoted));
-        m.setUpvotesList(p.upvotes.map((uv) => new StringValue().setValue(uv.toString())));
-        m.setDownvotesList(p.downvotes.map((dv) => new StringValue().setValue(dv.toString())));
-        m.setPicturesList(p.pictures.map((pic) => new StringValue().setValue(pic)));
-        m.setTagsList(p.tags.map((tag) => new StringValue().setValue(tag)));
-        return m;
+        return new PostModel()
+            .setId(new StringValue().setValue(p._id.toString()))
+            .setTitle(new StringValue().setValue(p.title))
+            .setDescription(new StringValue().setValue(p.description))
+            .setAuthorId(new StringValue().setValue(p.author.toString()))
+            .setIsPromoted(new BoolValue().setValue(p.isPromoted))
+            .setUpvotesList(p.upvotes.map((uv) => new StringValue().setValue(uv.toString())))
+            .setDownvotesList(p.downvotes.map((dv) => new StringValue().setValue(dv.toString())))
+            .setPicturesList(p.pictures.map((pic) => new StringValue().setValue(pic)))
+            .setTagsList(p.tags.map((tag) => new StringValue().setValue(tag)))
+            .setCommentsList(p.comments.map((com) => new StringValue().setValue(com.toString())))
     }
 
     /**
@@ -51,14 +49,14 @@ class GrpcTools {
     public static convertCommentModel(
         c: IComment,
     ): ICommentModel {
-        const m = new CommentModel();
-        m.setId(new StringValue().setValue(c._id.toString()));
-        m.setAuthorId(new StringValue().setValue(c.authorId.toString()));
-        m.setPostId(new StringValue().setValue(c.postId.toString()));
-        m.wasEdited(new BoolValue().setValue(c.wasEdited));
-        m.setUpvotesList(c.upvotes.map((uv) => new StringValue().setValue(uv.toString())));
-        m.setDownvotesList(c.upvotes.map((dv) => new StringValue().setValue(dv.toString())));
-        return m;
+        return new CommentModel()
+            .setId(new StringValue().setValue(c._id.toString()))
+            .setAuthorId(new StringValue().setValue(c.authorId.toString()))
+            .setPostId(new StringValue().setValue(c.postId.toString()))
+            .setWasEdited(new BoolValue().setValue(c.wasEdited))
+            .setContent(new StringValue().setValue(c.content.toString()))
+            .setUpvotesList(c.upvotes.map((uv) => new StringValue().setValue(uv.toString())))
+            .setDownvotesList(c.upvotes.map((dv) => new StringValue().setValue(dv.toString())));
     }
 }
 

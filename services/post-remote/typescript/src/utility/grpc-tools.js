@@ -19,33 +19,31 @@ class GrpcTools {
      * @returns
      */
     static convertPostModel(p) {
-        const m = new PostModel();
-        const stringId = p._id.toString();
-        const authorId = p.author.toString();
-        m.setId(new wrappers_pb_1.StringValue().setValue(stringId));
-        m.setTitle(new wrappers_pb_1.StringValue().setValue(p.title));
-        m.setDescription(new wrappers_pb_1.StringValue().setValue(p.description));
-        m.setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId));
-        m.setIsPromoted(new wrappers_pb_1.BoolValue().setValue(p.isPromoted));
-        m.setUpvotesList(p.upvotes.map((uv) => new wrappers_pb_1.StringValue().setValue(uv.toString())));
-        m.setDownvotesList(p.downvotes.map((dv) => new wrappers_pb_1.StringValue().setValue(dv.toString())));
-        m.setPicturesList(p.pictures.map((pic) => new wrappers_pb_1.StringValue().setValue(pic)));
-        m.setTagsList(p.tags.map((tag) => new wrappers_pb_1.StringValue().setValue(tag)));
-        return m;
+        return new PostModel()
+            .setId(new wrappers_pb_1.StringValue().setValue(p._id.toString()))
+            .setTitle(new wrappers_pb_1.StringValue().setValue(p.title))
+            .setDescription(new wrappers_pb_1.StringValue().setValue(p.description))
+            .setAuthorId(new wrappers_pb_1.StringValue().setValue(p.author.toString()))
+            .setIsPromoted(new wrappers_pb_1.BoolValue().setValue(p.isPromoted))
+            .setUpvotesList(p.upvotes.map((uv) => new wrappers_pb_1.StringValue().setValue(uv.toString())))
+            .setDownvotesList(p.downvotes.map((dv) => new wrappers_pb_1.StringValue().setValue(dv.toString())))
+            .setPicturesList(p.pictures.map((pic) => new wrappers_pb_1.StringValue().setValue(pic)))
+            .setTagsList(p.tags.map((tag) => new wrappers_pb_1.StringValue().setValue(tag)))
+            .setCommentsList(p.comments.map((com) => new wrappers_pb_1.StringValue().setValue(com.toString())));
     }
     /**
      * @param c
      * @returns
      */
     static convertCommentModel(c) {
-        const m = new CommentModel();
-        m.setId(new wrappers_pb_1.StringValue().setValue(c._id.toString()));
-        m.setAuthorId(new wrappers_pb_1.StringValue().setValue(c.authorId.toString()));
-        m.setPostId(new wrappers_pb_1.StringValue().setValue(c.postId.toString()));
-        m.wasEdited(new wrappers_pb_1.BoolValue().setValue(c.wasEdited));
-        m.setUpvotesList(c.upvotes.map((uv) => new wrappers_pb_1.StringValue().setValue(uv.toString())));
-        m.setDownvotesList(c.upvotes.map((dv) => new wrappers_pb_1.StringValue().setValue(dv.toString())));
-        return m;
+        return new CommentModel()
+            .setId(new wrappers_pb_1.StringValue().setValue(c._id.toString()))
+            .setAuthorId(new wrappers_pb_1.StringValue().setValue(c.authorId.toString()))
+            .setPostId(new wrappers_pb_1.StringValue().setValue(c.postId.toString()))
+            .setWasEdited(new wrappers_pb_1.BoolValue().setValue(c.wasEdited))
+            .setContent(new wrappers_pb_1.StringValue().setValue(c.content.toString()))
+            .setUpvotesList(c.upvotes.map((uv) => new wrappers_pb_1.StringValue().setValue(uv.toString())))
+            .setDownvotesList(c.upvotes.map((dv) => new wrappers_pb_1.StringValue().setValue(dv.toString())));
     }
 }
 exports.default = GrpcTools;

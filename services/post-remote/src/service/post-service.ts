@@ -4,10 +4,10 @@ import {IComment, IPost} from '../utility/types/base-types';
 import Validator from '../utility/validator';
 import GrpcTools from '../utility/grpc-tools';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
-import {DeleteResult} from 'mongodb'
+import {DeleteResult} from 'mongodb';
 import MongoosePostModel from '../model/schema/post-schema';
 import MongooseCommentModel from '../model/schema/comment-schema';
-// import MongooseUserModel from '../model/schema/user-schema';
+// Import MongooseUserModel from '../model/schema/user-schema';
 import {ObjectId} from 'bson';
 import {
     CommentForm,
@@ -39,7 +39,6 @@ export async function GET_POSTS(
         // , match = r.hasMatch() ? r.getMatch()!.getValue() : null
         , pipeline = []
     ;
-    console.log(limit, ' ', page);
     Validator['VALIDATE_FILTERS'](page, limit);
     pipeline.push(
         {$skip: (page - 1) * limit},
@@ -123,7 +122,7 @@ export async function CREATE_POST(
         description: description,
         pictures: pictures,
         isPromoted: isPromoted,
-        tags: tags
+        tags: tags,
     });
     callback(null, GrpcTools.convertPostModel(p));
 }
@@ -174,10 +173,10 @@ export async function DELETE_POST(
         , _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id)
         , user_id = r.hasUserId() ? r.getUserId()!.getValue() : null
         , author: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](user_id);
-    const result = await MongoosePostModel.deleteOne({_id, author}) as DeleteResult
+    const result = await MongoosePostModel.deleteOne({_id, author}) as DeleteResult;
     (result.deletedCount > 0)
         ? callback(null, new Empty())
-        : Validator['THROWER']('ERROR WHILE DELETING USER: RESOURCE NOT FOUND')
+        : Validator['THROWER']('ERROR WHILE DELETING USER: RESOURCE NOT FOUND');
 }
 
 /**
@@ -199,6 +198,13 @@ export async function CREATE_COMMENT(
         authorB_Id,
         postB_Id,
     );
+    await MongoosePostModel.findOneAndUpdate(
+        {_id: postB_Id},
+        {$push: {comments: c._id}}
+    ).catch(async (error) => {
+        await MongooseCommentModel.deleteOne({_id: c._id})
+        Validator["THROWER"](error, "Failed to Delete comment after Creation")
+    });
     callback(null, GrpcTools.convertCommentModel(c));
 }
 
@@ -215,8 +221,8 @@ export async function UPDATE_COMMENT(
         , content = r.hasContent() ? r.getContent()!.getValue() : null
         , _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
     Validator['VALIDATE_COMMENT_DATA'](content);
-    await MongooseCommentModel.findByIdAndUpdate(
-        {_id}, {$set: {content}})
+    const result = await MongooseCommentModel.findByIdAndUpdate(
+        {_id}, {$set: {content}}, {new: true})
         .then((c: any) => callback(null, GrpcTools.convertCommentModel(c as IComment)))
         .catch((error) => Validator['THROWER']('ERROR WHILE UPDATING COMMENT: ', error));
 }
@@ -231,12 +237,11 @@ export async function DELETE_COMMENT(
 ): Promise<void> {
     const r = call.request
         , id = r.hasId() ? r.getId()!.getValue() : null
-        , user_id = r.hasUserId() ? r.getUserId()!.getValue() : null
         , _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
-    const result = await MongooseCommentModel.deleteOne({_id}) as DeleteResult
+    const result = await MongooseCommentModel.deleteOne({_id}) as DeleteResult;
     (result.deletedCount > 0)
         ? callback(null, new Empty())
-        : Validator['THROWER']('ERROR WHILE DELETING USER: COMMENT NOT FOUND')
+        : Validator['THROWER']('ERROR WHILE DELETING USER: COMMENT NOT FOUND');
 }
 
 /**
@@ -249,9 +254,8 @@ export async function GET_POST_BY_ID(
 ): Promise<void> {
     const r = call.request
         , id = r.hasId() ? r.getId()!.getValue() : null
-    ;
-    Validator['VALIDATE_ID'](id);
-    const p = <IPost>await MongoosePostModel.findById(id);
+        , _id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](id);
+    const p = <IPost>await MongoosePostModel.findById(_id);
     Validator['VALIDATE_POST'](p);
     callback(null, GrpcTools.convertPostModel(p));
 }
@@ -270,8 +274,7 @@ export async function UPVOTE_POST(
         , postB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](postId)
         , currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId);
     const result = await MongoosePostModel.aggregate([
-        {$match: {_id: postB_Id}},
-        {
+        {$match: {_id: postB_Id}}, {
             $project: {
                 upvotes: {
                     $cond: [
@@ -340,7 +343,7 @@ export async function UPVOTE_COMMENT(
 ): Promise<void> {
     const r = call.request
         , commentId = r.hasId() ? r.getId()!.getValue() : null
-        , currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId() : null
+        , currentUserId = r.hasCurrentUserId() ? r.getCurrentUserId()!.getValue() : null
         , commentB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](commentId)
         , currentUserB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](currentUserId);
     const result = await MongooseCommentModel.aggregate([

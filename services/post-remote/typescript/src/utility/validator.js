@@ -45,7 +45,7 @@ class Validator {
      */
     static CONVERT_TO_OBJECT_ID(_id) {
         if (!_id || !mongoose_1.Types.ObjectId.isValid(_id)) {
-            throw new Error('Invalid User id');
+            throw new Error('Invalid User id conversions');
         }
         else {
             return new bson_1.ObjectId(_id);

@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Mongoose schema for comment. */
 const mongoose_1 = __importStar(require("mongoose"));
 const CommentSchema = new mongoose_1.Schema({
     content: {

@@ -194,8 +194,8 @@ var PostServiceService = exports.PostServiceService = {
         responseSerialize: serialize_post_PostModel,
         responseDeserialize: deserialize_post_PostModel,
     },
-    getPost: {
-        path: '/post.PostService/GetPost',
+    getPosts: {
+        path: '/post.PostService/GetPosts',
         requestStream: false,
         responseStream: true,
         requestType: posts_pb.GetPostsRequest,

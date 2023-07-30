@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Used for validation post or comment data. */
 const bson_1 = require("bson");
 const mongoose_1 = require("mongoose");
 const post_schema_1 = __importDefault(require("../model/schema/post-schema"));
@@ -24,7 +25,7 @@ class Validator {
      * @throws
      */
     static VALIDATE_USER(u) {
-        if (!u == null) {
+        if (!u) {
             throw new Error('User not found');
         }
     }
@@ -56,37 +57,41 @@ class Validator {
      * @throws
      */
     static THROWER(message, error = '!') {
+        console.log(message, error);
         throw new Error(message, error);
     }
     /**
-     * @param authorId
-     * @param  title
-     * @param  description
-     * @param  pictures
-     * @param isPromoted
-     * @param tags
+     * @param o
+     * @param o.author
+     * @param o.title
+     * @param o.description
+     * @param o.pictures
+     * @param o.isPromoted
+     * @param o.tags
      * @returns
+     * @throws
      */
-    static async VALIDATE_CREATE_POST(authorId, title, description, pictures, isPromoted, tags) {
+    static VALIDATE_CREATE_POST({ author, title, description, pictures, isPromoted, tags }) {
         if (!title || title.length <= 1) {
-            throw new Error('ERROR WHILE REGISTERING USER: invalid input: ');
+            throw new Error(`ERROR WHILE REGISTERING USER: invalid input: ${title}`);
         }
         return post_schema_1.default.create({
-            authorId,
+            author,
             title,
             description,
             pictures,
             isPromoted,
             tags,
-        }).catch(error => this['THROWER']('ERROR WHILE CREATING POST: ', error));
+        }).catch((error) => this['THROWER']('ERROR WHILE CREATING POST: ', error));
     }
     /**
      * @param content
-     * @param  authorId
-     * @param  postId
+     * @param authorId
+     * @param postId
      * @returns
+     * @throws
      */
-    static async VALIDATE_CREATE_COMMENT(content, authorId, postId) {
+    static VALIDATE_CREATE_COMMENT(content, authorId, postId) {
         if (!content || content.length <= 0) {
             throw new Error(`ERROR WHILE CREATING COMMENT: invalid input: ${content}`);
         }
@@ -94,10 +99,11 @@ class Validator {
             content,
             authorId,
             postId,
-        }).catch(error => this['THROWER']('ERROR WHILE CREATING POST: ', error));
+        }).catch((error) => this['THROWER']('ERROR WHILE CREATING POST: ', error));
     }
     /**
-     * @param  title
+     * @param title
+     * @throws
      */
     static VALIDATE_POST_DATA(title) {
         if (!title || title.length <= 1) {
@@ -105,7 +111,8 @@ class Validator {
         }
     }
     /**
-     * @param  content
+     * @param content
+     * @throws
      */
     static VALIDATE_COMMENT_DATA(content) {
         if (!content || content.length <= 0) {

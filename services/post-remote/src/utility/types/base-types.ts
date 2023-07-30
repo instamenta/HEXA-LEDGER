@@ -1,3 +1,4 @@
+/** @file Typescript types and interfaces. */
 import {Document, Schema} from 'mongoose';
 import {ObjectId} from 'bson';
 
@@ -18,6 +19,7 @@ export interface IUser extends Document {
 }
 
 export interface IPost extends Document {
+    _id: ObjectId;
     title: string;
     description: string;
     author: Schema.Types.ObjectId;

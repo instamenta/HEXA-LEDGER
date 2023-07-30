@@ -323,7 +323,7 @@ if (goog.DEBUG && !COMPILED) {
  * @private {!Array<number>}
  * @const
  */
-proto.user.UserModel.repeatedFields_ = [8, 9];
+proto.user.UserModel.repeatedFields_ = [8, 9, 10];
 if (jspb.Message.GENERATE_TO_OBJECT) {
     /**
      * Creates an object representation of this proto.
@@ -359,7 +359,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
             token: (f = msg.getToken()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
             userwallet: (f = msg.getUserwallet()) && proto.user.UserWallet.toObject(includeInstance, f),
             followersList: jspb.Message.toObjectList(msg.getFollowersList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
-            followingList: jspb.Message.toObjectList(msg.getFollowingList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance)
+            followingList: jspb.Message.toObjectList(msg.getFollowingList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
+            postsList: jspb.Message.toObjectList(msg.getPostsList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance)
         };
         if (includeInstance) {
             obj.$jspbMessageInstance = msg;
@@ -436,6 +437,11 @@ proto.user.UserModel.deserializeBinaryFromReader = function (msg, reader) {
                 reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
                 msg.addFollowing(value);
                 break;
+            case 10:
+                var value = new google_protobuf_wrappers_pb.StringValue;
+                reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+                msg.addPosts(value);
+                break;
             default:
                 reader.skipField();
                 break;
@@ -496,6 +502,10 @@ proto.user.UserModel.serializeBinaryToWriter = function (message, writer) {
     f = message.getFollowingList();
     if (f.length > 0) {
         writer.writeRepeatedMessage(9, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
+    }
+    f = message.getPostsList();
+    if (f.length > 0) {
+        writer.writeRepeatedMessage(10, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
     }
 };
 /**
@@ -751,6 +761,35 @@ proto.user.UserModel.prototype.addFollowing = function (opt_value, opt_index) {
  */
 proto.user.UserModel.prototype.clearFollowingList = function () {
     return this.setFollowingList([]);
+};
+/**
+ * repeated google.protobuf.StringValue posts = 10;
+ * @return {!Array<!proto.google.protobuf.StringValue>}
+ */
+proto.user.UserModel.prototype.getPostsList = function () {
+    return /** @type{!Array<!proto.google.protobuf.StringValue>} */ (jspb.Message.getRepeatedWrapperField(this, google_protobuf_wrappers_pb.StringValue, 10));
+};
+/**
+ * @param {!Array<!proto.google.protobuf.StringValue>} value
+ * @return {!proto.user.UserModel} returns this
+*/
+proto.user.UserModel.prototype.setPostsList = function (value) {
+    return jspb.Message.setRepeatedWrapperField(this, 10, value);
+};
+/**
+ * @param {!proto.google.protobuf.StringValue=} opt_value
+ * @param {number=} opt_index
+ * @return {!proto.google.protobuf.StringValue}
+ */
+proto.user.UserModel.prototype.addPosts = function (opt_value, opt_index) {
+    return jspb.Message.addToRepeatedWrapperField(this, 10, opt_value, proto.google.protobuf.StringValue, opt_index);
+};
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.user.UserModel} returns this
+ */
+proto.user.UserModel.prototype.clearPostsList = function () {
+    return this.setPostsList([]);
 };
 if (jspb.Message.GENERATE_TO_OBJECT) {
     /**

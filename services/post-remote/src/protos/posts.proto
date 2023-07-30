@@ -25,6 +25,7 @@ message PostModel {
   repeated google.protobuf.StringValue pictures = 14;
 
   google.protobuf.StringValue id = 15;
+  google.protobuf.StringValue auth_id = 16;
 }
 
 message PostForm {
@@ -35,6 +36,7 @@ message PostForm {
   google.protobuf.BoolValue is_promoted = 5;
   repeated google.protobuf.StringValue tags = 6;
   google.protobuf.StringValue _id = 7;
+  google.protobuf.StringValue auth_id = 8;
 }
 
 message CommentForm {
@@ -42,6 +44,7 @@ message CommentForm {
   google.protobuf.StringValue post_id = 2;
   google.protobuf.StringValue content = 3;
   google.protobuf.StringValue _id = 4;
+  google.protobuf.StringValue auth_id = 8;
 }
 
 message CommentModel {
@@ -57,7 +60,6 @@ message CommentModel {
   google.protobuf.Timestamp created_at = 8;
   google.protobuf.Timestamp updated_at = 9;
   google.protobuf.BoolValue was_edited = 10;
-
 }
 
 message GetByObjectId {
@@ -93,6 +95,7 @@ message VoteCommentRequest {
 
 message DeleteByObjectId {
   google.protobuf.StringValue _id = 1;
+  google.protobuf.StringValue user_id = 2;
 }
 
 message GetPostsRequest {
@@ -114,7 +117,7 @@ service PostService {
   rpc DeleteComment(DeleteByObjectId) returns (google.protobuf.Empty);
   // GET & FIND
   rpc GetPostById(GetByObjectId) returns (PostModel);
-  rpc GetPost(GetPostsRequest) returns (stream PostModel);
+  rpc GetPosts(GetPostsRequest) returns (stream PostModel);
   // COMMENT
   rpc GetPostComments(GetCommentsRequest) returns (stream CommentModel);
   // USER

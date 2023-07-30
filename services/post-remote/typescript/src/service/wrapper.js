@@ -55,7 +55,7 @@ async function getUserPosts(call) {
     }
 }
 exports.getUserPosts = getUserPosts;
-/*--------------------------------------------------------------*/
+/* --------------------------------------------------------------*/
 /**
  * @param call
  * @param callback

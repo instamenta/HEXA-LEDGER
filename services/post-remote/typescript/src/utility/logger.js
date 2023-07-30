@@ -1,12 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Used for console logging and sending kafka messages. */
 const producer_1 = require("../producer");
 const base_enumerations_1 = require("./enumerations/base-enumerations");
 const DEBUG_CONSOLE = process.env.DEBUG_CONSOLE || false, SERVICE_NAME = process.env.SERVICE_NAME || 'User-Remote-Service';
 class Log {
     /**
      * Send kafka messages & optionally console log
-     * ( on/off with env.DEBUG_CONSOLE )
+     * ( on/off with env.DEBUG_CONSOLE ).
      * @param type
      * @param message
      */
@@ -46,7 +47,7 @@ class Log {
     }
     /**
      * Handles console logging in terminal
-     * if DEBUG_CONSOLE == true
+     * if DEBUG_CONSOLE == true.
      * @param message
      * @param type
      * @param status
@@ -54,7 +55,7 @@ class Log {
      * @param length
      */
     static Console(message, type, status, symbol = '=', length = 30) {
-        if (!status || status != 'true' || Number.isNaN(length)) {
+        if (!status || status !== 'true' || Number.isNaN(length)) {
             return;
         }
         if (type.toLowerCase() === 'error') {
@@ -77,14 +78,14 @@ class Log {
         console.log(`${type} :`, message);
     }
     /**
-     * Console.logger
+     * Console.logger.
      */
     static mongo_start_log() {
         console.log(`✅ ${SERVICE_NAME} Connected to MongoDB ✅
 ================================================================`);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param MONGODB_URI
      * @param error
      */
@@ -97,7 +98,7 @@ ERROR MESSAGE: ${error.message}
 `, error);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param BROKER_URL
      * @param BROKER_PORT
      */
@@ -106,7 +107,7 @@ ERROR MESSAGE: ${error.message}
 ================================================================`);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param error
      */
     static kafka_disconnect_log(error) {
@@ -116,7 +117,7 @@ ERROR MESSAGE: ${error.message}
 `, error);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param BROKER_URL
      * @param BROKER_PORT
      * @param error
@@ -128,7 +129,7 @@ ERROR MESSAGE: ${error.message}
 `, error);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param type
      * @param error
      */
@@ -139,7 +140,7 @@ ERROR MESSAGE: ${error.message}
 `, error);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param port
      */
     static grpc_start_log(port) {
@@ -148,7 +149,7 @@ ERROR MESSAGE: ${error.message}
 ================================================================`);
     }
     /**
-     * Console.logger
+     * Console.logger.
      * @param port
      * @param error
      */

@@ -11,8 +11,8 @@ const post_schema_1 = __importDefault(require("../model/schema/post-schema"));
 const comment_schema_1 = __importDefault(require("../model/schema/comment-schema"));
 /**
  * @param call
- * @throws
  * @async
+ * @throws
  */
 async function GET_POSTS(call) {
     const r = call.request
@@ -21,16 +21,17 @@ async function GET_POSTS(call) {
     // , filter = r.hasFilter() ? r.getFilter()!.getValue() : null
     // , match = r.hasMatch() ? r.getMatch()!.getValue() : null
     , pipeline = [];
+    console.log(limit, ' ', page);
     validator_1.default['VALIDATE_FILTERS'](page, limit);
     pipeline.push({ $skip: (page - 1) * limit }, { $limit: limit });
     await post_schema_1.default.aggregate(pipeline).exec()
-        .then((arr) => arr.forEach(p => call.write(grpc_tools_1.default.convertPostModel(p))));
+        .then((arr) => arr.forEach((p) => call.write(grpc_tools_1.default.convertPostModel(p))));
 }
 exports.GET_POSTS = GET_POSTS;
 /**
  * @param call
- * @throws
  * @async
+ * @throws
  */
 async function GET_USER_POSTS(call) {
     const r = call.request, userId = r.hasUserId() ? r.getUserId().getValue() : null, limit = r.hasLimit() ? r.getLimit().getValue() : 5, page = r.hasPage() ? r.getPage().getValue() : 1
@@ -41,13 +42,13 @@ async function GET_USER_POSTS(call) {
     validator_1.default['VALIDATE_FILTERS'](page, limit);
     pipeline.push({ $match: { authorId: userId } }, { $skip: (page - 1) * limit }, { $limit: limit });
     await post_schema_1.default.aggregate(pipeline).exec()
-        .then((arr) => arr.forEach(p => call.write(grpc_tools_1.default.convertPostModel(p))));
+        .then((arr) => arr.forEach((p) => call.write(grpc_tools_1.default.convertPostModel(p))));
 }
 exports.GET_USER_POSTS = GET_USER_POSTS;
 /**
  * @param call
- * @throws
  * @async
+ * @throws
  */
 async function GET_POSTS_COMMENTS(call) {
     const r = call.request, postId = r.hasId() ? r.getId().getValue() : null, page = r.hasPage() ? r.getPage().getValue() : 1, limit = r.getLimit() ? r.getLimit().getValue() : 5;
@@ -63,14 +64,20 @@ async function GET_POSTS_COMMENTS(call) {
     }).exec().then((p) => p?.comments.forEach((c) => call.write(grpc_tools_1.default.convertCommentModel(c))));
 }
 exports.GET_POSTS_COMMENTS = GET_POSTS_COMMENTS;
-/*---------------------------------------------------------*/
 /**
  * @param call
  * @param callback
  */
 async function CREATE_POST(call, callback) {
-    const r = call.request, title = r.hasTitle() ? r.getTitle().getValue() : '', description = r.hasDescription() ? r.getDescription().getValue() : '', authorId = r.hasAuthorId() ? r.getAuthorId().getValue() : null, pictures = r.getPicturesList() ? r.getPicturesList().map(pic => pic.toString()) : [], isPromoted = r.hasIsPromoted() ? r.getIsPromoted().getValue() : false, tags = r.getTagsList() ? r.getTagsList().map(t => t.toString()) : [], authorB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](authorId);
-    const p = await validator_1.default['VALIDATE_CREATE_POST'](authorB_Id, title, description, pictures, isPromoted, tags);
+    const r = call.request, title = r.hasTitle() ? r.getTitle().getValue() : '', description = r.hasDescription() ? r.getDescription().getValue() : '', authorId = r.hasAuthorId() ? r.getAuthorId().getValue() : null, isPromoted = r.hasIsPromoted() ? r.getIsPromoted().getValue() : false, pictures = r.getPicturesList().map((pic) => pic.toString()), tags = r.getTagsList().map((t) => t.toString()), authorB_Id = validator_1.default['CONVERT_TO_OBJECT_ID'](authorId);
+    const p = await validator_1.default['VALIDATE_CREATE_POST']({
+        author: authorB_Id,
+        title: title,
+        description: description,
+        pictures: pictures,
+        isPromoted: isPromoted,
+        tags: tags
+    });
     callback(null, grpc_tools_1.default.convertPostModel(p));
 }
 exports.CREATE_POST = CREATE_POST;
@@ -79,7 +86,7 @@ exports.CREATE_POST = CREATE_POST;
  * @param callback
  */
 async function UPDATE_POST(call, callback) {
-    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, title = r.hasTitle() ? r.getTitle().getValue() : '', description = r.hasDescription() ? r.getDescription().getValue() : '', pictures = r.getPicturesList() ? r.getPicturesList().map(pic => pic.toString()) : [], isPromoted = r.hasIsPromoted() ? r.getIsPromoted().getValue() : false, tags = r.getTagsList() ? r.getTagsList().map(t => t.toString()) : [], _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, title = r.hasTitle() ? r.getTitle().getValue() : '', description = r.hasDescription() ? r.getDescription().getValue() : '', isPromoted = r.hasIsPromoted() ? r.getIsPromoted().getValue() : false, pictures = r.getPicturesList().map((pic) => pic.toString()), tags = r.getTagsList().map((t) => t.toString()), _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id), userId = r.hasAuthId() ? r.getAuthId().getValue() : null;
     validator_1.default['VALIDATE_POST_DATA'](title);
     await post_schema_1.default.findByIdAndUpdate({ _id }, {
         $set: {
@@ -98,10 +105,14 @@ exports.UPDATE_POST = UPDATE_POST;
  * @param callback
  */
 async function DELETE_POST(call, callback) {
-    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
-    await post_schema_1.default.deleteOne({ _id })
-        .then(() => callback(null, new empty_pb_1.Empty()))
-        .catch((error) => validator_1.default['THROWER']('ERROR WHILE DELETING USER: ', error));
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id), user_id = r.hasUserId() ? r.getUserId().getValue() : null, author = validator_1.default['CONVERT_TO_OBJECT_ID'](user_id);
+    const result = await post_schema_1.default.deleteOne({ _id, author });
+    if (result.deletedCount > 0) {
+        callback(null, new empty_pb_1.Empty());
+    }
+    else {
+        validator_1.default['THROWER']('ERROR WHILE DELETING USER: RESOURCE NOT FOUND');
+    }
 }
 exports.DELETE_POST = DELETE_POST;
 /**
@@ -131,7 +142,7 @@ exports.UPDATE_COMMENT = UPDATE_COMMENT;
  * @param callback
  */
 async function DELETE_COMMENT(call, callback) {
-    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
+    const r = call.request, id = r.hasId() ? r.getId().getValue() : null, user_id = r.hasUserId() ? r.getUserId().getValue() : null, _id = validator_1.default['CONVERT_TO_OBJECT_ID'](id);
     await comment_schema_1.default.deleteOne({ _id })
         .then(() => callback(null, new empty_pb_1.Empty()))
         .catch((error) => validator_1.default['THROWER']('ERROR WHILE DELETING USER: ', error));
@@ -171,7 +182,7 @@ async function UPVOTE_POST(call, callback) {
         { $limit: 1 },
         { $project: { upvotes: 1 } }
     ]);
-    if (result.length === 0) {
+    if (result && 'length' in result && result.length === 0) {
         validator_1.default['THROWER'](`USER: ${currentUserId} FAILED TO UPVOTE POST: ${postId}`);
     }
     const { upvotes } = result[0];
@@ -201,7 +212,7 @@ async function DOWNVOTE_POST(call, callback) {
         { $limit: 1 },
         { $project: { downvotes: 1 } }
     ]);
-    if (result.length === 0) {
+    if (result && 'length' in result && result.length === 0) {
         validator_1.default['THROWER'](`USER: ${currentUserId} FAILED TO DOWNVOTE POST: ${postId}`);
     }
     const { downvotes } = result[0];
@@ -231,7 +242,7 @@ async function UPVOTE_COMMENT(call, callback) {
         { $limit: 1 },
         { $project: { upvotes: 1 } }
     ]);
-    if (result.length === 0) {
+    if (result && 'length' in result && result.length === 0) {
         validator_1.default['THROWER'](`USER: ${currentUserId} FAILED TO UPVOTE COMMENT: ${commentId}`);
     }
     const { upvotes } = result[0];
@@ -261,7 +272,7 @@ async function DOWNVOTE_COMMENT(call, callback) {
         { $limit: 1 },
         { $project: { downvotes: 1 } }
     ]);
-    if (result.length === 0) {
+    if (result && 'length' in result && result.length === 0) {
         validator_1.default['THROWER'](`USER: ${currentUserId} FAILED TO DOWNVOTE COMMENT: ${commentId}`);
     }
     const { downvotes } = result[0];

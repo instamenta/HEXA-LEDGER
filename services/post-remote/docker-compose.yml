@@ -4,12 +4,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: user-remote
+    container_name: post-remote
     ports:
-      - '50051:50051'
+      - '50052:50052'
     env_file: .env
     environment:
-      - GRPC_PORT=50051
+      - GRPC_PORT=50052
     volumes:
      - ./:/var/data
     networks:

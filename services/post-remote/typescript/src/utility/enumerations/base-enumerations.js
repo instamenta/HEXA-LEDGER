@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LogAttr = exports.UAttr = void 0;
+/** @file Enumerations. */
 exports.UAttr = {
     _ID: '_id',
     USER: 'username',

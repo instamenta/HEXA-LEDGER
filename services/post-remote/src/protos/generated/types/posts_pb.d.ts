@@ -78,6 +78,11 @@ export class PostModel extends jspb.Message {
     getId(): google_protobuf_wrappers_pb.StringValue | undefined;
     setId(value?: google_protobuf_wrappers_pb.StringValue): PostModel;
 
+    hasAuthId(): boolean;
+    clearAuthId(): void;
+    getAuthId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setAuthId(value?: google_protobuf_wrappers_pb.StringValue): PostModel;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PostModel.AsObject;
     static toObject(includeInstance: boolean, msg: PostModel): PostModel.AsObject;
@@ -105,6 +110,7 @@ export namespace PostModel {
         donationsList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         picturesList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         id?: google_protobuf_wrappers_pb.StringValue.AsObject,
+        authId?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }
 
@@ -143,6 +149,11 @@ export class PostForm extends jspb.Message {
     getId(): google_protobuf_wrappers_pb.StringValue | undefined;
     setId(value?: google_protobuf_wrappers_pb.StringValue): PostForm;
 
+    hasAuthId(): boolean;
+    clearAuthId(): void;
+    getAuthId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setAuthId(value?: google_protobuf_wrappers_pb.StringValue): PostForm;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PostForm.AsObject;
     static toObject(includeInstance: boolean, msg: PostForm): PostForm.AsObject;
@@ -162,6 +173,7 @@ export namespace PostForm {
         isPromoted?: google_protobuf_wrappers_pb.BoolValue.AsObject,
         tagsList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         Id?: google_protobuf_wrappers_pb.StringValue.AsObject,
+        authId?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }
 
@@ -187,6 +199,11 @@ export class CommentForm extends jspb.Message {
     getId(): google_protobuf_wrappers_pb.StringValue | undefined;
     setId(value?: google_protobuf_wrappers_pb.StringValue): CommentForm;
 
+    hasAuthId(): boolean;
+    clearAuthId(): void;
+    getAuthId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setAuthId(value?: google_protobuf_wrappers_pb.StringValue): CommentForm;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): CommentForm.AsObject;
     static toObject(includeInstance: boolean, msg: CommentForm): CommentForm.AsObject;
@@ -203,6 +220,7 @@ export namespace CommentForm {
         postId?: google_protobuf_wrappers_pb.StringValue.AsObject,
         content?: google_protobuf_wrappers_pb.StringValue.AsObject,
         Id?: google_protobuf_wrappers_pb.StringValue.AsObject,
+        authId?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }
 
@@ -473,6 +491,11 @@ export class DeleteByObjectId extends jspb.Message {
     getId(): google_protobuf_wrappers_pb.StringValue | undefined;
     setId(value?: google_protobuf_wrappers_pb.StringValue): DeleteByObjectId;
 
+    hasUserId(): boolean;
+    clearUserId(): void;
+    getUserId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setUserId(value?: google_protobuf_wrappers_pb.StringValue): DeleteByObjectId;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): DeleteByObjectId.AsObject;
     static toObject(includeInstance: boolean, msg: DeleteByObjectId): DeleteByObjectId.AsObject;
@@ -486,6 +509,7 @@ export class DeleteByObjectId extends jspb.Message {
 export namespace DeleteByObjectId {
     export type AsObject = {
         Id?: google_protobuf_wrappers_pb.StringValue.AsObject,
+        userId?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }
 

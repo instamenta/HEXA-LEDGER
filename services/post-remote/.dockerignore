@@ -14,7 +14,7 @@ node_modules/
 .idea/
 *.sublime-*
 *.swp
-
+migrate-mongo-config.js
 # Logs
 logs/
 *.log

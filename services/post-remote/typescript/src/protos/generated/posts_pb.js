@@ -345,7 +345,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
             ethereumTransactionList: jspb.Message.toObjectList(msg.getEthereumTransactionList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
             donationsList: jspb.Message.toObjectList(msg.getDonationsList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
             picturesList: jspb.Message.toObjectList(msg.getPicturesList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
-            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
+            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
+            authId: (f = msg.getAuthId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
         };
         if (includeInstance) {
             obj.$jspbMessageInstance = msg;
@@ -452,6 +453,11 @@ proto.post.PostModel.deserializeBinaryFromReader = function (msg, reader) {
                 reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
                 msg.setId(value);
                 break;
+            case 16:
+                var value = new google_protobuf_wrappers_pb.StringValue;
+                reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+                msg.setAuthId(value);
+                break;
             default:
                 reader.skipField();
                 break;
@@ -536,6 +542,10 @@ proto.post.PostModel.serializeBinaryToWriter = function (message, writer) {
     f = message.getId();
     if (f != null) {
         writer.writeMessage(15, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
+    }
+    f = message.getAuthId();
+    if (f != null) {
+        writer.writeMessage(16, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
     }
 };
 /**
@@ -967,6 +977,34 @@ proto.post.PostModel.prototype.hasId = function () {
     return jspb.Message.getField(this, 15) != null;
 };
 /**
+ * optional google.protobuf.StringValue auth_id = 16;
+ * @return {?proto.google.protobuf.StringValue}
+ */
+proto.post.PostModel.prototype.getAuthId = function () {
+    return /** @type{?proto.google.protobuf.StringValue} */ (jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.StringValue, 16));
+};
+/**
+ * @param {?proto.google.protobuf.StringValue|undefined} value
+ * @return {!proto.post.PostModel} returns this
+*/
+proto.post.PostModel.prototype.setAuthId = function (value) {
+    return jspb.Message.setWrapperField(this, 16, value);
+};
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.post.PostModel} returns this
+ */
+proto.post.PostModel.prototype.clearAuthId = function () {
+    return this.setAuthId(undefined);
+};
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.post.PostModel.prototype.hasAuthId = function () {
+    return jspb.Message.getField(this, 16) != null;
+};
+/**
  * List of repeated fields within this message type.
  * @private {!Array<number>}
  * @const
@@ -1005,7 +1043,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
             picturesList: jspb.Message.toObjectList(msg.getPicturesList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
             isPromoted: (f = msg.getIsPromoted()) && google_protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
             tagsList: jspb.Message.toObjectList(msg.getTagsList(), google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
-            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
+            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
+            authId: (f = msg.getAuthId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
         };
         if (includeInstance) {
             obj.$jspbMessageInstance = msg;
@@ -1072,6 +1111,11 @@ proto.post.PostForm.deserializeBinaryFromReader = function (msg, reader) {
                 reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
                 msg.setId(value);
                 break;
+            case 8:
+                var value = new google_protobuf_wrappers_pb.StringValue;
+                reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+                msg.setAuthId(value);
+                break;
             default:
                 reader.skipField();
                 break;
@@ -1124,6 +1168,10 @@ proto.post.PostForm.serializeBinaryToWriter = function (message, writer) {
     f = message.getId();
     if (f != null) {
         writer.writeMessage(7, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
+    }
+    f = message.getAuthId();
+    if (f != null) {
+        writer.writeMessage(8, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
     }
 };
 /**
@@ -1324,6 +1372,34 @@ proto.post.PostForm.prototype.clearId = function () {
 proto.post.PostForm.prototype.hasId = function () {
     return jspb.Message.getField(this, 7) != null;
 };
+/**
+ * optional google.protobuf.StringValue auth_id = 8;
+ * @return {?proto.google.protobuf.StringValue}
+ */
+proto.post.PostForm.prototype.getAuthId = function () {
+    return /** @type{?proto.google.protobuf.StringValue} */ (jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.StringValue, 8));
+};
+/**
+ * @param {?proto.google.protobuf.StringValue|undefined} value
+ * @return {!proto.post.PostForm} returns this
+*/
+proto.post.PostForm.prototype.setAuthId = function (value) {
+    return jspb.Message.setWrapperField(this, 8, value);
+};
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.post.PostForm} returns this
+ */
+proto.post.PostForm.prototype.clearAuthId = function () {
+    return this.setAuthId(undefined);
+};
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.post.PostForm.prototype.hasAuthId = function () {
+    return jspb.Message.getField(this, 8) != null;
+};
 if (jspb.Message.GENERATE_TO_OBJECT) {
     /**
      * Creates an object representation of this proto.
@@ -1354,7 +1430,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
             authorId: (f = msg.getAuthorId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
             postId: (f = msg.getPostId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
             content: (f = msg.getContent()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
-            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
+            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
+            authId: (f = msg.getAuthId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
         };
         if (includeInstance) {
             obj.$jspbMessageInstance = msg;
@@ -1406,6 +1483,11 @@ proto.post.CommentForm.deserializeBinaryFromReader = function (msg, reader) {
                 reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
                 msg.setId(value);
                 break;
+            case 8:
+                var value = new google_protobuf_wrappers_pb.StringValue;
+                reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+                msg.setAuthId(value);
+                break;
             default:
                 reader.skipField();
                 break;
@@ -1446,6 +1528,10 @@ proto.post.CommentForm.serializeBinaryToWriter = function (message, writer) {
     f = message.getId();
     if (f != null) {
         writer.writeMessage(4, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
+    }
+    f = message.getAuthId();
+    if (f != null) {
+        writer.writeMessage(8, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
     }
 };
 /**
@@ -1559,6 +1645,34 @@ proto.post.CommentForm.prototype.clearId = function () {
  */
 proto.post.CommentForm.prototype.hasId = function () {
     return jspb.Message.getField(this, 4) != null;
+};
+/**
+ * optional google.protobuf.StringValue auth_id = 8;
+ * @return {?proto.google.protobuf.StringValue}
+ */
+proto.post.CommentForm.prototype.getAuthId = function () {
+    return /** @type{?proto.google.protobuf.StringValue} */ (jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.StringValue, 8));
+};
+/**
+ * @param {?proto.google.protobuf.StringValue|undefined} value
+ * @return {!proto.post.CommentForm} returns this
+*/
+proto.post.CommentForm.prototype.setAuthId = function (value) {
+    return jspb.Message.setWrapperField(this, 8, value);
+};
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.post.CommentForm} returns this
+ */
+proto.post.CommentForm.prototype.clearAuthId = function () {
+    return this.setAuthId(undefined);
+};
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.post.CommentForm.prototype.hasAuthId = function () {
+    return jspb.Message.getField(this, 8) != null;
 };
 /**
  * List of repeated fields within this message type.
@@ -3096,7 +3210,8 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
      */
     proto.post.DeleteByObjectId.toObject = function (includeInstance, msg) {
         var f, obj = {
-            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
+            id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
+            userId: (f = msg.getUserId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
         };
         if (includeInstance) {
             obj.$jspbMessageInstance = msg;
@@ -3133,6 +3248,11 @@ proto.post.DeleteByObjectId.deserializeBinaryFromReader = function (msg, reader)
                 reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
                 msg.setId(value);
                 break;
+            case 2:
+                var value = new google_protobuf_wrappers_pb.StringValue;
+                reader.readMessage(value, google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+                msg.setUserId(value);
+                break;
             default:
                 reader.skipField();
                 break;
@@ -3162,6 +3282,10 @@ proto.post.DeleteByObjectId.serializeBinaryToWriter = function (message, writer)
     if (f != null) {
         writer.writeMessage(1, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
     }
+    f = message.getUserId();
+    if (f != null) {
+        writer.writeMessage(2, f, google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter);
+    }
 };
 /**
  * optional google.protobuf.StringValue _id = 1;
@@ -3190,6 +3314,34 @@ proto.post.DeleteByObjectId.prototype.clearId = function () {
  */
 proto.post.DeleteByObjectId.prototype.hasId = function () {
     return jspb.Message.getField(this, 1) != null;
+};
+/**
+ * optional google.protobuf.StringValue user_id = 2;
+ * @return {?proto.google.protobuf.StringValue}
+ */
+proto.post.DeleteByObjectId.prototype.getUserId = function () {
+    return /** @type{?proto.google.protobuf.StringValue} */ (jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.StringValue, 2));
+};
+/**
+ * @param {?proto.google.protobuf.StringValue|undefined} value
+ * @return {!proto.post.DeleteByObjectId} returns this
+*/
+proto.post.DeleteByObjectId.prototype.setUserId = function (value) {
+    return jspb.Message.setWrapperField(this, 2, value);
+};
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.post.DeleteByObjectId} returns this
+ */
+proto.post.DeleteByObjectId.prototype.clearUserId = function () {
+    return this.setUserId(undefined);
+};
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.post.DeleteByObjectId.prototype.hasUserId = function () {
+    return jspb.Message.getField(this, 2) != null;
 };
 /**
  * List of repeated fields within this message type.

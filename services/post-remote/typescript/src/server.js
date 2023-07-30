@@ -26,15 +26,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Starts the grpc server and attaches all handlers for each endpoints. */
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const mongodb_1 = __importDefault(require("./mongodb"));
 const producer_1 = require("./producer");
 const logger_1 = __importDefault(require("./utility/logger"));
 const wrapper_1 = require("./service/wrapper");
-const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC_PORT = process.env.GRPC_PORT || 50052;
-(async function StartService() {
+const { PostServiceService } = require('./protos/generated/posts_grpc_pb'), GRPC_PORT = process.env.GRPC_PORT || 50052;
+(function StartService() {
     const Server = new GRPC.Server();
-    Server.addService(UserServiceService, {
+    Server.addService(PostServiceService, {
         createPost: wrapper_1.createPost,
         updatePost: wrapper_1.updatePost,
         deletePost: wrapper_1.deletePost,
@@ -61,7 +62,7 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
         await (0, producer_1.connectProducer)();
     });
 })();
-['unhandledRejection', 'uncaughtException'].forEach(type => {
+['unhandledRejection', 'uncaughtException'].forEach((type) => {
     process.on(type, async (error) => {
         try {
             logger_1.default['process_disconnect_log'](type, error);
@@ -73,7 +74,7 @@ const { UserServiceService } = require('./protos/generated/users_grpc_pb'), GRPC
         }
     });
 });
-['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
+['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
     process.once(type, async (error) => {
         try {
             logger_1.default['process_disconnect_log'](type, error);

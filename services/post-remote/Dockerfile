@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 50051
 
-CMD ["npx", "nodemon", "typescript/server.js"]
+CMD ["npx", "nodemon", "typescript/src/server.js"]

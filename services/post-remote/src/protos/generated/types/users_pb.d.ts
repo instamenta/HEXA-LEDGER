@@ -52,6 +52,10 @@ export class UserModel extends jspb.Message {
     getFollowingList(): Array<google_protobuf_wrappers_pb.StringValue>;
     setFollowingList(value: Array<google_protobuf_wrappers_pb.StringValue>): UserModel;
     addFollowing(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
+    clearPostsList(): void;
+    getPostsList(): Array<google_protobuf_wrappers_pb.StringValue>;
+    setPostsList(value: Array<google_protobuf_wrappers_pb.StringValue>): UserModel;
+    addPosts(value?: google_protobuf_wrappers_pb.StringValue, index?: number): google_protobuf_wrappers_pb.StringValue;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): UserModel.AsObject;
@@ -74,6 +78,7 @@ export namespace UserModel {
         userwallet?: UserWallet.AsObject,
         followersList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         followingList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
+        postsList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
     }
 }
 

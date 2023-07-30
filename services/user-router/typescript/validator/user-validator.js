@@ -1,4 +1,5 @@
 "use strict";
+/** @file Middleware for validation user routes. */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.pageLimitFilter = exports.pageLimit = void 0;
 const express_validator_1 = require("express-validator");

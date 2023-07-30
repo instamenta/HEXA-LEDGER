@@ -1,3 +1,4 @@
+/** @file Handles calls to auth endpoints of grpc client. */
 import * as GRPC from '@grpc/grpc-js';
 import GRPC_CLIENT from './grpc-client';
 import {UserModel} from '../protos/generated/types/users_pb';
@@ -12,16 +13,16 @@ const {LoginForm, RegisterForm, UpdateForm, idRequest} = require('../protos/gene
  * @returns
  */
 export function loginUser(email: string, password: string): Promise<UserGrpcModel> {
-	return new Promise((resolve, reject) => {
-		const m = new LoginForm();
-		m.setEmail(new StringValue().setValue(email));
-		m.setPassword(new StringValue().setValue(password));
+    return new Promise((resolve, reject) => {
+        const m = new LoginForm();
+        m.setEmail(new StringValue().setValue(email));
+        m.setPassword(new StringValue().setValue(password));
 
-		GRPC_CLIENT.login(m, (err: GRPC.ServiceError, r: UserModel) => {
-			err ? reject(err.message)
-				: resolve(UserGrpcModel.fromUserGRPCMessage(r));
-		});
-	});
+        GRPC_CLIENT.login(m, (err: GRPC.ServiceError, r: UserModel) => {
+            err ? reject(err.message)
+                : resolve(UserGrpcModel.fromUserGRPCMessage(r));
+        });
+    });
 }
 
 /**
@@ -31,17 +32,17 @@ export function loginUser(email: string, password: string): Promise<UserGrpcMode
  * @returns
  */
 export function registerUser(username: string, email: string, password: string): Promise<UserGrpcModel> {
-	return new Promise((resolve, reject) => {
-		const m = new RegisterForm();
-		m.setUsername(new StringValue().setValue(username));
-		m.setEmail(new StringValue().setValue(email));
-		m.setPassword(new StringValue().setValue(password));
+    return new Promise((resolve, reject) => {
+        const m = new RegisterForm();
+        m.setUsername(new StringValue().setValue(username));
+        m.setEmail(new StringValue().setValue(email));
+        m.setPassword(new StringValue().setValue(password));
 
-		GRPC_CLIENT.register(m, (err: GRPC.ServiceError, r: UserModel) => {
-			err ? reject(err.message)
-				: resolve(UserGrpcModel.fromUserGRPCMessage(r));
-		});
-	});
+        GRPC_CLIENT.register(m, (err: GRPC.ServiceError, r: UserModel) => {
+            err ? reject(err.message)
+                : resolve(UserGrpcModel.fromUserGRPCMessage(r));
+        });
+    });
 }
 
 /**
@@ -49,13 +50,13 @@ export function registerUser(username: string, email: string, password: string):
  * @returns
  */
 export function deleteUserById(id: string): Promise<boolean> {
-	return new Promise((resolve, reject) => {
-		const m = new idRequest().setId(new StringValue().setValue(id));
-		GRPC_CLIENT.deleteUserById(m, (err: GRPC.ServiceError) => {
-			err ? reject(err.message)
-				: resolve(true);
-		});
-	});
+    return new Promise((resolve, reject) => {
+        const m = new idRequest().setId(new StringValue().setValue(id));
+        GRPC_CLIENT.deleteUserById(m, (err: GRPC.ServiceError) => {
+            err ? reject(err.message)
+                : resolve(true);
+        });
+    });
 }
 
 /**
@@ -66,15 +67,15 @@ export function deleteUserById(id: string): Promise<boolean> {
  * @returns
  */
 export function updateUserById(id: string, username: string, email: string, password: string): Promise<UserGrpcModel> {
-	return new Promise((resolve, reject) => {
-		const m = new UpdateForm();
-		m.setId(new StringValue().setValue(id));
-		m.setUsername(new StringValue().setValue(username));
-		m.setEmail(new StringValue().setValue(email));
-		m.setPassword(new StringValue().setValue(password));
-		GRPC_CLIENT.updateUserById(m, (err: GRPC.ServiceError, r: UserModel) => {
-			err ? reject(err.message)
-				: resolve(UserGrpcModel.fromUserGRPCMessage(r));
-		});
-	});
+    return new Promise((resolve, reject) => {
+        const m = new UpdateForm();
+        m.setId(new StringValue().setValue(id));
+        m.setUsername(new StringValue().setValue(username));
+        m.setEmail(new StringValue().setValue(email));
+        m.setPassword(new StringValue().setValue(password));
+        GRPC_CLIENT.updateUserById(m, (err: GRPC.ServiceError, r: UserModel) => {
+            err ? reject(err.message)
+                : resolve(UserGrpcModel.fromUserGRPCMessage(r));
+        });
+    });
 }

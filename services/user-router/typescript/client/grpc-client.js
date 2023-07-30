@@ -23,6 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Initializes exports and connects to grpc client. */
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const users_grpc_pb_1 = require("../protos/generated/users_grpc_pb");
 const USER_REMOTE_REF = process.env.USER_REMOTE_REF || 'user-remote-api', USER_REMOTE_PORT = process.env.USER_REMOTE_PORT || 50051;

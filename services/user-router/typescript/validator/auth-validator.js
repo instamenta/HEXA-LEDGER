@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerValidator = exports.loginValidator = void 0;
+/** @file Middleware for validating auth routes. */
 const express_validator_1 = require("express-validator");
 exports.loginValidator = [
     (0, express_validator_1.body)('email')

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAuthenticated = exports.notOwner = exports.isOwner = exports.isGuest = void 0;
+/** @file Middleware used for auth and token related events. */
 const token_tools_1 = require("../utility/token-tools");
 /**
  * Middleware: isAuthenticated
@@ -40,13 +41,15 @@ exports.isAuthenticated = isAuthenticated;
  * @param response
  * @param next
  */
-async function isGuest(request, response, next) {
+function isGuest(request, response, next) {
     try {
         const token = request.headers['x-authorization-token'];
-        if (token)
+        if (token) {
             throw new Error('Valid authorization token');
-        else
+        }
+        else {
             next();
+        }
     }
     catch (error) {
         response.status(401).json({ message: error.message }).end();

@@ -24,6 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteUserById = exports.updateUserById = exports.register = exports.login = void 0;
+/** @file Controller used for handling auth related requests. */
 const AUTH_CLIENT = __importStar(require("../client/auth-client"));
 /**
  * @param request

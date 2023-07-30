@@ -77,7 +77,7 @@ exports.getUserById = getUserById;
  */
 async function getUserFollowers(request, response) {
     try {
-        const r = request, { id } = r.params, page = Number.parseInt(r.query.page) || 1, limit = Number.parseInt(r.query.limit) || 10, followers = await USER_CLIENT.getUserFollowers(id, page, limit);
+        const { id } = request.params, page = Number.parseInt(request.query.page) || 1, limit = Number.parseInt(request.query.limit) || 10, followers = await USER_CLIENT.getUserFollowers(id, page, limit);
         response.json(followers).status(200).end();
     }
     catch (error) {
@@ -92,7 +92,7 @@ exports.getUserFollowers = getUserFollowers;
  */
 async function getUserFollowing(request, response) {
     try {
-        const r = request, { id } = r.params, page = Number.parseInt(r.query.page) || 1, limit = Number.parseInt(r.query.limit) || 10, following = await USER_CLIENT.getUserFollowing(id, page, limit);
+        const { id } = request.params, page = Number.parseInt(request.query.page) || 1, limit = Number.parseInt(request.query.limit) || 10, following = await USER_CLIENT.getUserFollowing(id, page, limit);
         response.json(following).status(200).end();
     }
     catch (error) {
@@ -138,13 +138,13 @@ exports.unfollowUser = unfollowUser;
 //  * @param request
 //  * @param response
 //  */
-// async function getUserComments(request: Request, response: Response): Promise<void> {
-// 	try {
-// 		const { id } = request.params;
-// 		const comments = await USER_CLIENT.getUserComments(id);
-// 		response.json(comments).status(200).end();
+// Async function getUserComments(request: Request, response: Response): Promise<void> {
+// 	Try {
+// 		Const { id } = request.params;
+// 		Const comments = await USER_CLIENT.getUserComments(id);
+// 		Response.json(comments).status(200).end();
 // 	} catch (error: Error | any) {
-// 		console.error(error);
-// 		response.json({ message: error.message }).status(500).end();
+// 		Console.error(error);
+// 		Response.json({ message: error.message }).status(500).end();
 // 	}
 // }

@@ -49,7 +49,6 @@ exports.registerUser = registerUser;
  * @returns
  */
 function deleteUserById(id) {
-    console.log('////////////////////////////');
     return new Promise((resolve, reject) => {
         const m = new idRequest().setId(new wrappers_pb_1.StringValue().setValue(id));
         grpc_client_1.default.deleteUserById(m, (err) => {
@@ -67,7 +66,6 @@ exports.deleteUserById = deleteUserById;
  * @returns
  */
 function updateUserById(id, username, email, password) {
-    console.log('////////////////////////////');
     return new Promise((resolve, reject) => {
         const m = new UpdateForm();
         m.setId(new wrappers_pb_1.StringValue().setValue(id));

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Router for users. */
 const express_1 = require("express");
 const auth_middleware_1 = require("../middleware/auth-middleware");
 const user_validator_1 = require("../validator/user-validator");

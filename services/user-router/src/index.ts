@@ -1,3 +1,4 @@
+/** @file Main file used for starting the API router. */
 import EXPRESS, {Express} from 'express';
 import CORS from 'cors';
 import AUTH_ROUTER from './routes/auth-routes';
@@ -20,32 +21,32 @@ API.use('/user', USER_ROUTER);
 API.use(ERROR_MIDDLEWARE);
 
 (async function initializeService(): Promise<void> {
-	await API.listen(Number(API_PORT), () => {
-		console.log(`${SERVICE_NAME}  is running on port: ${API_PORT}`);
-	});
-	API.on('error', (error: Error | any) => {
-		console.log('API ran into Error:', error);
-	});
-})().catch(error => console.log(error));
+    await API.listen(Number(API_PORT), () => {
+        console.log(`${SERVICE_NAME}  is running on port: ${API_PORT}`);
+    });
+    API.on('error', (error: Error | any) => {
+        console.log('API ran into Error:', error);
+    });
+})().catch((error) => console.log(error));
 
-['unhandledRejection', 'uncaughtException'].forEach(type => {
-	process.on(type, (error: Error) => {
-		try {
-			console.error(`${SERVICE_NAME} - process.on ${type}`);
-			console.error(error);
-		} catch {
-			process.exit(1);
-		}
-	});
+['unhandledRejection', 'uncaughtException'].forEach((type) => {
+    process.on(type, (error: Error) => {
+        try {
+            console.error(`${SERVICE_NAME} - process.on ${type}`);
+            console.error(error);
+        } catch {
+            process.exit(1);
+        }
+    });
 });
 
-['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
-	process.once(type, (error: Error) => {
-		try {
-			console.error(`${SERVICE_NAME} - process.on ${type}`, error);
-			process.exit(0);
-		} finally {
-			process.kill(process.pid, type);
-		}
-	});
+['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
+    process.once(type, (error: Error) => {
+        try {
+            console.error(`${SERVICE_NAME} - process.on ${type}`, error);
+            process.exit(0);
+        } finally {
+            process.kill(process.pid, type);
+        }
+    });
 });

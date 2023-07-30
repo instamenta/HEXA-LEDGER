@@ -36,7 +36,6 @@ function getUsers(page = 1, limit = 5, filter) {
 }
 exports.getUsers = getUsers;
 /**
- *
  * @param page
  * @param limit
  * @returns
@@ -76,7 +75,6 @@ function getUserById(id) {
 }
 exports.getUserById = getUserById;
 /**
- *
  * @param id
  * @param page
  * @param limit
@@ -146,7 +144,6 @@ function followUser(currentUserId, id) {
 }
 exports.followUser = followUser;
 /**
- *
  * @param currentUserId
  * @param id
  * @returns
@@ -163,54 +160,54 @@ function unfollowUser(currentUserId, id) {
     });
 }
 exports.unfollowUser = unfollowUser;
-// function getUserPosts(id: string): Promise<PostClass[]> {
-//     return new Promise((resolve, reject) => {
+// Function getUserPosts(id: string): Promise<PostClass[]> {
+//     Return new Promise((resolve, reject) => {
 //         // Create a gRPC request message
-//         const m = new GetUserPostsRequest();
-//         m.setId(new StringValue().setValue(id));
+//         Const m = new GetUserPostsRequest();
+//         M.setId(new StringValue().setValue(id));
 //
-//         const posts: PostClass[] = [];
+//         Const posts: PostClass[] = [];
 //
-//         const $stream = GRPC_CLIENT.getUserPosts(m);
+//         Const $stream = GRPC_CLIENT.getUserPosts(m);
 //
 //         // Handle the $stream events
 //         $stream.on("data", (response: PostModel) => {
-//             const post = PostClass.fromPostGRPCMessage(response);
-//             posts.push(post);
+//             Const post = PostClass.fromPostGRPCMessage(response);
+//             Posts.push(post);
 //         });
 //
 //         $stream.on("error", (err: GRPC.ServiceError) => {
-//             reject(err.message);
+//             Reject(err.message);
 //         });
 //
 //         $stream.on("end", () => {
-//             resolve(posts);
+//             Resolve(posts);
 //         });
 //     });
 // }
 //
-// function getUserComments(id: string): Promise<CommentClass[]> {
-//     return new Promise((resolve, reject) => {
+// Function getUserComments(id: string): Promise<CommentClass[]> {
+//     Return new Promise((resolve, reject) => {
 //         // Create a gRPC request message
-//         const m = new GetUserCommentsRequest();
-//         m.setId(new StringValue().setValue(id));
+//         Const m = new GetUserCommentsRequest();
+//         M.setId(new StringValue().setValue(id));
 //
-//         const comments: CommentClass[] = [];
+//         Const comments: CommentClass[] = [];
 //
-//         const $stream = GRPC_CLIENT.getUserComments(m);
+//         Const $stream = GRPC_CLIENT.getUserComments(m);
 //
 //         // Handle the $stream events
 //         $stream.on("data", (response: CommentModel) => {
-//             const comment = CommentClass.fromCommentGRPCMessage(response);
-//             comments.push(comment);
+//             Const comment = CommentClass.fromCommentGRPCMessage(response);
+//             Comments.push(comment);
 //         });
 //
 //         $stream.on("error", (err: GRPC.ServiceError) => {
-//             reject(err.message);
+//             Reject(err.message);
 //         });
 //
 //         $stream.on("end", () => {
-//             resolve(comments);
+//             Resolve(comments);
 //         });
 //     });
 // }

@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Main file used for starting the API router. */
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const auth_routes_1 = __importDefault(require("./routes/auth-routes"));
@@ -25,8 +26,8 @@ API.use(error_middleware_1.default);
     API.on('error', (error) => {
         console.log('API ran into Error:', error);
     });
-})().catch(error => console.log(error));
-['unhandledRejection', 'uncaughtException'].forEach(type => {
+})().catch((error) => console.log(error));
+['unhandledRejection', 'uncaughtException'].forEach((type) => {
     process.on(type, (error) => {
         try {
             console.error(`${SERVICE_NAME} - process.on ${type}`);
@@ -37,7 +38,7 @@ API.use(error_middleware_1.default);
         }
     });
 });
-['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach(type => {
+['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
     process.once(type, (error) => {
         try {
             console.error(`${SERVICE_NAME} - process.on ${type}`, error);

@@ -1,42 +1,43 @@
 "use strict";
-// import {sendLogMessage} from '../producer';
+/** @file User for console logging and sending kafka messages. */
+// Import {sendLogMessage} from '../producer';
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.grpc_disconnect_log = exports.grpc_start_log = exports.process_disconnect_log = exports.kafka_error_log = exports.kafka_disconnect_log = exports.kafka_start_log = exports.mongo_desconnect_log = exports.mongo_start_log = exports.log = void 0;
 const DEBUG_CONSOLE = process.env.DEBUG_CONSOLE || false;
 /**
- * Send Kafka messages & optionally console.logs
+ * Send Kafka messages & optionally console.logs.
  * @param type
  * @param message
  */
-async function log(type = 'ERROR', message) {
+function log(type = 'ERROR', message) {
     switch (type.toUpperCase()) {
         case 'ERROR': {
-            // await sendLogMessage(message, 'ERROR');
+            // Await sendLogMessage(message, 'ERROR');
             Console(message, 'ERROR', DEBUG_CONSOLE, '#');
             break;
         }
         case 'DEBUG': {
-            // await sendLogMessage(message, 'DEBUG');
+            // Await sendLogMessage(message, 'DEBUG');
             Console(message, 'DEBUG', DEBUG_CONSOLE, '%');
             break;
         }
         case 'COLLECT': {
-            // await sendLogMessage(message, 'COLLECT');
+            // Await sendLogMessage(message, 'COLLECT');
             Console(message, 'COLLECT', DEBUG_CONSOLE, '-');
             break;
         }
         case 'CRITICAL': {
-            // await sendLogMessage(message, 'CRITICAL');
+            // Await sendLogMessage(message, 'CRITICAL');
             Console(message, 'CRITICAL', DEBUG_CONSOLE, '');
             break;
         }
         case 'INFO': {
-            // await sendLogMessage(message, 'INFO');
+            // Await sendLogMessage(message, 'INFO');
             Console(message, 'INFO', DEBUG_CONSOLE, '@');
             break;
         }
         default: {
-            // await sendLogMessage(message, type);
+            // Await sendLogMessage(message, type);
             Console(message, type, DEBUG_CONSOLE);
             break;
         }
@@ -44,7 +45,7 @@ async function log(type = 'ERROR', message) {
 }
 exports.log = log;
 /**
- * Handles Console.logging in terminal
+ * Handles Console.logging in terminal.
  * @param message
  * @param type
  * @param status
@@ -52,7 +53,7 @@ exports.log = log;
  * @param length
  */
 function Console(message, type, status, symbol = '=', length = 30) {
-    if (!status || status != 'true' || Number.isNaN(length)) {
+    if (!status || status !== 'true' || Number.isNaN(length)) {
         return;
     }
     if (type.toLowerCase() === 'error') {
@@ -83,7 +84,6 @@ function mongo_start_log() {
 }
 exports.mongo_start_log = mongo_start_log;
 /**
- *
  * @param MONGODB_URI
  * @param error
  */
@@ -97,7 +97,6 @@ ERROR MESSAGE: ${error.message}
 }
 exports.mongo_desconnect_log = mongo_desconnect_log;
 /**
- *
  * @param BROKER_URL
  * @param BROKER_PORT
  */
@@ -107,7 +106,6 @@ function kafka_start_log(BROKER_URL, BROKER_PORT) {
 }
 exports.kafka_start_log = kafka_start_log;
 /**
- *
  * @param error
  */
 function kafka_disconnect_log(error) {
@@ -117,7 +115,6 @@ function kafka_disconnect_log(error) {
 }
 exports.kafka_disconnect_log = kafka_disconnect_log;
 /**
- *
  * @param BROKER_URL
  * @param BROKER_PORT
  * @param error
@@ -130,7 +127,6 @@ function kafka_error_log(BROKER_URL, BROKER_PORT, error) {
 }
 exports.kafka_error_log = kafka_error_log;
 /**
- *
  * @param type
  * @param error
  */
@@ -141,7 +137,6 @@ function process_disconnect_log(type, error) {
 }
 exports.process_disconnect_log = process_disconnect_log;
 /**
- *
  * @param port
  */
 function grpc_start_log(port) {
@@ -151,7 +146,6 @@ function grpc_start_log(port) {
 }
 exports.grpc_start_log = grpc_start_log;
 /**
- *
  * @param port
  * @param error
  */

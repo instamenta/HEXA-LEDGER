@@ -1,3 +1,4 @@
+/** @file The controller that handles routes request for user. */
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../middleware/auth-middleware';
 import * as USER_CLIENT from '../client/user-client';
@@ -127,14 +128,14 @@ export async function unfollowUser(request: iRequestWithUser, response: Response
 //  * @param request
 //  * @param response
 //  */
-// async function getUserComments(request: Request, response: Response): Promise<void> {
-// 	try {
-// 		const { id } = request.params;
-// 		const comments = await USER_CLIENT.getUserComments(id);
-// 		response.json(comments).status(200).end();
+// Async function getUserComments(request: Request, response: Response): Promise<void> {
+// 	Try {
+// 		Const { id } = request.params;
+// 		Const comments = await USER_CLIENT.getUserComments(id);
+// 		Response.json(comments).status(200).end();
 // 	} catch (error: Error | any) {
-// 		console.error(error);
-// 		response.json({ message: error.message }).status(500).end();
+// 		Console.error(error);
+// 		Response.json({ message: error.message }).status(500).end();
 // 	}
 // }
 

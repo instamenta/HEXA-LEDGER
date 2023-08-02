@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.decodeToken = void 0;
+/** @file JWT handler. */
 const jsonwebtoken_1 = require("jsonwebtoken");
 const TOKEN_SECRET = process.env.TOKEN_SECRET || 'SECRET';
 /**

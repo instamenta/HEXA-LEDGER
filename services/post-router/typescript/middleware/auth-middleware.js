@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAuthenticated = exports.notOwner = exports.isOwner = exports.isGuest = void 0;
+/** @file Middleware for validating auth request. */
 const token_tools_1 = require("../utility/token-tools");
 /**
  * Middleware: isAuthenticated
@@ -16,7 +17,6 @@ async function isAuthenticated(request, response, next) {
         if (!token) {
             throw new Error('Authorization token not provided');
         }
-        console.log('in');
         const extracted = token.toString();
         await (0, token_tools_1.decodeToken)(extracted)
             .then((decoded) => {
@@ -40,7 +40,7 @@ exports.isAuthenticated = isAuthenticated;
  * @param response
  * @param next
  */
-async function isGuest(request, response, next) {
+function isGuest(request, response, next) {
     try {
         const token = request.headers['x-authorization-token'];
         if (token)
@@ -64,6 +64,7 @@ exports.isGuest = isGuest;
 function isOwner(request, response, next) {
     const resourceId = request.params?.id;
     const authenticatedUserId = request.userData._id;
+    console.log(resourceId, '!+==', authenticatedUserId);
     (authenticatedUserId === resourceId) /* Validates User === Owner */
         ? next()
         : response.json({ message: 'You are not the owner of this resource' })

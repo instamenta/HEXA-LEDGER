@@ -1,7 +1,7 @@
 /** @file Grpc client used for calling to the client's endpoints. */
 import * as GRPC from '@grpc/grpc-js';
 import GRPC_CLIENT from './grpc-client';
-import {UserModel} from '../protos/generated/types/users_pb';
+import {UserModel as IUserModel} from '../protos/generated/types/users_pb';
 import {StringValue, Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import UserGrpcModel from '../model/user-grpc-model';
 
@@ -27,12 +27,11 @@ export function getUsers(page = 1, limit = 5, filter?: string): Promise<UserGrpc
         const m = new GetUsersRequest();
         m.setLimit(new Int32Value().setValue(limit));
         m.setPage(new Int32Value().setValue(page));
-        if (filter)
-            m.setFilter(new StringValue().setValue(filter));
-
+        if (filter) m.setFilter(new StringValue().setValue(filter));
         const users: UserGrpcModel[] = [];
         const $stream = GRPC_CLIENT.getUsers(m);
-        $stream.on('data', (response: UserModel) => {
+
+        $stream.on('data', (response: IUserModel) => {
             users.push(UserGrpcModel.fromUserGRPCMessage(response));
         });
         $stream.on('error', (err: GRPC.ServiceError) => {
@@ -57,7 +56,7 @@ export function getAllUsers(page = 1, limit = 5): Promise<UserGrpcModel[]> {
 
         const users: UserGrpcModel[] = [];
         const $stream = GRPC_CLIENT.getAllUsers(m);
-        $stream.on('data', (response: UserModel) => {
+        $stream.on('data', (response: IUserModel) => {
             users.push(UserGrpcModel.fromUserGRPCMessage(response));
         });
         $stream.on('error', (err: GRPC.ServiceError) => {
@@ -79,7 +78,7 @@ export function getUserById(id: string): Promise<UserGrpcModel> {
         const m = new GetUserByIdRequest();
         m.setId(new StringValue().setValue(id));
 
-        GRPC_CLIENT.getUserById(m, (err: GRPC.ServiceError, response: UserModel) => {
+        GRPC_CLIENT.getUserById(m, (err: GRPC.ServiceError, response: IUserModel) => {
             err ? reject(err.message)
                 : resolve(UserGrpcModel.fromUserGRPCMessage(response));
         });
@@ -101,7 +100,7 @@ export function getUserFollowers(id: string, page = 1, limit = 5): Promise<UserG
 
         const followers: UserGrpcModel[] = [];
         const $stream = GRPC_CLIENT.getUserFollowers(m);
-        $stream.on('data', (response: UserModel) => {
+        $stream.on('data', (response: IUserModel) => {
             followers.push(UserGrpcModel.fromUserGRPCMessage(response));
         });
         $stream.on('error', (err: GRPC.ServiceError) => {
@@ -128,7 +127,7 @@ export function getUserFollowing(id: string, page = 1, limit = 5): Promise<UserG
 
         const following: UserGrpcModel[] = [];
         const $stream = GRPC_CLIENT.getUserFollowing(m);
-        $stream.on('data', (response: UserModel) => {
+        $stream.on('data', (response: IUserModel) => {
             following.push(UserGrpcModel.fromUserGRPCMessage(response));
         });
         $stream.on('error', (err: GRPC.ServiceError) => {

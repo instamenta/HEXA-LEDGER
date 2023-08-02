@@ -1,3 +1,4 @@
+/** @file Typescript interfaces and types. */
 import {Request} from 'express';
 import {Timestamp} from 'google-protobuf/google/protobuf/timestamp_pb';
 
@@ -33,3 +34,17 @@ export interface IPostData {
     donations: Array<string>;
     pictures: Array<string>;
 }
+
+export interface ICommentData extends Document {
+    _id: string | null;
+    authorId: string | null;
+    postId: string | null;
+    upvotes: Array<string>;
+    downvotes: Array<string>;
+    subcomments: Array<string>;
+    content: string | null;
+    wasEdited: boolean;
+}
+
+// CreatedAt: Timestamp | Date | any;
+// UpdatedAt: Timestamp | Date | any;

@@ -5,7 +5,12 @@ import {UserModel} from '../protos/generated/types/users_pb';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import UserGrpcModel from '../model/user-grpc-model';
 
-const {LoginForm, RegisterForm, UpdateForm, idRequest} = require('../protos/generated/users_pb');
+const {
+    LoginForm,
+    RegisterForm,
+    UpdateForm,
+    idRequest
+} = require('../protos/generated/users_pb');
 
 /**
  * @param email

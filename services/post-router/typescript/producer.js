@@ -1,8 +1,9 @@
 "use strict";
-// import {Kafka, Producer as KafkaProducer, CompressionTypes, CompressionCodecs} from 'kafkajs';
-// import {kafka_error_log, kafka_start_log} from './utility/logger';
+/** @file Kafka consumer wrapper. */
+// Import {Kafka, Producer as KafkaProducer, CompressionTypes, CompressionCodecs} from 'kafkajs';
+// Import {kafka_error_log, kafka_start_log} from './utility/logger';
 //
-// const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0'
+// Const BROKER_URL: string = process.env.BROKER_URL || 'redpanda-0'
 // 	, BROKER_PORT: string = process.env.BROKER_PORT || '9092'
 // 	, SnappyCodec = require('kafkajs-snappy')
 // 	, Redpanda: Kafka = new Kafka({brokers: ['redpanda-0:9092']})
@@ -10,17 +11,17 @@
 // ;
 // CompressionCodecs[CompressionTypes.Snappy] = SnappyCodec;
 //
-// export {connectProducer, disconnectProducer, sendLogMessage};
+// Export {connectProducer, disconnectProducer, sendLogMessage};
 //
 // /**
 //  * Connects kafka producer
 //  */
-// async function connectProducer(): Promise<void> {
-// 	try {
-// 		await Producer.connect();
-// 		kafka_start_log(BROKER_URL, BROKER_PORT);
+// Async function connectProducer(): Promise<void> {
+// 	Try {
+// 		Await Producer.connect();
+// 		Kafka_start_log(BROKER_URL, BROKER_PORT);
 // 	} catch (error) {
-// 		kafka_error_log(BROKER_URL, BROKER_PORT, error);
+// 		Kafka_error_log(BROKER_URL, BROKER_PORT, error);
 // 	}
 // }
 //
@@ -29,14 +30,14 @@
 //  * @param event
 //  * @returns
 //  */
-// async function sendLogMessage(message: object | string, event = 'UNDEFINED'): Promise<void> {
-// 	await Producer.send({
-// 		topic: 'logger_topic',
-// 		compression: CompressionTypes.Snappy,
-// 		messages: [
+// Async function sendLogMessage(message: object | string, event = 'UNDEFINED'): Promise<void> {
+// 	Await Producer.send({
+// 		Topic: 'logger_topic',
+// 		Compression: CompressionTypes.Snappy,
+// 		Messages: [
 // 			{
-// 				headers: {event: event},
-// 				value: JSON.stringify({message}),
+// 				Headers: {event: event},
+// 				Value: JSON.stringify({message}),
 // 			},
 // 		],
 // 	});
@@ -45,8 +46,8 @@
 // /**
 //  * @returns
 //  */
-// async function disconnectProducer(): Promise<void> {
-// 	await Producer.disconnect()
+// Async function disconnectProducer(): Promise<void> {
+// 	Await Producer.disconnect()
 // 		.then(() => console.log('Disconnected producer'))
 // 		.catch((error: Error) => console.error('Kafka Producer Error:', error));
 // }

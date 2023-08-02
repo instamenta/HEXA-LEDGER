@@ -31,7 +31,7 @@ const POST_CLIENT = __importStar(require("../client/post-client"));
  */
 async function getPosts(request, response) {
     try {
-        const { ids, limit, page, filter, match } = request.body;
+        const { ids } = request.body, filter = request.query?.filter, match = request.query?.match, page = request.query?.page ? +request.query.page : undefined, limit = request.query?.limit ? +request.query.limit : undefined;
         const posts = await POST_CLIENT.getPosts(ids, limit, page, filter, match);
         response.json(posts).end();
     }
@@ -80,8 +80,9 @@ exports.getPostById = getPostById;
 async function updatePost(request, response) {
     try {
         const postId = request.params.id;
+        const authId = request.userData._id;
         const { title, description, authorId, pictures, isPromoted, tags } = request.body;
-        const updatedPost = await POST_CLIENT.updatePost(postId, title, description, authorId, pictures, isPromoted, tags);
+        const updatedPost = await POST_CLIENT.updatePost(postId, title, description, authorId, pictures, isPromoted, tags, authId);
         if (updatedPost) {
             response.json(updatedPost).end();
         }
@@ -101,8 +102,8 @@ exports.updatePost = updatePost;
  */
 async function deletePost(request, response) {
     try {
-        const postId = request.params.id;
-        const post = await POST_CLIENT.deletePost(postId);
+        const postId = request.params.id, authId = request.userData._id;
+        const post = await POST_CLIENT.deletePost(postId, authId);
         post ? response.json({ message: 'Post deleted successfully' }).end()
             : response.status(404).json({ message: 'Post not found' }).end();
     }
@@ -118,7 +119,7 @@ exports.deletePost = deletePost;
  */
 async function getPostComments(request, response) {
     try {
-        const { postId } = request.params, page = Number.parseInt(request.query.page), limit = Number.parseInt(request.query.limit), comments = await POST_CLIENT.getPostComments(postId, page, limit);
+        const { postId } = request.params, page = request.query?.page ? +request.query.page : undefined, limit = request.query?.limit ? +request.query.limit : undefined, comments = await POST_CLIENT.getPostComments(postId, page, limit);
         response.json(comments).end();
     }
     catch (error) {
@@ -144,7 +145,6 @@ async function createComment(request, response) {
 }
 exports.createComment = createComment;
 /**
- *
  * @param request
  * @param response
  */
@@ -168,8 +168,8 @@ exports.updateComment = updateComment;
  */
 async function deleteComment(request, response) {
     try {
-        const { commentId } = request.params;
-        const com = await POST_CLIENT.deleteComment(commentId);
+        const { commentId } = request.params, authId = request.userData._id;
+        const com = await POST_CLIENT.deleteComment(commentId, authId);
         com ? response.json({ message: 'Comment deleted successfully' }).end()
             : response.status(404).json({ message: 'Comment not found' }).end();
     }
@@ -180,7 +180,6 @@ async function deleteComment(request, response) {
 }
 exports.deleteComment = deleteComment;
 /**
- *
  * @param request
  * @param response
  */
@@ -197,7 +196,6 @@ async function upvotePost(request, response) {
 }
 exports.upvotePost = upvotePost;
 /**
- *
  * @param request
  * @param response
  */
@@ -253,7 +251,7 @@ exports.downvoteComment = downvoteComment;
  */
 async function getUserPosts(request, response) {
     try {
-        const userId = request.params.userId, page = Number.parseInt(request.query.page), limit = Number.parseInt(request.query.limit), filter = request.query.filter, match = request.query.match;
+        const { userId } = request.params, page = request.query?.page ? +request.query.page : undefined, limit = request.query?.limit ? +request.query.limit : undefined, filter = request.query.filter, match = request.query.match;
         const posts = await POST_CLIENT.getUserPosts(userId, limit, page, filter, match);
         response.json(posts).end();
     }

@@ -44,14 +44,14 @@ class PostGrpcModel {
             createdAt: m.hasCreatedAt() ? m.getCreatedAt() : Date.now(),
             updatedAt: m.hasUpdatedAt() ? m.getUpdatedAt() : Date.now(),
             isPromoted: m.hasIsPromoted() ? m.getIsPromoted().getValue() : false,
-            upvotes: m.getUpvotesList().map((upvote) => upvote.toString()),
-            downvotes: m.getDownvotesList().map((downvote) => downvote.toString()),
-            comments: m.getCommentsList().map((comment) => comment.toString()),
+            upvotes: m.getUpvotesList().map((uv) => uv.toString()),
+            downvotes: m.getDownvotesList().map((dv) => dv.toString()),
+            comments: m.getCommentsList().map((c) => c.toString()),
             tags: m.getTagsList().map((tag) => tag.toString()),
-            tronTransaction: m.getTronTransactionList().map((data) => data.toString()),
-            ethereumTransaction: m.getEthereumTransactionList().map((data) => data.toString()),
+            tronTransaction: m.getTronTransactionList().map((trxTX) => trxTX.toString()),
+            ethereumTransaction: m.getEthereumTransactionList().map((ethTX) => ethTX.toString()),
             donations: m.getDonationsList().map((donation) => donation.toString()),
-            pictures: m.getPicturesList().map((picture) => picture.toString()),
+            pictures: m.getPicturesList().map((pic) => pic.toString()),
         });
     }
 }

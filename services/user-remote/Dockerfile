@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-WORKDIR /
+WORKDIR app/
 
 COPY package*.json ./
 
@@ -10,8 +10,6 @@ COPY . .
 
 EXPOSE 50051
 CMD [ "npm", "run", "build" ]
-
-CMD [ "rm" , "-rf", "./src"]
 
 CMD ["npx", "nodemon", "typescript/src/server.js"]
 

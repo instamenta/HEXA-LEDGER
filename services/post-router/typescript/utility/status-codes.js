@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Http status code enumerations . */
 const httpStatusCodes = {
     CONTINUE: 100,
     SWITCHING_PROTOCOLS: 101,

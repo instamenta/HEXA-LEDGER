@@ -1,3 +1,4 @@
+/** @file Handles request to post routes. */
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
 import * as POST_CLIENT from '../client/post-client';
@@ -9,10 +10,11 @@ import * as POST_CLIENT from '../client/post-client';
 export async function getPosts(request: Request, response: Response) {
     try {
         const {ids} = request.body
-            , page: number = Number.parseInt(request.query.page as string)
-            , limit: number = Number.parseInt(request.query.limit as string)
-            , filter = request.query.filter as string
-            , match = request.query.match as string;
+            , filter = request.query?.filter as string
+            , match = request.query?.match as string
+            , page = request.query?.page ? +request.query!.page : undefined
+            , limit = request.query?.limit ? +request.query!.limit : undefined
+        ;
         const posts = await POST_CLIENT.getPosts(ids, limit, page, filter, match);
         response.json(posts).end();
     } catch (error) {
@@ -73,6 +75,7 @@ export async function getPostById(request: Request, response: Response) {
 export async function updatePost(request: iRequestWithUser, response: Response) {
     try {
         const postId = request.params.id;
+        const authId = request.userData._id;
         const {
             title,
             description,
@@ -89,6 +92,7 @@ export async function updatePost(request: iRequestWithUser, response: Response) 
             pictures,
             isPromoted,
             tags,
+            authId
         );
         if (updatedPost) {
             response.json(updatedPost).end();
@@ -107,8 +111,10 @@ export async function updatePost(request: iRequestWithUser, response: Response) 
  */
 export async function deletePost(request: iRequestWithUser, response: Response) {
     try {
-        const postId = request.params.id;
-        const post = await POST_CLIENT.deletePost(postId);
+        const postId = request.params.id
+            , authId = request.userData._id
+        ;
+        const post = await POST_CLIENT.deletePost(postId, authId);
         post ? response.json({message: 'Post deleted successfully'}).end()
             : response.status(404).json({message: 'Post not found'}).end();
     } catch (error) {
@@ -124,8 +130,8 @@ export async function deletePost(request: iRequestWithUser, response: Response) 
 export async function getPostComments(request: Request, response: Response) {
     try {
         const {postId} = request.params
-            , page: number = Number.parseInt(request.query.page as string)
-            , limit: number = Number.parseInt(request.query.limit as string)
+            , page = request.query?.page ? +request.query!.page : undefined
+            , limit = request.query?.limit ? +request.query!.limit : undefined
             , comments = await POST_CLIENT.getPostComments(postId, page, limit);
         response.json(comments).end();
     } catch (error) {
@@ -156,7 +162,6 @@ export async function createComment(request: iRequestWithUser, response: Respons
 }
 
 /**
- *
  * @param request
  * @param response
  */
@@ -169,7 +174,7 @@ export async function updateComment(request: iRequestWithUser, response: Respons
             _id,
             postId,
             content,
-            commentId
+            commentId,
         );
         comment
             ? response.json(comment).end()
@@ -186,8 +191,10 @@ export async function updateComment(request: iRequestWithUser, response: Respons
  */
 export async function deleteComment(request: iRequestWithUser, response: Response) {
     try {
-        const {commentId} = request.params;
-        const com = await POST_CLIENT.deleteComment(commentId);
+        const {commentId} = request.params
+            , authId = request.userData._id
+        ;
+        const com = await POST_CLIENT.deleteComment(commentId, authId);
         com ? response.json({message: 'Comment deleted successfully'}).end()
             : response.status(404).json({message: 'Comment not found'}).end();
     } catch (error) {
@@ -198,7 +205,6 @@ export async function deleteComment(request: iRequestWithUser, response: Respons
 
 
 /**
- *
  * @param request
  * @param response
  */
@@ -216,7 +222,6 @@ export async function upvotePost(request: iRequestWithUser, response: Response) 
 }
 
 /**
- *
  * @param request
  * @param response
  */
@@ -274,8 +279,8 @@ export async function downvoteComment(request: iRequestWithUser, response: Respo
 export async function getUserPosts(request: Request, response: Response) {
     try {
         const {userId} = request.params
-            , page: number = Number.parseInt(request.query.page as string)
-            , limit: number = Number.parseInt(request.query.limit as string)
+            , page = request.query?.page ? +request.query!.page : undefined
+            , limit = request.query?.limit ? +request.query!.limit : undefined
             , filter = request.query.filter as string
             , match = request.query.match as string;
         const posts = await POST_CLIENT.getUserPosts(

@@ -23,7 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+/** @file Start and exports the grpc client. */
 const GRPC = __importStar(require("@grpc/grpc-js"));
 const posts_grpc_pb_1 = require("../protos/generated/posts_grpc_pb");
-const CLIENT = new posts_grpc_pb_1.PostServiceClient('user-remote:50052', GRPC.credentials.createInsecure());
-exports.default = CLIENT;
+const POST_REMOTE_REF = process.env['POST_REMOTE_REF'] || 'post-remote', POST_REMOTE_PORT = process.env['POST_REMOTE_PORT'] || 50052;
+const GRPC_CLIENT = new posts_grpc_pb_1.PostServiceClient(`${POST_REMOTE_REF}:${POST_REMOTE_PORT}`, GRPC.credentials.createInsecure());
+exports.default = GRPC_CLIENT;

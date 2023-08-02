@@ -1,0 +1,64 @@
+:root {
+    --primary-color: #995438;    /* ORANGE */
+    --secondary-color: #1e100b;  /* BROWN */
+    --accent-color: #b36242;     /* LIGHT-ORANGE */
+    --text-color: #fefcfb;       /* WHITE */
+    --background-color: #040201; /* BLACK */
+}
+
+* {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+body {
+    margin: 0;
+}
+
+button {
+    background-color: var(--accent-color);
+    border: var(--secondary-color);
+    padding: 0.6rem 2rem;
+    border-radius: 1rem 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+nav li {
+    margin: 0 3px;
+    padding: 0.6rem 1.2rem;
+    border: var(--text-color) solid 1px;
+}
+
+ul {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    list-style-type: none;
+}
+
+span.logo {
+    color: var(--accent-color);
+}
+
+p.logo {
+    font-size: 1.5rem;
+}
+
+a {
+    font-size: 1.2rem;
+}
+
+nav, a:hover {
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: var(--accent-color) solid 1px;
+    padding: 0 2rem;
+    margin: 0;
+}

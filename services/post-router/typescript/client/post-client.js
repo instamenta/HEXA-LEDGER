@@ -4,28 +4,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.downvoteComment = exports.upvoteComment = exports.downvotePost = exports.upvotePost = exports.getUserPosts = exports.getPostComments = exports.getPosts = exports.getPostById = exports.deleteComment = exports.updateComment = exports.createComment = exports.deletePost = exports.updatePost = exports.createPost = void 0;
-const posts_pb_1 = require("../protos/generated/types/posts_pb");
 const wrappers_pb_1 = require("google-protobuf/google/protobuf/wrappers_pb");
 const grpc_client_1 = __importDefault(require("./grpc-client"));
 const post_grpc_model_1 = __importDefault(require("../model/post-grpc-model"));
+const comment_grpc_model_1 = __importDefault(require("../model/comment-grpc-model"));
+const { PostForm, DeleteByObjectId, CommentForm, GetByObjectId, GetPostsRequest, GetCommentsRequest, GetUserPostsRequest, PostModel, CommentModel, VotePostRequest, VoteCommentRequest } = require('../protos/generated/posts_pb');
 /**
  * @param title
- * @param  description
- * @param  authorId
- * @param  pictures
- * @param  isPromoted
- * @param  tags
+ * @param description
+ * @param authorId
+ * @param pictures
+ * @param isPromoted
+ * @param tags
  * @returns
  */
 function createPost(title = '', description = '', authorId = '', pictures = [], isPromoted = false, tags = []) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.PostForm();
-        m.setTitle(new wrappers_pb_1.StringValue().setValue(title));
-        m.setDescription(new wrappers_pb_1.StringValue().setValue(description));
-        m.setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId));
-        m.setPicturesList(pictures.map((pic) => new wrappers_pb_1.StringValue().setValue(pic)));
-        m.setIsPromoted(new wrappers_pb_1.BoolValue().setValue(isPromoted));
-        m.setTagsList(tags.map((tag) => new wrappers_pb_1.StringValue().setValue(tag)));
+        const m = new PostForm()
+            .setTitle(new wrappers_pb_1.StringValue().setValue(title))
+            .setDescription(new wrappers_pb_1.StringValue().setValue(description))
+            .setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId))
+            .setPicturesList(pictures.map((pic) => new wrappers_pb_1.StringValue().setValue(pic)))
+            .setIsPromoted(new wrappers_pb_1.BoolValue().setValue(isPromoted))
+            .setTagsList(tags.map((tag) => new wrappers_pb_1.StringValue().setValue(tag)));
         grpc_client_1.default.createPost(m, (err, response) => {
             err ? reject(err)
                 : resolve(post_grpc_model_1.default.fromPostGRPCMessage(response));
@@ -41,18 +42,20 @@ exports.createPost = createPost;
  * @param pictures
  * @param isPromoted
  * @param tags
+ * @param authId
  * @returns
  */
-function updatePost(id = '', title = '', description = '', authorId = '', pictures = [], isPromoted = false, tags = []) {
+function updatePost(id = '', title = '', description = '', authorId = '', pictures = [], isPromoted = false, tags = [], authId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.PostForm();
-        m.setId(new wrappers_pb_1.StringValue().setValue(id));
-        m.setTitle(new wrappers_pb_1.StringValue().setValue(title));
-        m.setDescription(new wrappers_pb_1.StringValue().setValue(description));
-        m.setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId));
-        m.setPicturesList(pictures.map((pic) => new wrappers_pb_1.StringValue().setValue(pic)));
-        m.setIsPromoted(new wrappers_pb_1.BoolValue().setValue(isPromoted));
-        m.setTagsList(tags.map((tag) => new wrappers_pb_1.StringValue().setValue(tag)));
+        const m = new PostForm()
+            .setId(new wrappers_pb_1.StringValue().setValue(id))
+            .setTitle(new wrappers_pb_1.StringValue().setValue(title))
+            .setDescription(new wrappers_pb_1.StringValue().setValue(description))
+            .setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId))
+            .setPicturesList(pictures.map((pic) => new wrappers_pb_1.StringValue().setValue(pic)))
+            .setIsPromoted(new wrappers_pb_1.BoolValue().setValue(isPromoted))
+            .setTagsList(tags.map((tag) => new wrappers_pb_1.StringValue().setValue(tag)))
+            .setAuthId(new wrappers_pb_1.StringValue().setValue(authId));
         grpc_client_1.default.updatePost(m, (err, response) => {
             err ? reject(err)
                 : resolve(post_grpc_model_1.default.fromPostGRPCMessage(response));
@@ -62,12 +65,14 @@ function updatePost(id = '', title = '', description = '', authorId = '', pictur
 exports.updatePost = updatePost;
 /**
  * @param id
+ * @param authId
  * @returns
  */
-function deletePost(id) {
+function deletePost(id, authId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.DeleteByObjectId();
-        m.setId(new wrappers_pb_1.StringValue().setValue(id));
+        const m = new DeleteByObjectId()
+            .setId(new wrappers_pb_1.StringValue().setValue(id))
+            .setUserId(new wrappers_pb_1.StringValue().setValue(authId));
         grpc_client_1.default.deletePost(m, (err, response) => {
             err ? reject(err)
                 : resolve(response);
@@ -83,13 +88,13 @@ exports.deletePost = deletePost;
  */
 function createComment(authorId, postId, content) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.CommentForm();
-        m.setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId));
-        m.setContent(new wrappers_pb_1.StringValue().setValue(postId));
-        m.setPostId(new wrappers_pb_1.StringValue().setValue(content));
+        const m = new CommentForm()
+            .setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId))
+            .setContent(new wrappers_pb_1.StringValue().setValue(content))
+            .setPostId(new wrappers_pb_1.StringValue().setValue(postId));
         grpc_client_1.default.createComment(m, (err, response) => {
             err ? reject(err)
-                : resolve(response);
+                : resolve(comment_grpc_model_1.default.fromCommentGRPCMessage(response));
         });
     });
 }
@@ -103,26 +108,28 @@ exports.createComment = createComment;
  */
 function updateComment(authorId, postId, content, commentId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.CommentForm();
-        m.setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId));
-        m.setContent(new wrappers_pb_1.StringValue().setValue(postId));
-        m.setPostId(new wrappers_pb_1.StringValue().setValue(content));
-        m.setId(new wrappers_pb_1.StringValue().setValue(commentId));
+        const m = new CommentForm()
+            .setAuthorId(new wrappers_pb_1.StringValue().setValue(authorId))
+            .setContent(new wrappers_pb_1.StringValue().setValue(content))
+            .setPostId(new wrappers_pb_1.StringValue().setValue(postId))
+            .setId(new wrappers_pb_1.StringValue().setValue(commentId));
         grpc_client_1.default.updateComment(m, (err, response) => {
             err ? reject(err.message)
-                : resolve(response);
+                : resolve(comment_grpc_model_1.default.fromCommentGRPCMessage(response));
         });
     });
 }
 exports.updateComment = updateComment;
 /**
  * @param id
+ * @param authId
  * @returns
  */
-function deleteComment(id) {
+function deleteComment(id, authId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.DeleteByObjectId();
-        m.setId(new wrappers_pb_1.StringValue().setValue(id));
+        const m = new DeleteByObjectId()
+            .setId(new wrappers_pb_1.StringValue().setValue(id))
+            .setUserId(new wrappers_pb_1.StringValue().setValue(authId));
         grpc_client_1.default.deleteComment(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(response);
@@ -136,8 +143,9 @@ exports.deleteComment = deleteComment;
  */
 function getPostById(id) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.GetByObjectId();
-        m.setId(new wrappers_pb_1.StringValue().setValue(id));
+        console.log(id);
+        const m = new GetByObjectId()
+            .setId(new wrappers_pb_1.StringValue().setValue(id));
         grpc_client_1.default.getPostById(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(post_grpc_model_1.default.fromPostGRPCMessage(response));
@@ -153,16 +161,15 @@ exports.getPostById = getPostById;
  * @param match
  * @returns
  */
-function getPosts(ids = [], limit = 5, page = 0, filter = '', match = '') {
+function getPosts(ids = [], limit = 5, page = 1, filter = '', match = '') {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.GetPostsRequest();
-        m.setIdsList(ids.map((id) => new wrappers_pb_1.StringValue().setValue(id)));
-        m.setPage(new wrappers_pb_1.Int32Value().setValue(limit));
-        m.setLimit(new wrappers_pb_1.Int32Value().setValue(page));
-        m.setFilter(new wrappers_pb_1.StringValue().setValue(filter));
-        m.setMatch(new wrappers_pb_1.StringValue().setValue(match));
-        const posts = [];
-        const $stream = grpc_client_1.default.getPost(m);
+        const m = new GetPostsRequest()
+            .setPage(new wrappers_pb_1.Int32Value().setValue(page))
+            .setLimit(new wrappers_pb_1.Int32Value().setValue(limit));
+        // M.setIdsList(ids.map((id) => new StringValue().setValue(id)));
+        // M.setFilter(new StringValue().setValue(filter));
+        // M.setMatch(new StringValue().setValue(match));
+        const posts = [], $stream = grpc_client_1.default.getPosts(m);
         $stream.on('data', (response) => {
             posts.push(post_grpc_model_1.default.fromPostGRPCMessage(response));
         });
@@ -183,14 +190,13 @@ exports.getPosts = getPosts;
  */
 function getPostComments(postId, page = 1, limit = 10) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.GetCommentsRequest();
-        m.setId(new wrappers_pb_1.StringValue().setValue(postId));
-        m.setPage(new wrappers_pb_1.Int32Value().setValue(page));
-        m.setLimit(new wrappers_pb_1.Int32Value().setValue(limit));
-        const comments = [];
-        const $stream = grpc_client_1.default.getPostComments(m);
+        const m = new GetCommentsRequest()
+            .setId(new wrappers_pb_1.StringValue().setValue(postId))
+            .setPage(new wrappers_pb_1.Int32Value().setValue(page))
+            .setLimit(new wrappers_pb_1.Int32Value().setValue(limit));
+        const comments = [], $stream = grpc_client_1.default.getPostComments(m);
         $stream.on('data', (response) => {
-            comments.push(response);
+            comments.push(comment_grpc_model_1.default.fromCommentGRPCMessage(response));
         });
         $stream.on('error', (err) => {
             reject(err.message);
@@ -202,7 +208,6 @@ function getPostComments(postId, page = 1, limit = 10) {
 }
 exports.getPostComments = getPostComments;
 /**
- *
  * @param userId
  * @param limit
  * @param page
@@ -212,14 +217,13 @@ exports.getPostComments = getPostComments;
  */
 function getUserPosts(userId, limit = 10, page = 1, filter = '', match = '') {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.GetUserPostsRequest();
-        m.setUserId(new wrappers_pb_1.StringValue());
-        m.setPage(new wrappers_pb_1.Int32Value().setValue(page));
-        m.setLimit(new wrappers_pb_1.Int32Value().setValue(limit));
-        m.setFilter(new wrappers_pb_1.StringValue().setValue(filter));
-        m.setMatch(new wrappers_pb_1.StringValue().setValue(match));
-        const posts = [];
-        const $stream = grpc_client_1.default.getUserPosts(m);
+        const m = new GetUserPostsRequest()
+            .setUserId(new wrappers_pb_1.StringValue())
+            .setPage(new wrappers_pb_1.Int32Value().setValue(page))
+            .setLimit(new wrappers_pb_1.Int32Value().setValue(limit))
+            .setFilter(new wrappers_pb_1.StringValue().setValue(filter))
+            .setMatch(new wrappers_pb_1.StringValue().setValue(match));
+        const posts = [], $stream = grpc_client_1.default.getUserPosts(m);
         $stream.on('data', (response) => {
             posts.push(post_grpc_model_1.default.fromPostGRPCMessage(response));
         });
@@ -233,16 +237,15 @@ function getUserPosts(userId, limit = 10, page = 1, filter = '', match = '') {
 }
 exports.getUserPosts = getUserPosts;
 /**
- *
  * @param postId
  * @param userId
  * @returns
  */
 function upvotePost(postId, userId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.VotePostRequest();
-        m.setId(new wrappers_pb_1.StringValue().setValue(postId));
-        m.setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
+        const m = new VotePostRequest()
+            .setId(new wrappers_pb_1.StringValue().setValue(postId))
+            .setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
         grpc_client_1.default.upvotePost(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(response);
@@ -251,16 +254,15 @@ function upvotePost(postId, userId) {
 }
 exports.upvotePost = upvotePost;
 /**
- *
  * @param postId
  * @param userId
  * @returns
  */
 function downvotePost(postId, userId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.VotePostRequest();
-        m.setId(new wrappers_pb_1.StringValue().setValue(postId));
-        m.setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
+        const m = new VotePostRequest()
+            .setId(new wrappers_pb_1.StringValue().setValue(postId))
+            .setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
         grpc_client_1.default.downvotePost(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(response);
@@ -275,9 +277,9 @@ exports.downvotePost = downvotePost;
  */
 function upvoteComment(commentId, userId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.VoteCommentRequest();
-        m.setId(new wrappers_pb_1.StringValue().setValue(commentId));
-        m.setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
+        const m = new VoteCommentRequest()
+            .setId(new wrappers_pb_1.StringValue().setValue(commentId))
+            .setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
         grpc_client_1.default.upvoteComment(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(response);
@@ -292,9 +294,9 @@ exports.upvoteComment = upvoteComment;
  */
 function downvoteComment(commentId, userId) {
     return new Promise((resolve, reject) => {
-        const m = new posts_pb_1.VoteCommentRequest();
-        m.setId(new wrappers_pb_1.StringValue().setValue(commentId));
-        m.setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
+        const m = new VoteCommentRequest()
+            .setId(new wrappers_pb_1.StringValue().setValue(commentId))
+            .setCurrentUserId(new wrappers_pb_1.StringValue().setValue(userId));
         grpc_client_1.default.downvoteComment(m, (err, response) => {
             err ? reject(err.message)
                 : resolve(response);

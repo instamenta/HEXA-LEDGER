@@ -1,3 +1,4 @@
+/** @file Middleware for validating auth request. */
 import {decodeToken} from '../utility/token-tools';
 import {Request, Response, NextFunction} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
@@ -11,24 +12,23 @@ import {iRequestWithUser} from '../utility/types/base-types';
  * @param next
  */
 async function isAuthenticated(request: iRequestWithUser, response: Response, next: NextFunction): Promise<void> {
-	try {
-		const token: string | string[] | undefined = request.headers['x-authorization-token'];
-		if (!token) {
-			throw new Error('Authorization token not provided');
-		}
-		console.log('in');
-		const extracted = token.toString();
-		await decodeToken(extracted)
-			.then((decoded) => {
-				request.userData = decoded;
-				next();
-			})
-			.catch(() => {
-				throw new Error('Invalid authorization token');
-			});
-	} catch (error: Error | any) {
-		response.status(401).json({message: error.message}).end();
-	}
+    try {
+        const token: string | string[] | undefined = request.headers['x-authorization-token'];
+        if (!token) {
+            throw new Error('Authorization token not provided');
+        }
+        const extracted = token.toString();
+        await decodeToken(extracted)
+            .then((decoded) => {
+                request.userData = decoded;
+                next();
+            })
+            .catch(() => {
+                throw new Error('Invalid authorization token');
+            });
+    } catch (error: Error | any) {
+        response.status(401).json({message: error.message}).end();
+    }
 }
 
 /**
@@ -39,14 +39,14 @@ async function isAuthenticated(request: iRequestWithUser, response: Response, ne
  * @param response
  * @param next
  */
-async function isGuest(request: Request, response: Response, next: NextFunction): Promise<void> {
-	try {
-		const token: string | string[] | undefined = request.headers['x-authorization-token'];
-		if (token) throw new Error('Valid authorization token');
-		else next();
-	} catch (error: Error | any) {
-		response.status(401).json({message: error.message}).end();
-	}
+function isGuest(request: Request, response: Response, next: NextFunction): void {
+    try {
+        const token: string | string[] | undefined = request.headers['x-authorization-token'];
+        if (token) throw new Error('Valid authorization token');
+        else next();
+    } catch (error: Error | any) {
+        response.status(401).json({message: error.message}).end();
+    }
 }
 
 /**
@@ -58,16 +58,17 @@ async function isGuest(request: Request, response: Response, next: NextFunction)
  * @param next
  */
 function isOwner(
-	request: iRequestWithUser,
-	response: Response,
-	next: NextFunction
+    request: iRequestWithUser,
+    response: Response,
+    next: NextFunction
 ): void {
-	const resourceId: string = request.params?.id;
-	const authenticatedUserId: string | undefined = request.userData._id;
-	(authenticatedUserId === resourceId) /* Validates User === Owner */
-		? next()
-		: response.json({message: 'You are not the owner of this resource'})
-			.status(403).end();
+    const resourceId: string = request.params?.id as string;
+    const authenticatedUserId: string | undefined = request.userData._id;
+    console.log(resourceId, '!+==', authenticatedUserId);
+    (authenticatedUserId === resourceId) /* Validates User === Owner */
+        ? next()
+        : response.json({message: 'You are not the owner of this resource'})
+            .status(403).end();
 }
 
 /**
@@ -79,12 +80,12 @@ function isOwner(
  * @param next
  */
 function notOwner(request: iRequestWithUser, response: Response, next: NextFunction): void {
-	const resourceId: string = request.params?.id;
-	const authenticatedUserId: string | undefined = request.userData?._id;
-	(authenticatedUserId === resourceId) /* Validates User !== Owner */
-		? response.json({message: 'You are the owner of this resource'})
-			.status(403).end()
-		: next();
+    const resourceId: string = request.params?.id;
+    const authenticatedUserId: string | undefined = request.userData?._id;
+    (authenticatedUserId === resourceId) /* Validates User !== Owner */
+        ? response.json({message: 'You are the owner of this resource'})
+            .status(403).end()
+        : next();
 }
 
 export {isGuest, isOwner, notOwner, isAuthenticated};

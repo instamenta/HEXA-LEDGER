@@ -1,12 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 /** @file Router for handling post route requests. */
 const express_1 = require("express");
 const auth_middleware_1 = require("../middleware/auth-middleware");
-const error_middleware_1 = __importDefault(require("../middleware/error-middleware"));
 const post_controller_1 = require("../controller/post-controller");
 const POST_ROUTER = (0, express_1.Router)();
 POST_ROUTER.route('/')
@@ -32,5 +28,4 @@ POST_ROUTER.route('/:id/downvote')
     .put(auth_middleware_1.isAuthenticated, post_controller_1.downvotePost);
 POST_ROUTER.route('/users/:userId')
     .get(auth_middleware_1.isAuthenticated, post_controller_1.getUserPosts);
-POST_ROUTER.use('/*', error_middleware_1.default);
 exports.default = POST_ROUTER;

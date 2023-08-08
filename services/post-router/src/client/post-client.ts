@@ -182,7 +182,7 @@ export function deleteComment(id: string, authId: string): Promise<Empty> {
  */
 export function getPostById(id: string): Promise<PostGrpcModel> {
     return new Promise((resolve, reject) => {
-        console.log(id)
+        console.log(id);
         const m = new GetByObjectId()
             .setId(new StringValue().setValue(id));
         GRPC_CLIENT.getPostById(m, (err: GRPC.ServiceError, response: IPostModel) => {

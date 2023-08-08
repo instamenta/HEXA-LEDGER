@@ -39,7 +39,7 @@ class GrpcTools {
             .setDownvotesList(p.downvotes.map((dv) => new StringValue().setValue(dv.toString())))
             .setPicturesList(p.pictures.map((pic) => new StringValue().setValue(pic)))
             .setTagsList(p.tags.map((tag) => new StringValue().setValue(tag)))
-            .setCommentsList(p.comments.map((com) => new StringValue().setValue(com.toString())))
+            .setCommentsList(p.comments.map((com) => new StringValue().setValue(com.toString())));
     }
 
     /**

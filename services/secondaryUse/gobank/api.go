@@ -22,6 +22,10 @@ type APIServer struct {
 	store      Storage
 }
 
+type ApiError struct {
+	Error string `json:"error"`
+}
+
 func NewAPIServer(listenAddr string, store Storage) *APIServer {
 	return &APIServer{
 		listenAddr: listenAddr,
@@ -41,6 +45,7 @@ func (s *APIServer) Run() {
 
 	http.ListenAndServe(s.listenAddr, router)
 }
+
 func (s *APIServer) handleLogin(w http.ResponseWriter, r *http.Request) error {
 	if r.Method != "POST" {
 		return fmt.Errorf("method not allowed %s\n", r.Method)
@@ -199,10 +204,6 @@ func validateJWT(tokenString string) (*jwt.Token, error) {
 
 		return []byte(secret), nil
 	})
-}
-
-type ApiError struct {
-	Error string `json:"error"`
 }
 
 func makeHTTPHandleFunc(f apiFunc) http.HandlerFunc {

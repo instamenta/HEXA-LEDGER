@@ -1,0 +1,134 @@
+version: '3.8'
+networks:
+  redpanda_network:
+    driver: bridge
+
+services:
+  user-remote:
+    build:
+      context: ./user-remote/.
+      dockerfile: Dockerfile
+    container_name: user-remote-api
+    ports:
+      - '50051:50051'
+    env_file: ./user-remote/.env
+    environment:
+      - GRPC_PORT=50051
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda_network
+
+  user-router:
+    build:
+      context: ./user-router/.
+      dockerfile: Dockerfile
+    container_name: user-router-api
+    ports:
+      - '5085:5085'
+    env_file: ./user-router/.env
+    environment:
+      - ROUTER_PORT=5085
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda_network
+  post-router:
+    build:
+      context: ./post-router/.
+      dockerfile: Dockerfile
+    container_name: post-router-api
+    ports:
+      - '5095:5095'
+    env_file: ./post-router/.env
+    environment:
+      - ROUTER_PORT=5095
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda_network
+  post-remote:
+    build:
+      context: ./post-remote/.
+      dockerfile: Dockerfile
+    container_name: post-remote-api
+    ports:
+      - '50052:50052'
+    env_file: ./post-remote/.env
+    environment:
+      - GRPC_PORT=50052
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda_network
+
+  redpanda-0:
+    command:
+      - redpanda
+      - start
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda-0:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      # Address the broker advertises to clients that connect to the HTTP Proxy.
+      - --advertise-pandaproxy-addr internal://redpanda-0:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      # Redpanda brokers use the RPC API to communicate with eachother internally.
+      - --rpc-addr redpanda-0:33145
+      - --advertise-rpc-addr redpanda-0:33145
+      # Tells Seastar (the framework Redpanda uses under the hood) to use 1 core on the system.
+      - --smp 1
+      # The amount of memory to make available to Redpanda.
+      - --memory 2G
+      # Mode dev-container uses well-known configuration properties for development in containers.
+      - --mode dev-container
+      # enable logs for debugging.
+    #      - --default-log-level=debug
+    image: docker.redpanda.com/redpandadata/redpanda:v23.1.11
+    container_name: redpanda-0
+    volumes:
+      - redpanda-0:/var/lib/redpanda/data
+    networks:
+      - redpanda_network
+    ports:
+      - "18081:18081"
+      - "18082:18082"
+      - "19092:19092"
+      - "19644:9644"
+  console:
+    container_name: redpanda-console
+    image: docker.redpanda.com/redpandadata/console:v2.2.4
+    networks:
+      - redpanda_network
+    entrypoint: /bin/sh
+    command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
+    environment:
+      CONFIG_FILEPATH: /tmp/config.yml
+      CONSOLE_CONFIG_FILE: |
+        kafka:
+          brokers: ["redpanda-0:9092"]
+          schemaRegistry:
+            enabled: true
+            urls: ["http://redpanda-0:8081"]
+        redpanda:
+          adminApi:
+            enabled: true
+            urls: ["http://redpanda-0:9644"]
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redpanda-0
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "6666:6666"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb+srv://janoopsi:janoopsi9999@clickercluster.ltycehn.mongodb.net/?retryWrites=true&w=majority
+      - ME_CONFIG_BASICAUTH_USERNAME=janoopsi # Replace with your desired username
+      - ME_CONFIG_BASICAUTH_PASSWORD=123123 # Replace with your desired password
+    networks:
+      - redpanda_network
+
+volumes:
+  redpanda-0: null

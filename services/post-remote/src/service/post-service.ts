@@ -202,8 +202,8 @@ export async function CREATE_COMMENT(
         {_id: postB_Id},
         {$push: {comments: c._id}}
     ).catch(async (error) => {
-        await MongooseCommentModel.deleteOne({_id: c._id})
-        Validator["THROWER"](error, "Failed to Delete comment after Creation")
+        await MongooseCommentModel.deleteOne({_id: c._id});
+        Validator['THROWER'](error, 'Failed to Delete comment after Creation');
     });
     callback(null, GrpcTools.convertCommentModel(c));
 }

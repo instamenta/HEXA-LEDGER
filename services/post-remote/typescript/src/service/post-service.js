@@ -120,7 +120,7 @@ async function CREATE_COMMENT(call, callback) {
     const c = await validator_1.default['VALIDATE_CREATE_COMMENT'](content, authorB_Id, postB_Id);
     await post_schema_1.default.findOneAndUpdate({ _id: postB_Id }, { $push: { comments: c._id } }).catch(async (error) => {
         await comment_schema_1.default.deleteOne({ _id: c._id });
-        validator_1.default["THROWER"](error, "Failed to Delete comment after Creation");
+        validator_1.default['THROWER'](error, 'Failed to Delete comment after Creation');
     });
     callback(null, grpc_tools_1.default.convertCommentModel(c));
 }

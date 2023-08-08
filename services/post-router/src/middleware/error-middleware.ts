@@ -1,3 +1,4 @@
+/** @file Error handling middleware. */
 import { Request, Response, NextFunction } from 'express';
 
 /**
@@ -13,7 +14,7 @@ function errorMiddleware(
     response: Response,
     next: NextFunction
 ): void {
-    console.log()
+    console.log();
     console.error(error.stack);
     console.error('Non-existing Uri:', request.url);
     response

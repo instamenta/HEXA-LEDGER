@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'user-remote'
+    static_configs:
+      - targets: ['user-remote-api:8996']
+
+  - job_name: 'user-router'
+    static_configs:
+      - targets: ['user-router-api:8997']
+
+  - job_name: 'post-router'
+    static_configs:
+      - targets: ['post-router-api:8998']
+
+  - job_name: 'post-remote'
+    static_configs:
+      - targets: ['post-remote-api:1445']
+
+  - job_name: 'prometheus-self'
+    static_configs:
+      - targets: ['localhost:9099']

@@ -27,8 +27,8 @@ class GrpcTools {
                 followers: [],
                 following: [],
             };
-            Object.keys(include).forEach((key) => {
-                switch (key) {
+            for (let i = 0, keys = Object.keys(include), len = keys.length; i < len; i++) {
+                switch (keys[i]) {
                     case base_enumerations_1.UAttr._ID: {
                         m._id = u.hasId() ? u.getId().getValue() : null;
                         break;
@@ -58,18 +58,16 @@ class GrpcTools {
                         break;
                     }
                 }
-            });
+            }
             return m;
         }
     }
     static convertUserModel(u) {
-        const m = new UserModel();
-        const stringId = u._id.toString();
-        m.setId(new wrappers_pb_1.StringValue().setValue(stringId));
-        m.setUsername(new wrappers_pb_1.StringValue().setValue(u.username));
-        m.setEmail(new wrappers_pb_1.StringValue().setValue(u.email));
-        m.setPicture(new wrappers_pb_1.StringValue().setValue(u.picture));
-        return m;
+        return new UserModel()
+            .setId(new wrappers_pb_1.StringValue().setValue(u._id.toString()))
+            .setUsername(new wrappers_pb_1.StringValue().setValue(u.username))
+            .setEmail(new wrappers_pb_1.StringValue().setValue(u.email))
+            .setPicture(new wrappers_pb_1.StringValue().setValue(u.picture));
     }
 }
 exports.default = GrpcTools;

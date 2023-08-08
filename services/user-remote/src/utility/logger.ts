@@ -1,5 +1,4 @@
 /** @file Logger used for all console.logging and sending Kafka messages if enabled. */
-
 // Import {sendLogMessage} from '../producer';
 import {IError} from './types/base-types';
 import {LogAttr} from './enumerations/base-enumerations';
@@ -16,7 +15,7 @@ class Log {
      * @param message
      */
     public static log(
-        type = LogAttr.DEFAULT,
+        type: LogAttr = LogAttr.DEFAULT,
         message: string | object | any,
     ): void {
         switch (type.toUpperCase()) {

@@ -1,5 +1,4 @@
 /** @file Grpc tools used for getting and creating GRPC messages and etc. */
-
 import {UserModel as IUserModel} from '../protos/generated/types/users_pb';
 import {ServerUnaryCall} from '@grpc/grpc-js';
 import {StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
@@ -41,8 +40,8 @@ class GrpcTools {
                 followers: [],
                 following: [],
             };
-            Object.keys(include).forEach((key) => {
-                switch (key) {
+            for (let i = 0, keys = Object.keys(include), len = keys.length; i < len; i++) {
+                switch (keys[i]) {
                     case UAttr._ID: {
                         m._id = u.hasId() ? u.getId()!.getValue() : null;
                         break;
@@ -72,7 +71,7 @@ class GrpcTools {
                         break;
                     }
                 }
-            });
+            }
             return m;
         }
     }
@@ -81,16 +80,12 @@ class GrpcTools {
      * @param u
      * @returns
      */
-    public static convertUserModel(
-        u: IUser,
-    ): IUserModel {
-        const m = new UserModel();
-        const stringId: string = u._id.toString();
-        m.setId(new StringValue().setValue(stringId));
-        m.setUsername(new StringValue().setValue(u.username));
-        m.setEmail(new StringValue().setValue(u.email));
-        m.setPicture(new StringValue().setValue(u.picture));
-        return m;
+    public static convertUserModel(u: IUser): IUserModel {
+        return new UserModel()
+            .setId(new StringValue().setValue(u._id.toString()))
+            .setUsername(new StringValue().setValue(u.username))
+            .setEmail(new StringValue().setValue(u.email))
+            .setPicture(new StringValue().setValue(u.picture));
     }
 }
 

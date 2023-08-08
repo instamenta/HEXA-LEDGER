@@ -1,5 +1,4 @@
 /** @file User Schema for Mongoose. */
-
 import {IError, IUser} from '../../utility/types/base-types';
 import MONGOOSE, {Schema} from 'mongoose';
 import BCRYPT from 'bcrypt';

@@ -6,17 +6,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 /** @file Start and initializes all services and the router. */
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
-const post_routes_1 = __importDefault(require("./routes/post-routes"));
+const morgan_1 = __importDefault(require("morgan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const post_routes_1 = __importDefault(require("./routes/post-routes"));
 const error_middleware_1 = __importDefault(require("./middleware/error-middleware"));
-// Import {connectProducer} from './producer';
-const API_PORT = process.env.ROUTER_PORT || '5095';
-const SERVICE_NAME = process.env.SERVICE_NAME || 'Post-Router-Service';
-const API = (0, express_1.default)();
+const prom_client_1 = require("prom-client");
+const API_PORT = process.env.ROUTER_PORT || '5095', SERVICE_NAME = process.env.SERVICE_NAME || 'Post-Router-Service', API = (0, express_1.default)();
+(0, prom_client_1.collectDefaultMetrics)();
+const httpRequestCount = new prom_client_1.Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+    labelNames: ['method', 'route', 'status'],
+});
 API.use((0, cors_1.default)());
 API.use((0, cookie_parser_1.default)());
+API.use((0, morgan_1.default)('combined'));
 API.use(express_1.default.json());
+API.use(metricsMiddleware);
 API.use('/post', post_routes_1.default);
+API.get('/metrics', (req, res) => {
+    res.set('Content-Type', prom_client_1.register.contentType);
+    res.end(prom_client_1.register.metrics());
+});
 API.use(error_middleware_1.default);
 (async function initializeService() {
     await API.listen(Number(API_PORT), () => {
@@ -27,6 +38,19 @@ API.use(error_middleware_1.default);
         console.log('API ran into Error:', error);
     });
 })().catch((error) => console.log(error));
+/**
+ * @param req
+ * @param res
+ * @param next
+ */
+function metricsMiddleware(req, res, next) {
+    res.on('finish', () => httpRequestCount.inc({
+        method: req.method,
+        route: req.route ? req.route.path : 'unknown',
+        status: res.statusCode,
+    }));
+    next();
+}
 ['unhandledRejection', 'uncaughtException'].forEach((type) => {
     process.on(type, (error) => {
         try {

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/services/secondaryUse/fullstack-web3-dex" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/services/secondaryUse/goose" vcs="Git" />
   </component>
 </project>

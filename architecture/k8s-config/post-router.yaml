@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: post-router-configmap
+data:
+  ROUTER_PORT: "5086"
+  MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster.ltycehn.mongodb.net/?retryWrites=true&w=majority"
+  SERVICE_NAME: 'hexagots-post-router-api'
+  POST_REMOTE_REF: "post-remote-api"
+  POST_REMOTE_PORT: "50052"
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: post-router-secret
+type: Opaque
+#data:
+#  - MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-router-service
+  labels:
+    app: post-router-api
+spec:
+  type: NodePort
+  selector:
+    app: post-router-api
+  ports:
+    - protocol: TCP
+      port: 5086
+      targetPort: 5086
+      nodePort: 30086
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-router-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: post-router-api
+  template:
+    metadata:
+      labels:
+        app: post-router-api
+    spec:
+      containers:
+        - name: post-router-api
+          image: janoopsi/post-router-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5086
+          env:
+            - name: ROUTER_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: post-router-configmap
+                  key: ROUTER_PORT
+            - name: MONGODB_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: post-router-configmap
+                  key: MONGODB_URI
+            - name: SERVICE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: post-router-configmap
+                  key: SERVICE_NAME
+            - name: POST_REMOTE_REF
+              valueFrom:
+                configMapKeyRef:
+                  name: post-router-configmap
+                  key: POST_REMOTE_REF
+            - name: POST_REMOTE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: post-router-configmap
+                  key: POST_REMOTE_PORT
+
+#          env:
+#            - name: MONGODB_URI
+#              valueFrom:
+#                secretKeyRef:
+#                  name: post-router-secret
+#                  key: MONGODB_URI
+#            - name: TOKEN_SECRET
+#              valueFrom:
+#                secretKeyRef:
+#                  name: post-router-secret
+#                  key: TOKEN_SECRET
+#            - name: ROUTER_PORT
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: post-router-configmap
+#                  key: ROUTER_PORT
+#            - name: SERVICE_NAME
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: post-router-configmap
+#                  key: SERVICE_NAME

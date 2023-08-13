@@ -27,6 +27,7 @@
     "kafkajs": "^2.2.4",
     "kafkajs-snappy": "^1.1.0",
     "migrate-mongo": "^10.0.0",
+    "mongodb": "^5.7.0",
     "mongoose": "^7.3.0"
   },
   "devDependencies": {

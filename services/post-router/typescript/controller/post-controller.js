@@ -22,241 +22,388 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserPosts = exports.downvoteComment = exports.upvoteComment = exports.downvotePost = exports.upvotePost = exports.deleteComment = exports.updateComment = exports.createComment = exports.getPostComments = exports.deletePost = exports.updatePost = exports.getPostById = exports.createPost = exports.getPosts = void 0;
 const POST_CLIENT = __importStar(require("../client/post-client"));
+const status_codes_1 = __importDefault(require("../utility/status-codes"));
 /**
+ * Gets Posts filtered by Optional Parameters.
+ *
+ * Ids - List of Post Ids
+ * Limit - Number for limiting the Post's count
+ * Page - Number for the Post's offset
+ * Filter - specific Tags or Characteristics
+ * Match - Regex or text.
  * @param request
  * @param response
+ * @async
  */
 async function getPosts(request, response) {
     try {
-        const { ids } = request.body, filter = request.query?.filter, match = request.query?.match, page = request.query?.page ? +request.query.page : undefined, limit = request.query?.limit ? +request.query.limit : undefined;
-        const posts = await POST_CLIENT.getPosts(ids, limit, page, filter, match);
-        response.json(posts).end();
+        const { ids } = request.body;
+        await POST_CLIENT.getPosts(ids, request.query?.limit ? +request.query.limit : undefined, request.query?.page ? +request.query.page : undefined, request.query?.filter, request.query?.match).then((posts) => response.status(status_codes_1.default.OK)
+            .json(posts)
+            .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to get posts' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to get posts' })
+            .end();
         console.log(error);
     }
 }
 exports.getPosts = getPosts;
 /**
+ * Create Post from submitted form
+ * Title - Text that servers as Title for the Post
+ * Description - Text explaining the post
+ * AuthorId - The id of the Post's creator
+ * Pictures - List of pictures belonging to post
+ * IsPromoted - Flag signalling if post is promoted
+ * Tags - used for filltering.
  * @param request
  * @param response
+ * @async
  */
 async function createPost(request, response) {
     try {
-        const { title, description, authorId, pictures, isPromoted, tags } = request.body;
-        const post = await POST_CLIENT.createPost(title, description, authorId, pictures, isPromoted, tags);
-        response.status(201).json(post);
+        await POST_CLIENT.createPost(request.body.title, request.body.description, request.body.authorId, request.body.pictures, request.body.isPromoted, request.body.tags).then((post) => response.status(status_codes_1.default.OK)
+            .json(post)
+            .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to create post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to create post' })
+            .end();
         console.log(error);
     }
 }
 exports.createPost = createPost;
 /**
+ * Used for getting specific Post.
+ *
+ * Id - the Id of a Post.
  * @param request
  * @param response
+ * @async
  */
 async function getPostById(request, response) {
     try {
-        const postId = request.params.id, post = await POST_CLIENT.getPostById(postId);
-        post ? response.json(post).end()
-            : response.status(404).json({ message: 'Post not found' }).end();
+        await POST_CLIENT.getPostById(request.params.id).then((post) => post
+            ? response.status(status_codes_1.default.OK)
+                .json(post)
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to get post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to get post' })
+            .end();
         console.log(error);
     }
 }
 exports.getPostById = getPostById;
 /**
+ * Used for Updating Post.
+ *
+ * PostId - Post id used for finding the specific post to be updated
+ * title - the new or old title of the post
+ * description - the new or old description of the title
+ * authorId - the post's author id
+ * pictures - List of pictures belonging to the Post
+ * isPromoted - Flag signalling if post is promoted
+ * tags - tags used for filtering
+ * userId - the id of the user sending the request used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function updatePost(request, response) {
     try {
-        const postId = request.params.id;
-        const authId = request.userData._id;
-        const { title, description, authorId, pictures, isPromoted, tags } = request.body;
-        const updatedPost = await POST_CLIENT.updatePost(postId, title, description, authorId, pictures, isPromoted, tags, authId);
-        if (updatedPost) {
-            response.json(updatedPost).end();
-        }
-        else {
-            response.status(404).json({ message: 'Post not found' }).end();
-        }
+        await POST_CLIENT.updatePost(request.params.id, request.body.title, request.body.description, request.body.authorId, request.body.pictures, request.body.isPromoted, request.body.tags, request.userData._id).then((updatedPost) => updatedPost
+            ? response.status(status_codes_1.default.OK)
+                .json(updatedPost)
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to update post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to update post' })
+            .end();
         console.log(error);
     }
 }
 exports.updatePost = updatePost;
 /**
+ * Used for Deleting specific post.
+ *
+ * PostId - the id of the post that is being deleted
+ * UserId - the id of the user used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function deletePost(request, response) {
     try {
-        const postId = request.params.id, authId = request.userData._id;
-        const post = await POST_CLIENT.deletePost(postId, authId);
-        post ? response.json({ message: 'Post deleted successfully' }).end()
-            : response.status(404).json({ message: 'Post not found' }).end();
+        await POST_CLIENT.deletePost(request.params.id, request.userData._id)
+            .then((post) => post
+            ? response.status(status_codes_1.default.OK)
+                .json({ message: 'Post deleted successfully' })
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to delete post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to delete post' })
+            .end();
         console.log(error);
     }
 }
 exports.deletePost = deletePost;
 /**
+ * Used for getting the Post's comments.
+ *
+ * PostId - the id of the post
+ * Page - Number for the Post's offset
+ * Limit -Number for limiting the Post's count.
  * @param request
  * @param response
+ * @async
  */
 async function getPostComments(request, response) {
     try {
-        const { postId } = request.params, page = request.query?.page ? +request.query.page : undefined, limit = request.query?.limit ? +request.query.limit : undefined, comments = await POST_CLIENT.getPostComments(postId, page, limit);
-        response.json(comments).end();
+        await POST_CLIENT.getPostComments(request.params.postId, request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined).then((comments) => response.status(status_codes_1.default.OK)
+            .json(comments)
+            .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to get post comments' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to get post comments' })
+            .end();
         console.log(error);
     }
 }
 exports.getPostComments = getPostComments;
 /**
+ * Used for Creating Comment on a Post.
+ *
+ * UserId - the id of the user used for authentication and is being attached as Comment's author
+ * PostId - the id of the post that is being commented
+ * Content - Text serving as Comment's content.
  * @param request
  * @param response
+ * @async
  */
 async function createComment(request, response) {
     try {
-        const postId = request.params.postId, { content } = request.body, { _id } = request.userData;
-        const comment = await POST_CLIENT.createComment(_id, postId, content);
-        response.status(201).json(comment).end();
+        await POST_CLIENT.createComment(request.userData._id, request.params.postId, request.body.content).then((comment) => response.status(status_codes_1.default.OK)
+            .json(comment)
+            .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to create comment' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to create comment' })
+            .end();
         console.log(error);
     }
 }
 exports.createComment = createComment;
 /**
+ * Used for Updating Comment.
+ *
+ * UserId - the id of the user used for authentication
+ * PostId - the id of the post
+ * Content - the new Content of the comment
+ * CommentId - the id of the Comment.
  * @param request
  * @param response
+ * @async
  */
 async function updateComment(request, response) {
     try {
-        const { commentId, postId } = request.params, { content } = request.body, { _id } = request.userData;
-        const comment = await POST_CLIENT.updateComment(_id, postId, content, commentId);
-        comment
-            ? response.json(comment).end()
-            : response.status(404).json({ message: 'Comment not found' }).end();
+        await POST_CLIENT.updateComment(request.userData._id, request.params.postId, request.body.content, request.params.commentId).then((comment) => comment
+            ? response.status(status_codes_1.default.OK)
+                .json(comment)
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Comment not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to update comment' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to update comment' })
+            .end();
         console.log(error);
     }
 }
 exports.updateComment = updateComment;
 /**
+ * Used for Deleting Comment.
+ *
+ * CommentId - the id of the comment being deleted
+ * UserId - the id of the user used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function deleteComment(request, response) {
     try {
-        const { commentId } = request.params, authId = request.userData._id;
-        const com = await POST_CLIENT.deleteComment(commentId, authId);
-        com ? response.json({ message: 'Comment deleted successfully' }).end()
-            : response.status(404).json({ message: 'Comment not found' }).end();
+        await POST_CLIENT.deleteComment(request.params.commentId, request.userData._id).then((comment) => comment
+            ? response.status(status_codes_1.default.OK)
+                .json({ message: 'Comment deleted successfully' })
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Comment not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to delete comment' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to delete comment' })
+            .end();
         console.log(error);
     }
 }
 exports.deleteComment = deleteComment;
 /**
+ * Used for Upvoting Post.
+ *
+ * Post - the id of the Post targeted
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function upvotePost(request, response) {
     try {
-        const postId = request.params.id, { _id } = request.userData, post = await POST_CLIENT.upvotePost(postId, _id);
-        post ? response.json(post).end()
-            : response.status(404).json({ message: 'Post not found' }).end();
+        await POST_CLIENT.upvotePost(request.params.id, request.userData._id).then((post) => post
+            ? response.status(status_codes_1.default.OK)
+                .json(post)
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to upvote post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to upvote post' })
+            .end();
         console.log(error);
     }
 }
 exports.upvotePost = upvotePost;
 /**
+ * Used for Downvoting Post.
+ *
+ * PostId - the id of the Post used for targeting
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function downvotePost(request, response) {
     try {
-        const postId = request.params.id, { _id } = request.userData, post = await POST_CLIENT.downvotePost(postId, _id);
-        post ? response.json(post).end()
-            : response.status(404).json({ message: 'Post not found' }).end();
+        await POST_CLIENT.downvotePost(request.params.id, request.userData._id).then((post) => post
+            ? response.status(status_codes_1.default.OK)
+                .json(post)
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to downvote post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to downvote post' })
+            .end();
         console.log(error);
     }
 }
 exports.downvotePost = downvotePost;
 /**
+ * Used for Upvoting Comment.
+ *
+ * CommentId - the id of the Comment used for targeting
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function upvoteComment(request, response) {
     try {
-        const { commentId } = request.params, { _id } = request.userData;
-        const post = await POST_CLIENT.upvoteComment(commentId, _id);
-        post ? response.json(post).end()
-            : response.status(404).json({ message: 'Post not found' }).end();
+        await POST_CLIENT.upvoteComment(request.params.commentId, request.userData._id).then((post) => post
+            ? response.status(status_codes_1.default.OK)
+                .json(post)
+                .end()
+            : response.status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to upvote post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to upvote post' })
+            .end();
         console.log(error);
     }
 }
 exports.upvoteComment = upvoteComment;
 /**
+ * Used for Downvoting Comment.
+ *
+ * CommentId - the id of the Comment used for targeting
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
+ * @async
  */
 async function downvoteComment(request, response) {
     try {
-        const { commentId } = request.params, { _id } = request.userData;
-        const post = await POST_CLIENT.downvoteComment(commentId, _id);
-        post ? response.json(post).end()
-            : response.status(404).json({ message: 'Post not found' }).end();
+        await POST_CLIENT.downvoteComment(request.params.commentId, request.userData._id).then((post) => post
+            ? response.status(status_codes_1.default.OK)
+                .json(post)
+                .end()
+            : response
+                .status(status_codes_1.default.NOT_FOUND)
+                .json({ message: 'Post not found' })
+                .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to downvote post' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to downvote post' })
+            .end();
         console.log(error);
     }
 }
 exports.downvoteComment = downvoteComment;
 /**
+ * Gets Posts of specific User.
+ *
+ * UserId - id of the user being targeted
+ * Limit - Number for limiting the Post's count
+ * Page - Number for the Post's offset
+ * Filter - specific Tags or Characteristics
+ * Match - Regex or text.
  * @param request
  * @param response
+ * @async
  */
 async function getUserPosts(request, response) {
     try {
-        const { userId } = request.params, page = request.query?.page ? +request.query.page : undefined, limit = request.query?.limit ? +request.query.limit : undefined, filter = request.query.filter, match = request.query.match;
-        const posts = await POST_CLIENT.getUserPosts(userId, limit, page, filter, match);
-        response.json(posts).end();
+        await POST_CLIENT.getUserPosts(request.params.userId, request.query?.limit ? +request.query.limit : undefined, request.query?.page ? +request.query.page : undefined, request.query.filter, request.query.match).then((posts) => response.status(status_codes_1.default.OK)
+            .json(posts)
+            .end());
     }
     catch (error) {
-        response.status(500).json({ message: 'Failed to get user posts' }).end();
+        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+            .json({ message: 'Failed to get user posts' })
+            .end();
         console.log(error);
     }
 }

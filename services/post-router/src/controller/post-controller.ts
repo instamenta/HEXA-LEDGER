@@ -2,20 +2,18 @@
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
 import * as POST_CLIENT from '../client/post-client';
-import StatusCode from '../utility/status-codes'
+import StatusCode from '../utility/status-codes';
 
 /**
- * Gets Posts filtered by Optional Parameters
+ * Gets Posts filtered by Optional Parameters.
  *
  * Ids - List of Post Ids
  * Limit - Number for limiting the Post's count
  * Page - Number for the Post's offset
  * Filter - specific Tags or Characteristics
- * Match - Regex or text
- *
+ * Match - Regex or text.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function getPosts(request: Request, response: Response) {
@@ -46,11 +44,9 @@ export async function getPosts(request: Request, response: Response) {
  * AuthorId - The id of the Post's creator
  * Pictures - List of pictures belonging to post
  * IsPromoted - Flag signalling if post is promoted
- * Tags - used for filltering
- *
+ * Tags - used for filltering.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function createPost(request: iRequestWithUser, response: Response) {
@@ -75,13 +71,11 @@ export async function createPost(request: iRequestWithUser, response: Response) 
 }
 
 /**
- * Used for getting specific Post
+ * Used for getting specific Post.
  *
- * Id - the Id of a Post
- *
+ * Id - the Id of a Post.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function getPostById(request: Request, response: Response) {
@@ -104,20 +98,18 @@ export async function getPostById(request: Request, response: Response) {
 }
 
 /**
- * Used for Updating Post
+ * Used for Updating Post.
  *
- * postId - Post id used for finding the specific post to be updated
+ * PostId - Post id used for finding the specific post to be updated
  * title - the new or old title of the post
  * description - the new or old description of the title
  * authorId - the post's author id
  * pictures - List of pictures belonging to the Post
  * isPromoted - Flag signalling if post is promoted
  * tags - tags used for filtering
- * userId - the id of the user sending the request used for authentication
- *
+ * userId - the id of the user sending the request used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function updatePost(request: iRequestWithUser, response: Response) {
@@ -147,14 +139,12 @@ export async function updatePost(request: iRequestWithUser, response: Response) 
 }
 
 /**
- * Used for Deleting specific post
+ * Used for Deleting specific post.
  *
  * PostId - the id of the post that is being deleted
- * UserId - the id of the user used for authentication
- *
+ * UserId - the id of the user used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function deletePost(request: iRequestWithUser, response: Response) {
@@ -177,15 +167,13 @@ export async function deletePost(request: iRequestWithUser, response: Response) 
 }
 
 /**
- * Used for getting the Post's comments
+ * Used for getting the Post's comments.
  *
  * PostId - the id of the post
  * Page - Number for the Post's offset
- * Limit -Number for limiting the Post's count
- *
+ * Limit -Number for limiting the Post's count.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function getPostComments(request: Request, response: Response) {
@@ -197,7 +185,7 @@ export async function getPostComments(request: Request, response: Response) {
         ).then((comments) =>
             response.status(StatusCode.OK)
                 .json(comments)
-                .end())
+                .end());
     } catch (error) {
         response.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get post comments'})
@@ -207,15 +195,13 @@ export async function getPostComments(request: Request, response: Response) {
 }
 
 /**
- * Used for Creating Comment on a Post
+ * Used for Creating Comment on a Post.
  *
  * UserId - the id of the user used for authentication and is being attached as Comment's author
  * PostId - the id of the post that is being commented
- * Content - Text serving as Comment's content
- *
+ * Content - Text serving as Comment's content.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function createComment(request: iRequestWithUser, response: Response) {
@@ -237,16 +223,14 @@ export async function createComment(request: iRequestWithUser, response: Respons
 }
 
 /**
- * Used for Updating Comment
+ * Used for Updating Comment.
  *
  * UserId - the id of the user used for authentication
  * PostId - the id of the post
  * Content - the new Content of the comment
- * CommentId - the id of the Comment
- *
+ * CommentId - the id of the Comment.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function updateComment(request: iRequestWithUser, response: Response) {
@@ -272,14 +256,12 @@ export async function updateComment(request: iRequestWithUser, response: Respons
 }
 
 /**
- * Used for Deleting Comment
+ * Used for Deleting Comment.
  *
  * CommentId - the id of the comment being deleted
- * UserId - the id of the user used for authentication
- *
+ * UserId - the id of the user used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function deleteComment(request: iRequestWithUser, response: Response) {
@@ -293,7 +275,7 @@ export async function deleteComment(request: iRequestWithUser, response: Respons
                 .end()
             : response.status(StatusCode.NOT_FOUND)
                 .json({message: 'Comment not found'})
-                .end())
+                .end());
     } catch (error) {
         response.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to delete comment'})
@@ -304,14 +286,12 @@ export async function deleteComment(request: iRequestWithUser, response: Respons
 
 
 /**
- * Used for Upvoting Post
+ * Used for Upvoting Post.
  *
  * Post - the id of the Post targeted
- * UsedId - the id of the user used for authentication
- *
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function upvotePost(request: iRequestWithUser, response: Response) {
@@ -325,7 +305,7 @@ export async function upvotePost(request: iRequestWithUser, response: Response) 
                 .end()
             : response.status(StatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
-                .end())
+                .end());
     } catch (error) {
         response.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to upvote post'})
@@ -335,14 +315,12 @@ export async function upvotePost(request: iRequestWithUser, response: Response) 
 }
 
 /**
- * Used for Downvoting Post
+ * Used for Downvoting Post.
  *
  * PostId - the id of the Post used for targeting
- * UsedId - the id of the user used for authentication
- *
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function downvotePost(request: iRequestWithUser, response: Response) {
@@ -366,14 +344,12 @@ export async function downvotePost(request: iRequestWithUser, response: Response
 }
 
 /**
- * Used for Upvoting Comment
+ * Used for Upvoting Comment.
  *
  * CommentId - the id of the Comment used for targeting
- * UsedId - the id of the user used for authentication
- *
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function upvoteComment(request: iRequestWithUser, response: Response) {
@@ -398,14 +374,12 @@ export async function upvoteComment(request: iRequestWithUser, response: Respons
 
 
 /**
- * Used for Downvoting Comment
+ * Used for Downvoting Comment.
  *
  * CommentId - the id of the Comment used for targeting
- * UsedId - the id of the user used for authentication
- *
+ * UsedId - the id of the user used for authentication.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function downvoteComment(request: iRequestWithUser, response: Response) {
@@ -430,17 +404,15 @@ export async function downvoteComment(request: iRequestWithUser, response: Respo
 }
 
 /**
- * Gets Posts of specific User
+ * Gets Posts of specific User.
  *
  * UserId - id of the user being targeted
  * Limit - Number for limiting the Post's count
  * Page - Number for the Post's offset
  * Filter - specific Tags or Characteristics
- * Match - Regex or text
- *
+ * Match - Regex or text.
  * @param request
  * @param response
- * @public
  * @async
  */
 export async function getUserPosts(request: Request, response: Response) {

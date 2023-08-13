@@ -1,7 +1,7 @@
-/** @file Starts the grpc server and attaches all handlers for each endpoints. */
+/** @file Starts the grpc server and attach all handlers for each endpoints. */
 import * as GRPC from '@grpc/grpc-js';
 import connectDatabase from './mongodb';
-import {connectProducer, disconnectProducer} from './producer';
+// Import {connectProducer, disconnectProducer} from './producer';
 import Log from './utility/logger';
 import {
     createPost,
@@ -52,15 +52,15 @@ const {PostServiceService} = require('./protos/generated/posts_grpc_pb')
             Server.start();
             Log['grpc_start_log'](port);
             await connectDatabase();
-            await connectProducer();
+            // Await connectProducer();
         });
 })();
 
 ['unhandledRejection', 'uncaughtException'].forEach((type) => {
-    process.on(type, async (error: Error) => {
+    process.on(type, (error: Error) => {
         try {
             Log['process_disconnect_log'](type, error);
-            await disconnectProducer();
+            // Await disconnectProducer();
         } catch {
             console.log('Exit...');
             process.exit(1);
@@ -69,12 +69,12 @@ const {PostServiceService} = require('./protos/generated/posts_grpc_pb')
 });
 
 ['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
-    process.once(type, async (error: Error) => {
+    process.once(type, (error: Error) => {
         try {
             Log['process_disconnect_log'](type, error);
             process.exit(0);
         } finally {
-            await disconnectProducer();
+            // Await disconnectProducer();
             Log['kafka_disconnect_log'](error);
             process.kill(process.pid, type);
         }

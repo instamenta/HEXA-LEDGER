@@ -1,5 +1,5 @@
 /** @file Used for console logging and sending kafka messages. */
-import {sendLogMessage} from '../producer';
+// Import {sendLogMessage} from '../producer';
 import {IError, strnum} from './types/base-types';
 import {LogAttr} from './enumerations/base-enumerations';
 
@@ -14,38 +14,38 @@ class Log {
      * @param type
      * @param message
      */
-    public static async log(
+    public static log(
         type = LogAttr.DEFAULT,
         message: string | object | any,
-    ): Promise<void> {
+    ): void {
         switch (type.toUpperCase()) {
             case LogAttr.ERROR: {
-                await sendLogMessage(message, LogAttr.ERROR);
+                // Await sendLogMessage(message, LogAttr.ERROR);
                 this.Console(message, LogAttr.ERROR, DEBUG_CONSOLE, '#');
                 break;
             }
             case LogAttr.DEBUG: {
-                await sendLogMessage(message, LogAttr.DEBUG);
+                // Await sendLogMessage(message, LogAttr.DEBUG);
                 this.Console(message, LogAttr.DEBUG, DEBUG_CONSOLE, '%');
                 break;
             }
             case LogAttr.COLLECT: {
-                await sendLogMessage(message, LogAttr.COLLECT);
+                // Await sendLogMessage(message, LogAttr.COLLECT);
                 this.Console(message, LogAttr.COLLECT, DEBUG_CONSOLE, '-');
                 break;
             }
             case LogAttr.CRITICAL: {
-                await sendLogMessage(message, LogAttr.CRITICAL);
+                // Await sendLogMessage(message, LogAttr.CRITICAL);
                 this.Console(message, LogAttr.CRITICAL, DEBUG_CONSOLE, '');
                 break;
             }
             case LogAttr.INFO: {
-                await sendLogMessage(message, LogAttr.INFO);
+                // Await sendLogMessage(message, LogAttr.INFO);
                 this.Console(message, LogAttr.INFO, DEBUG_CONSOLE, '@');
                 break;
             }
             default: {
-                await sendLogMessage(message, type);
+                // Await sendLogMessage(message, type);
                 this.Console(message, type, DEBUG_CONSOLE);
                 break;
             }

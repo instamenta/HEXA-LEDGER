@@ -2,7 +2,7 @@
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
 import * as POST_CLIENT from '../client/post-client';
-import StatusCode from '../utility/status-codes';
+import HttpStatusCode from '@instamenta/http-status-codes';
 
 /**
  * Gets Posts filtered by Optional Parameters.
@@ -26,11 +26,11 @@ export async function getPosts(request: Request, response: Response) {
             request.query?.filter as string,
             request.query?.match as string
         ).then((posts) =>
-            response.status(StatusCode.OK)
+            response.status(HttpStatusCode.OK)
                 .json(posts)
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get posts'})
             .end();
         console.log(error);
@@ -59,11 +59,11 @@ export async function createPost(request: iRequestWithUser, response: Response) 
             request.body.isPromoted,
             request.body.tags
         ).then((post) =>
-            response.status(StatusCode.OK)
+            response.status(HttpStatusCode.OK)
                 .json(post)
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to create post'})
             .end();
         console.log(error);
@@ -83,14 +83,14 @@ export async function getPostById(request: Request, response: Response) {
         await POST_CLIENT.getPostById(
             request.params.id
         ).then((post) => post
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(post)
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get post'})
             .end();
         console.log(error);
@@ -124,14 +124,14 @@ export async function updatePost(request: iRequestWithUser, response: Response) 
             request.body.tags,
             request.userData._id
         ).then((updatedPost) => updatedPost
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(updatedPost)
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to update post'})
             .end();
         console.log(error);
@@ -151,15 +151,15 @@ export async function deletePost(request: iRequestWithUser, response: Response) 
     try {
         await POST_CLIENT.deletePost(request.params.id, request.userData._id)
             .then((post) => post
-                ? response.status(StatusCode.OK)
+                ? response.status(HttpStatusCode.OK)
                     .json({message: 'Post deleted successfully'})
                     .end()
-                : response.status(StatusCode.NOT_FOUND)
+                : response.status(HttpStatusCode.NOT_FOUND)
                     .json({message: 'Post not found'})
                     .end()
             );
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to delete post'})
             .end();
         console.log(error);
@@ -183,11 +183,11 @@ export async function getPostComments(request: Request, response: Response) {
             request.query?.page ? +request.query!.page : undefined,
             request.query?.limit ? +request.query!.limit : undefined
         ).then((comments) =>
-            response.status(StatusCode.OK)
+            response.status(HttpStatusCode.OK)
                 .json(comments)
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get post comments'})
             .end();
         console.log(error);
@@ -211,11 +211,11 @@ export async function createComment(request: iRequestWithUser, response: Respons
             request.params.postId,
             request.body.content
         ).then((comment) =>
-            response.status(StatusCode.OK)
+            response.status(HttpStatusCode.OK)
                 .json(comment)
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to create comment'})
             .end();
         console.log(error);
@@ -241,14 +241,14 @@ export async function updateComment(request: iRequestWithUser, response: Respons
             request.body.content,
             request.params.commentId,
         ).then((comment) => comment
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(comment)
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Comment not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to update comment'})
             .end();
         console.log(error);
@@ -270,14 +270,14 @@ export async function deleteComment(request: iRequestWithUser, response: Respons
             request.params.commentId,
             request.userData._id
         ).then((comment) => comment
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json({message: 'Comment deleted successfully'})
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Comment not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to delete comment'})
             .end();
         console.log(error);
@@ -300,14 +300,14 @@ export async function upvotePost(request: iRequestWithUser, response: Response) 
             request.params.id,
             request.userData._id
         ).then((post) => post
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(post)
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to upvote post'})
             .end();
         console.log(error);
@@ -329,14 +329,14 @@ export async function downvotePost(request: iRequestWithUser, response: Response
             request.params.id,
             request.userData._id
         ).then((post) => post
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(post)
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to downvote post'})
             .end();
         console.log(error);
@@ -358,14 +358,14 @@ export async function upvoteComment(request: iRequestWithUser, response: Respons
             request.params.commentId,
             request.userData._id
         ).then((post) => post
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(post)
                 .end()
-            : response.status(StatusCode.NOT_FOUND)
+            : response.status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to upvote post'})
             .end();
         console.log(error);
@@ -388,15 +388,15 @@ export async function downvoteComment(request: iRequestWithUser, response: Respo
             request.params.commentId,
             request.userData._id
         ).then((post) => post
-            ? response.status(StatusCode.OK)
+            ? response.status(HttpStatusCode.OK)
                 .json(post)
                 .end()
             : response
-                .status(StatusCode.NOT_FOUND)
+                .status(HttpStatusCode.NOT_FOUND)
                 .json({message: 'Post not found'})
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to downvote post'})
             .end();
         console.log(error);
@@ -424,11 +424,11 @@ export async function getUserPosts(request: Request, response: Response) {
             request.query.filter as string,
             request.query.match as string,
         ).then((posts) =>
-            response.status(StatusCode.OK)
+            response.status(HttpStatusCode.OK)
                 .json(posts)
                 .end());
     } catch (error) {
-        response.status(StatusCode.INTERNAL_SERVER_ERROR)
+        response.status(HttpStatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get user posts'})
             .end();
         console.log(error);

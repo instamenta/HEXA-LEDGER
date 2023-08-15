@@ -11,12 +11,22 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const post_routes_1 = __importDefault(require("./routes/post-routes"));
 const error_middleware_1 = __importDefault(require("./middleware/error-middleware"));
 const prom_client_1 = require("prom-client");
+const dot_configurator_1 = __importDefault(require("dot_configurator"));
 const API_PORT = process.env.ROUTER_PORT || '5095', SERVICE_NAME = process.env.SERVICE_NAME || 'Post-Router-Service', API = (0, express_1.default)();
 (0, prom_client_1.collectDefaultMetrics)();
+console.log(process.env);
+const Dot = new dot_configurator_1.default(process.env);
+console.log(Dot.GET('MY_OBJECT'));
 const httpRequestCount = new prom_client_1.Counter({
     name: 'http_requests_total',
     help: 'Total number of HTTP requests',
     labelNames: ['method', 'route', 'status'],
+});
+const responseTimeHistogram = new prom_client_1.Histogram({
+    name: 'http_response_time_seconds',
+    help: 'Histogram of response times',
+    labelNames: ['method', 'route', 'status'],
+    buckets: [0.1, 0.5, 1, 2, 5],
 });
 API.use((0, cors_1.default)());
 API.use((0, cookie_parser_1.default)());
@@ -24,32 +34,48 @@ API.use((0, morgan_1.default)('combined'));
 API.use(express_1.default.json());
 API.use(metricsMiddleware);
 API.use('/post', post_routes_1.default);
-API.get('/metrics', (req, res) => {
+API.get('/metrics', async (req, res) => {
     res.set('Content-Type', prom_client_1.register.contentType);
-    res.end(prom_client_1.register.metrics());
+    const metrics = await prom_client_1.register.metrics();
+    res.end(metrics);
 });
 API.use(error_middleware_1.default);
-(async function initializeService() {
-    await API.listen(Number(API_PORT), () => {
+(function initializeService() {
+    API.listen(Number(API_PORT), () => {
         console.log(`${SERVICE_NAME} is running on port: ${API_PORT}`);
         // Await connectProducer();
     });
     API.on('error', (error) => {
         console.log('API ran into Error:', error);
     });
-})().catch((error) => console.log(error));
+})();
 /**
  * @param req
  * @param res
  * @param next
  */
 function metricsMiddleware(req, res, next) {
-    res.on('finish', () => httpRequestCount.inc({
-        method: req.method,
-        route: req.route ? req.route.path : 'unknown',
-        status: res.statusCode,
-    }));
+    res.on('finish', () => {
+        httpRequestCount.inc({
+            method: req.method,
+            route: req.route ? req.route.path : 'unknown',
+            status: res.statusCode,
+        });
+        responseTimeHistogram.observe({
+            method: req.method,
+            route: req.route ? req.route.path : 'unknown',
+            status: res.statusCode,
+        }, getElapsedTimeInSeconds(process.hrtime()));
+    });
     next();
+}
+/**
+ * @param startTime
+ * @returns
+ */
+function getElapsedTimeInSeconds(startTime) {
+    const elapsedNanoseconds = process.hrtime(startTime);
+    return elapsedNanoseconds[0] + elapsedNanoseconds[1] * 1e-9;
 }
 ['unhandledRejection', 'uncaughtException'].forEach((type) => {
     process.on(type, (error) => {

@@ -28,7 +28,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserPosts = exports.downvoteComment = exports.upvoteComment = exports.downvotePost = exports.upvotePost = exports.deleteComment = exports.updateComment = exports.createComment = exports.getPostComments = exports.deletePost = exports.updatePost = exports.getPostById = exports.createPost = exports.getPosts = void 0;
 const POST_CLIENT = __importStar(require("../client/post-client"));
-const status_codes_1 = __importDefault(require("../utility/status-codes"));
+const http_status_codes_1 = __importDefault(require("@instamenta/http-status-codes"));
 /**
  * Gets Posts filtered by Optional Parameters.
  *
@@ -44,12 +44,12 @@ const status_codes_1 = __importDefault(require("../utility/status-codes"));
 async function getPosts(request, response) {
     try {
         const { ids } = request.body;
-        await POST_CLIENT.getPosts(ids, request.query?.limit ? +request.query.limit : undefined, request.query?.page ? +request.query.page : undefined, request.query?.filter, request.query?.match).then((posts) => response.status(status_codes_1.default.OK)
+        await POST_CLIENT.getPosts(ids, request.query?.limit ? +request.query.limit : undefined, request.query?.page ? +request.query.page : undefined, request.query?.filter, request.query?.match).then((posts) => response.status(http_status_codes_1.default.OK)
             .json(posts)
             .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to get posts' })
             .end();
         console.log(error);
@@ -70,12 +70,12 @@ exports.getPosts = getPosts;
  */
 async function createPost(request, response) {
     try {
-        await POST_CLIENT.createPost(request.body.title, request.body.description, request.body.authorId, request.body.pictures, request.body.isPromoted, request.body.tags).then((post) => response.status(status_codes_1.default.OK)
+        await POST_CLIENT.createPost(request.body.title, request.body.description, request.body.authorId, request.body.pictures, request.body.isPromoted, request.body.tags).then((post) => response.status(http_status_codes_1.default.OK)
             .json(post)
             .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to create post' })
             .end();
         console.log(error);
@@ -93,15 +93,15 @@ exports.createPost = createPost;
 async function getPostById(request, response) {
     try {
         await POST_CLIENT.getPostById(request.params.id).then((post) => post
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(post)
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to get post' })
             .end();
         console.log(error);
@@ -126,15 +126,15 @@ exports.getPostById = getPostById;
 async function updatePost(request, response) {
     try {
         await POST_CLIENT.updatePost(request.params.id, request.body.title, request.body.description, request.body.authorId, request.body.pictures, request.body.isPromoted, request.body.tags, request.userData._id).then((updatedPost) => updatedPost
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(updatedPost)
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to update post' })
             .end();
         console.log(error);
@@ -154,15 +154,15 @@ async function deletePost(request, response) {
     try {
         await POST_CLIENT.deletePost(request.params.id, request.userData._id)
             .then((post) => post
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json({ message: 'Post deleted successfully' })
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to delete post' })
             .end();
         console.log(error);
@@ -181,12 +181,12 @@ exports.deletePost = deletePost;
  */
 async function getPostComments(request, response) {
     try {
-        await POST_CLIENT.getPostComments(request.params.postId, request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined).then((comments) => response.status(status_codes_1.default.OK)
+        await POST_CLIENT.getPostComments(request.params.postId, request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined).then((comments) => response.status(http_status_codes_1.default.OK)
             .json(comments)
             .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to get post comments' })
             .end();
         console.log(error);
@@ -205,12 +205,12 @@ exports.getPostComments = getPostComments;
  */
 async function createComment(request, response) {
     try {
-        await POST_CLIENT.createComment(request.userData._id, request.params.postId, request.body.content).then((comment) => response.status(status_codes_1.default.OK)
+        await POST_CLIENT.createComment(request.userData._id, request.params.postId, request.body.content).then((comment) => response.status(http_status_codes_1.default.OK)
             .json(comment)
             .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to create comment' })
             .end();
         console.log(error);
@@ -231,15 +231,15 @@ exports.createComment = createComment;
 async function updateComment(request, response) {
     try {
         await POST_CLIENT.updateComment(request.userData._id, request.params.postId, request.body.content, request.params.commentId).then((comment) => comment
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(comment)
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Comment not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to update comment' })
             .end();
         console.log(error);
@@ -258,15 +258,15 @@ exports.updateComment = updateComment;
 async function deleteComment(request, response) {
     try {
         await POST_CLIENT.deleteComment(request.params.commentId, request.userData._id).then((comment) => comment
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json({ message: 'Comment deleted successfully' })
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Comment not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to delete comment' })
             .end();
         console.log(error);
@@ -285,15 +285,15 @@ exports.deleteComment = deleteComment;
 async function upvotePost(request, response) {
     try {
         await POST_CLIENT.upvotePost(request.params.id, request.userData._id).then((post) => post
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(post)
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to upvote post' })
             .end();
         console.log(error);
@@ -312,15 +312,15 @@ exports.upvotePost = upvotePost;
 async function downvotePost(request, response) {
     try {
         await POST_CLIENT.downvotePost(request.params.id, request.userData._id).then((post) => post
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(post)
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to downvote post' })
             .end();
         console.log(error);
@@ -339,15 +339,15 @@ exports.downvotePost = downvotePost;
 async function upvoteComment(request, response) {
     try {
         await POST_CLIENT.upvoteComment(request.params.commentId, request.userData._id).then((post) => post
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(post)
                 .end()
-            : response.status(status_codes_1.default.NOT_FOUND)
+            : response.status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to upvote post' })
             .end();
         console.log(error);
@@ -366,16 +366,16 @@ exports.upvoteComment = upvoteComment;
 async function downvoteComment(request, response) {
     try {
         await POST_CLIENT.downvoteComment(request.params.commentId, request.userData._id).then((post) => post
-            ? response.status(status_codes_1.default.OK)
+            ? response.status(http_status_codes_1.default.OK)
                 .json(post)
                 .end()
             : response
-                .status(status_codes_1.default.NOT_FOUND)
+                .status(http_status_codes_1.default.NOT_FOUND)
                 .json({ message: 'Post not found' })
                 .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to downvote post' })
             .end();
         console.log(error);
@@ -396,12 +396,12 @@ exports.downvoteComment = downvoteComment;
  */
 async function getUserPosts(request, response) {
     try {
-        await POST_CLIENT.getUserPosts(request.params.userId, request.query?.limit ? +request.query.limit : undefined, request.query?.page ? +request.query.page : undefined, request.query.filter, request.query.match).then((posts) => response.status(status_codes_1.default.OK)
+        await POST_CLIENT.getUserPosts(request.params.userId, request.query?.limit ? +request.query.limit : undefined, request.query?.page ? +request.query.page : undefined, request.query.filter, request.query.match).then((posts) => response.status(http_status_codes_1.default.OK)
             .json(posts)
             .end());
     }
     catch (error) {
-        response.status(status_codes_1.default.INTERNAL_SERVER_ERROR)
+        response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
             .json({ message: 'Failed to get user posts' })
             .end();
         console.log(error);

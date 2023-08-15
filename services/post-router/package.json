@@ -17,9 +17,13 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.8.15",
     "@grpc/proto-loader": "^0.7.7",
+    "@instamenta/hexagot-post-proto-lib": "^1.0.1",
+    "@instamenta/http-status-codes": "^1.3.3",
+    "@instamenta/vlogger": "^1.0.0",
     "bson": "^5.3.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "dot_configurator": "^1.0.7",
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",

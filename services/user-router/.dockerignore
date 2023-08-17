@@ -1,20 +1,9 @@
-npm-debug.log
-.git
+node_modules
+.idea
+src
+.eslintrc
+docker-compose.yml
+.dockerignore
 .gitignore
-
-# Dependency directories
-node_modules/
-
-# Uncompiled Typescript files
-
-# IDE and editor files
-.vscode/
-.idea/
-*.sublime-*
-*.swp
-
-
-# Logs
-logs/
-*.log
-npm-debug.log*
+tsconfig.json
+.env.dist

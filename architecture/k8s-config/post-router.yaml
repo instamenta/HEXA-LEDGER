@@ -6,7 +6,7 @@ data:
   ROUTER_PORT: "5086"
   MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster.ltycehn.mongodb.net/?retryWrites=true&w=majority"
   SERVICE_NAME: 'hexagots-post-router-api'
-  POST_REMOTE_REF: "post-remote-api"
+  POST_REMOTE_REF: "post-remote-service"
   POST_REMOTE_PORT: "50052"
 ---
 
@@ -51,6 +51,9 @@ spec:
     metadata:
       labels:
         app: post-router-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: post-router-api

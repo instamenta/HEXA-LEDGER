@@ -6,7 +6,7 @@ data:
   ROUTER_PORT: "5085"
   MONGODB_URI: "mongodb+srv://janoopsi:janoopsi9999@clickercluster.ltycehn.mongodb.net/?retryWrites=true&w=majority"
   SERVICE_NAME: 'hexagots-user-router-api'
-  USER_REMOTE_REF: "user-remote-api"
+  USER_REMOTE_REF: "user-remote-service"
   USER_REMOTE_PORT: "50051"
 ---
 
@@ -51,6 +51,9 @@ spec:
     metadata:
       labels:
         app: user-router-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: user-router-api

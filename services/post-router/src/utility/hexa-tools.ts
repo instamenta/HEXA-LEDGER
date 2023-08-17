@@ -10,30 +10,30 @@ const responseTimeHistogram = getPrometheusHistogram();
 
 /** @param CASES */
 export function processOn(CASES: Array<string>): void {
-    CASES.forEach((TYPE: string) => {
-        process.on(TYPE, (error: Error) => {
-            try {
-                console.error(`${Dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`);
-                console.error(error);
-            } catch {
-                process.exit(1);
-            }
-        });
-    });
+   CASES.forEach((TYPE: string) => {
+      process.on(TYPE, (error: Error) => {
+         try {
+            console.error(`${Dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`);
+            console.error(error);
+         } catch {
+            process.exit(1);
+         }
+      });
+   });
 }
 
 /** @param CASES */
 export function processOnce(CASES: Array<string>): void {
-    CASES.forEach((TYPE: string) => {
-        process.once(TYPE, (error: Error) => {
-            try {
-                console.error(`${Dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`, error);
-                process.exit(0);
-            } finally {
-                process.kill(process.pid, TYPE);
-            }
-        });
-    });
+   CASES.forEach((TYPE: string) => {
+      process.once(TYPE, (error: Error) => {
+         try {
+            console.error(`${Dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`, error);
+            process.exit(0);
+         } finally {
+            process.kill(process.pid, TYPE);
+         }
+      });
+   });
 }
 
 /**
@@ -42,8 +42,8 @@ export function processOnce(CASES: Array<string>): void {
  * @param res
  */
 export async function SCRAPE_ENDPOINT (req: Request, res: Response) {
-    res.set('Content-Type', register.contentType);
-    res.end(await register.metrics());
+   res.set('Content-Type', register.contentType);
+   res.end(await register.metrics());
 }
 
 /**
@@ -53,22 +53,22 @@ export async function SCRAPE_ENDPOINT (req: Request, res: Response) {
  * @param next
  */
 export function metricsMiddleware(req: Request, res: Response, next: NextFunction) {
-    res.on('finish', () => {
-        httpRequestCount.inc({
+   res.on('finish', () => {
+      httpRequestCount.inc({
+         method: req.method,
+         route: req.route ? req.route.path : 'unknown',
+         status: res.statusCode,
+      });
+      responseTimeHistogram.observe(
+         {
             method: req.method,
             route: req.route ? req.route.path : 'unknown',
             status: res.statusCode,
-        });
-        responseTimeHistogram.observe(
-            {
-                method: req.method,
-                route: req.route ? req.route.path : 'unknown',
-                status: res.statusCode,
-            },
-            getElapsedTimeInSeconds(process.hrtime())
-        );
-    });
-    next();
+         },
+         getElapsedTimeInSeconds(process.hrtime())
+      );
+   });
+   next();
 }
 
 /**
@@ -77,8 +77,8 @@ export function metricsMiddleware(req: Request, res: Response, next: NextFunctio
  * @returns
  */
 function getElapsedTimeInSeconds(startTime: [number, number]): number {
-    const elapsedNanoseconds = process.hrtime(startTime);
-    return elapsedNanoseconds[0] + elapsedNanoseconds[1] * 1e-9;
+   const elapsedNanoseconds = process.hrtime(startTime);
+   return elapsedNanoseconds[0] + elapsedNanoseconds[1] * 1e-9;
 }
 
 /**
@@ -86,11 +86,11 @@ function getElapsedTimeInSeconds(startTime: [number, number]): number {
  * @returns
  */
 function getPrometheusCounter(): Counter<string> {
-    return new Counter({
-        name: 'http_requests_total',
-        help: 'Total number of HTTP requests',
-        labelNames: ['method', 'route', 'status'],
-    });
+   return new Counter({
+      name: 'http_requests_total',
+      help: 'Total number of HTTP requests',
+      labelNames: ['method', 'route', 'status'],
+   });
 }
 
 /**
@@ -98,10 +98,10 @@ function getPrometheusCounter(): Counter<string> {
  * @returns
  */
 function getPrometheusHistogram(): Histogram<string> {
-    return new Histogram({
-        name: 'http_response_time_seconds',
-        help: 'Histogram of response times',
-        labelNames: ['method', 'route', 'status'],
-        buckets: [0.1, 0.5, 1, 2, 5],
-    });
+   return new Histogram({
+      name: 'http_response_time_seconds',
+      help: 'Histogram of response times',
+      labelNames: ['method', 'route', 'status'],
+      buckets: [0.1, 0.5, 1, 2, 5],
+   });
 }

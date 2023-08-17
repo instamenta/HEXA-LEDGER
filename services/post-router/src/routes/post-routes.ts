@@ -1,56 +1,57 @@
-/** @file Router for handling post route requests. */
+/** @file Router for Post. */
+
 import {Router} from 'express';
-import {isAuthenticated, notOwner, isOwner} from '../middleware/auth-middleware';
-import {
-    createPost,
-    updatePost,
-    deletePost,
-    createComment,
-    updateComment,
-    deleteComment,
-    getPostById,
-    getPosts,
-    getPostComments,
-    upvotePost,
-    downvotePost,
-    upvoteComment,
-    downvoteComment,
-    getUserPosts
-} from '../controller/post-controller';
+import {isAuthenticated as isAuth, notOwner, isOwner} from '../middleware/auth-middleware';
+import PostController from '../controller/post-controller';
 
-const POST_ROUTER: Router = Router();
+/**
+ * @class PostRouter
+ * @property router
+ * @property postController
+ */
+export default class PostRouter {
+   private router: Router = Router();
+   private postController: PostController;
 
-POST_ROUTER.route('/')
-    .get(getPosts)
-    .post(<any>isAuthenticated, <any>createPost)
-;
-POST_ROUTER.route('/:id')
-    .get(getPostById)
-    .put(<any>isAuthenticated, <any>updatePost)
-    .delete(<any>isAuthenticated, <any>deletePost)
-;
-POST_ROUTER.route('/:postId/comments')
-    .get(getPostComments)
-    .post(<any>isAuthenticated, <any>createComment)
-;
-POST_ROUTER.route('/:postId/comments/:commentId')
-    .put(<any>isAuthenticated, <any>updateComment)
-    .delete(<any>isAuthenticated, <any>deleteComment)
-;
-POST_ROUTER.route('/comment/:commentId/upvote')
-    .put(<any>isAuthenticated, <any>upvoteComment)
-;
-POST_ROUTER.route('/comment/:commentId/downvote')
-    .put(<any>isAuthenticated, <any>downvoteComment)
-;
-POST_ROUTER.route('/:id/upvote')
-    .put(<any>isAuthenticated, <any>upvotePost)
-;
-POST_ROUTER.route('/:id/downvote')
-    .put(<any>isAuthenticated, <any>downvotePost)
-;
-POST_ROUTER.route('/users/:userId')
-    .get(<any>isAuthenticated, <any>getUserPosts)
-;
+   /**
+    * @constructor
+    * @param postController
+    */
+   constructor(postController: PostController) {
+      this.postController = postController;
 
-export default POST_ROUTER;
+      this.router.get('/', <any>this.postController.getPosts);
+
+      this.router.post('/', <any>isAuth, <any>this.postController.createPost);
+
+      this.router.get('/:id', <any>this.postController.getPostById);
+
+      this.router.put('/:id', <any>isAuth, <any>this.postController.updatePost);
+
+      this.router.delete('/:id', <any>isAuth, <any>this.postController.deletePost);
+
+      this.router.get('/:postId/comments', <any>this.postController.getPostComments);
+
+      this.router.post('/:postId/comments', <any>isAuth, <any>this.postController.createComment);
+
+      this.router.put('/:postId/comments/:commentId', <any>isAuth, <any>this.postController.updateComment);
+
+      this.router.delete('/:postId/comments/:commentId', <any>isAuth, <any>this.postController.deleteComment);
+
+      this.router.put('/comment/:commentId/upvote', <any>isAuth, <any>this.postController.upvoteComment);
+
+      this.router.put('/comment/:commentId/downvote', <any>isAuth, <any>this.postController.downvoteComment);
+
+      this.router.put('/:id/upvote', <any>isAuth, <any>this.postController.upvotePost);
+
+      this.router.put('/:id/downvote', <any>isAuth, <any>this.postController.downvotePost);
+
+      this.router.get('/users/:userId', <any>isAuth, <any>this.postController.getUserPosts);
+
+   }
+
+   public getRouter():  Router{
+      return this.router;
+   }
+}
+

@@ -1,25 +1,33 @@
 "use strict";
+/** @file Router for User. */
 Object.defineProperty(exports, "__esModule", { value: true });
-/** @file Router for users. */
 const express_1 = require("express");
 const auth_middleware_1 = require("../middleware/auth-middleware");
 const user_validator_1 = require("../validator/user-validator");
-const user_controller_1 = require("../controller/user-controller");
-const USER_ROUTER = (0, express_1.Router)();
-USER_ROUTER.route('/')
-    .get(user_validator_1.pageLimit, user_controller_1.getAllUsers);
-USER_ROUTER.route('/find')
-    .get(user_validator_1.pageLimitFilter, user_controller_1.getUsers);
-USER_ROUTER.route('/:id')
-    .get(user_controller_1.getUserById);
-// USER_ROUTER.route('/:id/comments')
-// 	.get(getUserComments);
-USER_ROUTER.route('/:id/followers')
-    .get(user_validator_1.pageLimit, user_controller_1.getUserFollowers);
-USER_ROUTER.route('/:id/following')
-    .get(user_validator_1.pageLimit, user_controller_1.getUserFollowing);
-USER_ROUTER.route('/:id/follow')
-    .put(auth_middleware_1.isAuthenticated, auth_middleware_1.notOwner, user_controller_1.followUser);
-USER_ROUTER.route('/:id/unfollow')
-    .put(auth_middleware_1.isAuthenticated, auth_middleware_1.notOwner, user_controller_1.unfollowUser);
-exports.default = USER_ROUTER;
+/**
+ * @class UserRouter
+ * @property router
+ * @property userController
+ */
+class UserRouter {
+    router = (0, express_1.Router)();
+    userController;
+    /**
+     * @constructor UserRouter
+     * @param userController
+     */
+    constructor(userController) {
+        this.userController = userController;
+        this.router.get('/', user_validator_1.pageLimit, this.userController.getAllUsers);
+        this.router.get('/find', user_validator_1.pageLimitFilter, this.userController.getUsers);
+        this.router.get('/:id', this.userController.getUserById);
+        this.router.get('/:id/followers', user_validator_1.pageLimit, this.userController.getUserFollowers);
+        this.router.get('/:id/following', user_validator_1.pageLimit, this.userController.getUserFollowing);
+        this.router.put('/:id/follow', auth_middleware_1.isAuthenticated, auth_middleware_1.notOwner, this.userController.followUser);
+        this.router.put('/:id/unfollow', auth_middleware_1.isAuthenticated, auth_middleware_1.notOwner, this.userController.unfollowUser);
+    }
+    getRouter() {
+        return this.router;
+    }
+}
+exports.default = UserRouter;

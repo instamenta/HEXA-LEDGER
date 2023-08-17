@@ -1,91 +1,148 @@
 /** @file Controller used for handling auth related requests. */
 import * as AUTH_CLIENT from '../client/auth-client';
 import {Request, Response} from 'express';
+import StatusCode from '@instamenta/http-status-codes';
 
-export {login, register, updateUserById, deleteUserById};
+export default class AuthController {
 
 
-/**
- * @param request
- * @param response
- */
-async function register(request: Request, response: Response): Promise<void> {
-    try {
-        const {username, email, password} = request.body;
-        await AUTH_CLIENT.registerUser(username, email, password)
-            .then((User) => {
-                response.json(User).status(200).end();
-            })
-            .catch((error) => {
-                throw new Error('Register Error: ' + error.message);
-            });
-    } catch (error: Error | any) {
-        console.log(error);
-        response.json({message: error.message}).status(400).end();
-    }
+   /**
+    *! Register a new user.
+    *
+    * @param request - The request object.
+    * @param response - The response object.
+    * @example
+    *! fetch('/auth/register', {
+    *!   method: 'POST',
+    *!   body: JSON.stringify({
+    *!     username: 'example_user',
+    *!     email: 'example@example.com',
+    *!     password: 'example_password'
+    *!   }),
+    *!   headers: {
+    *!     'Content-Type': 'application/json'
+    *!   }
+    *! })
+    */
+   register(request: Request, response: Response): void {
+      try {
+         AUTH_CLIENT.registerUser(
+            request.body?.username,
+            request.body?.email,
+            request.body?.password
+         ).then((User) =>
+            response.status(StatusCode.OK)
+               .json(User)
+               .end());
+      } catch (error: Error | any) {
+         response.status(400)
+            .json({message: error.message})
+            .end();
+         console.log(error);
+      }
+   }
+
+   /**
+    *! Log in a user.
+    *
+    * @param request - The request object.
+    * @param response - The response object.
+    * @example
+    *! fetch('/auth/login', {
+    *!   method: 'POST',
+    *!   body: JSON.stringify({
+    *!     email: 'example@example.com',
+    *!     password: 'example_password'
+    *!   }),
+    *!   headers: {
+    *!     'Content-Type': 'application/json'
+    *!   }
+    *! })
+    */
+   login(request: Request, response: Response): void {
+      try {
+         AUTH_CLIENT.loginUser(
+            request.body?.email,
+            request.body?.password
+         ).then((User) =>
+            response.status(StatusCode.OK)
+               .json(User)
+               .end());
+      } catch (error: Error | any) {
+         response.status(400)
+            .json({message: error.message})
+            .end();
+         console.error(error);
+      }
+   }
+
+   /**
+    *! Update a user by their ID.
+    *
+    * @param request - The request object.
+    * @param response - The response object.
+    * @example
+    *! fetch('/auth/update', {
+    *!   method: 'PUT',
+    *!   body: JSON.stringify({
+    *!     id: 'user_id',
+    *!     username: 'new_username',
+    *!     email: 'new_email@example.com',
+    *!     password: 'new_password'
+    *!   }),
+    *!   headers: {
+    *!     'Content-Type': 'application/json'
+    *!   }
+    *! })
+    */
+   updateUserById(request: Request, response: Response): void {
+      try {
+         AUTH_CLIENT.updateUserById(
+            request.body?.id,
+            request.body?.username,
+            request.body?.email,
+            request.body?.password
+         ).then((User) =>
+            response.status(StatusCode.OK)
+               .json(User)
+               .end());
+      } catch (error: Error | any) {
+         response.status(400)
+            .json({message: error.message})
+            .end();
+         console.error(error);
+      }
+   }
+
+   /**
+    *! Delete a user by their ID.
+    *
+    * @param request - The request object.
+    * @param response - The response object.
+    * @example
+    *! fetch('/auth/delete', {
+    *!   method: 'DELETE',
+    *!   body: JSON.stringify({
+    *!     id: 'user_id'
+    *!   }),
+    *!   headers: {
+    *!     'Content-Type': 'application/json'
+    *!   }
+    *! })
+    */
+   deleteUserById(request: Request, response: Response): void {
+      try {
+         AUTH_CLIENT.deleteUserById(
+            request.body?.id
+         ).then(() =>
+            response.status(StatusCode.OK)
+               .end());
+      } catch (error: Error | any) {
+         response.status(400)
+            .json({message: error.message})
+            .end();
+         console.error(error);
+      }
+   }
 }
-
-/**
- * @param request
- * @param response
- */
-async function login(request: Request, response: Response): Promise<void> {
-    try {
-        const {email, password} = request.body;
-        console.log(email, password);
-        await AUTH_CLIENT.loginUser(email, password)
-            .then((User) => {
-                response.json(User).status(200).end();
-            })
-            .catch((error) => {
-                throw new Error('Login Error: ' + error.message);
-            });
-    } catch (error: Error | any) {
-        console.error(error);
-        response.json({message: error.message}).status(400).end();
-    }
-}
-
-/**
- * @param request
- * @param response
- */
-async function updateUserById(request: Request, response: Response): Promise<void> {
-    try {
-        const {id, username, email, password} = request.body;
-        await AUTH_CLIENT.updateUserById(id, username, email, password)
-            .then((User) => {
-                response.json(User).status(200).end();
-            })
-            .catch((error) => {
-                throw new Error('Updating User Error: ' + error);
-            });
-    } catch (error: Error | any) {
-        console.error(error);
-        response.json({message: error.message}).status(400).end();
-    }
-}
-
-/**
- * @param request
- * @param response
- */
-async function deleteUserById(request: Request, response: Response): Promise<void> {
-    try {
-        const {id} = request.body;
-
-        await AUTH_CLIENT.deleteUserById(id)
-            .then(() => {
-                response.status(200).end();
-            })
-            .catch((error) => {
-                throw new Error('Deleting User Error: ' + error);
-            });
-    } catch (error: Error | any) {
-        console.error(error);
-        response.json({message: error.message}).status(400).end();
-    }
-}
-
-
 

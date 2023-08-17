@@ -22,92 +22,134 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUserById = exports.updateUserById = exports.register = exports.login = void 0;
 /** @file Controller used for handling auth related requests. */
 const AUTH_CLIENT = __importStar(require("../client/auth-client"));
-/**
- * @param request
- * @param response
- */
-async function register(request, response) {
-    try {
-        const { username, email, password } = request.body;
-        await AUTH_CLIENT.registerUser(username, email, password)
-            .then((User) => {
-            response.json(User).status(200).end();
-        })
-            .catch((error) => {
-            throw new Error('Register Error: ' + error.message);
-        });
+const http_status_codes_1 = __importDefault(require("@instamenta/http-status-codes"));
+class AuthController {
+    /**
+     *! Register a new user.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     *! fetch('/auth/register', {
+     *!   method: 'POST',
+     *!   body: JSON.stringify({
+     *!     username: 'example_user',
+     *!     email: 'example@example.com',
+     *!     password: 'example_password'
+     *!   }),
+     *!   headers: {
+     *!     'Content-Type': 'application/json'
+     *!   }
+     *! })
+     */
+    register(request, response) {
+        try {
+            AUTH_CLIENT.registerUser(request.body?.username, request.body?.email, request.body?.password).then((User) => response.status(http_status_codes_1.default.OK)
+                .json(User)
+                .end());
+        }
+        catch (error) {
+            response.status(400)
+                .json({ message: error.message })
+                .end();
+            console.log(error);
+        }
     }
-    catch (error) {
-        console.log(error);
-        response.json({ message: error.message }).status(400).end();
+    /**
+     *! Log in a user.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     *! fetch('/auth/login', {
+     *!   method: 'POST',
+     *!   body: JSON.stringify({
+     *!     email: 'example@example.com',
+     *!     password: 'example_password'
+     *!   }),
+     *!   headers: {
+     *!     'Content-Type': 'application/json'
+     *!   }
+     *! })
+     */
+    login(request, response) {
+        try {
+            AUTH_CLIENT.loginUser(request.body?.email, request.body?.password).then((User) => response.status(http_status_codes_1.default.OK)
+                .json(User)
+                .end());
+        }
+        catch (error) {
+            response.status(400)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Update a user by their ID.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     *! fetch('/auth/update', {
+     *!   method: 'PUT',
+     *!   body: JSON.stringify({
+     *!     id: 'user_id',
+     *!     username: 'new_username',
+     *!     email: 'new_email@example.com',
+     *!     password: 'new_password'
+     *!   }),
+     *!   headers: {
+     *!     'Content-Type': 'application/json'
+     *!   }
+     *! })
+     */
+    updateUserById(request, response) {
+        try {
+            AUTH_CLIENT.updateUserById(request.body?.id, request.body?.username, request.body?.email, request.body?.password).then((User) => response.status(http_status_codes_1.default.OK)
+                .json(User)
+                .end());
+        }
+        catch (error) {
+            response.status(400)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Delete a user by their ID.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     *! fetch('/auth/delete', {
+     *!   method: 'DELETE',
+     *!   body: JSON.stringify({
+     *!     id: 'user_id'
+     *!   }),
+     *!   headers: {
+     *!     'Content-Type': 'application/json'
+     *!   }
+     *! })
+     */
+    deleteUserById(request, response) {
+        try {
+            AUTH_CLIENT.deleteUserById(request.body?.id).then(() => response.status(http_status_codes_1.default.OK)
+                .end());
+        }
+        catch (error) {
+            response.status(400)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
     }
 }
-exports.register = register;
-/**
- * @param request
- * @param response
- */
-async function login(request, response) {
-    try {
-        const { email, password } = request.body;
-        console.log(email, password);
-        await AUTH_CLIENT.loginUser(email, password)
-            .then((User) => {
-            response.json(User).status(200).end();
-        })
-            .catch((error) => {
-            throw new Error('Login Error: ' + error.message);
-        });
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(400).end();
-    }
-}
-exports.login = login;
-/**
- * @param request
- * @param response
- */
-async function updateUserById(request, response) {
-    try {
-        const { id, username, email, password } = request.body;
-        await AUTH_CLIENT.updateUserById(id, username, email, password)
-            .then((User) => {
-            response.json(User).status(200).end();
-        })
-            .catch((error) => {
-            throw new Error('Updating User Error: ' + error);
-        });
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(400).end();
-    }
-}
-exports.updateUserById = updateUserById;
-/**
- * @param request
- * @param response
- */
-async function deleteUserById(request, response) {
-    try {
-        const { id } = request.body;
-        await AUTH_CLIENT.deleteUserById(id)
-            .then(() => {
-            response.status(200).end();
-        })
-            .catch((error) => {
-            throw new Error('Deleting User Error: ' + error);
-        });
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(400).end();
-    }
-}
-exports.deleteUserById = deleteUserById;
+exports.default = AuthController;

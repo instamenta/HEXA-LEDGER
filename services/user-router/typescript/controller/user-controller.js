@@ -22,129 +22,182 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.unfollowUser = exports.followUser = exports.getUserFollowing = exports.getUserFollowers = exports.getUserById = exports.getAllUsers = exports.getUsers = void 0;
 const USER_CLIENT = __importStar(require("../client/user-client"));
-/**
- * @param request
- * @param response
- */
-async function getUsers(request, response) {
-    try {
-        const r = request.query, page = Number.parseInt(r.page) || 1, limit = Number.parseInt(r.limit) || 10, filter = r.filter || '', userList = await USER_CLIENT.getUsers(page, limit, filter);
-        response.json(userList).status(200).end();
+const http_status_codes_1 = __importDefault(require("@instamenta/http-status-codes"));
+/** @class UserController */
+class UserController {
+    /**
+     *! Get a list of users.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     * ! fetch('/users?page=1&limit=10')
+     */
+    getUsers(request, response) {
+        try {
+            USER_CLIENT.getUsers(request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined, request.query?.filter).then((userList) => response.status(http_status_codes_1.default.OK)
+                .json(userList)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
     }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
+    /**
+     *! Get a list of all users.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     * ! fetch('/users/all?page=1&limit=10')
+     */
+    getAllUsers(request, response) {
+        try {
+            USER_CLIENT.getAllUsers(request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined).then((userList) => response.status(http_status_codes_1.default.OK)
+                .json(userList)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Get a user by their ID.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     * ! fetch('/users/:id')
+     */
+    getUserById(request, response) {
+        try {
+            USER_CLIENT.getUserById(request.params?.id).then((user) => response.status(http_status_codes_1.default.OK)
+                .json(user)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Get followers of a user.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     * ! fetch('/users/:id/followers?page=1&limit=10')
+     */
+    getUserFollowers(request, response) {
+        try {
+            USER_CLIENT.getUserFollowers(request.params?.id, request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined).then((followers) => response.status(http_status_codes_1.default.OK)
+                .json(followers)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Get users that a user is following.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     * ! fetch('/users/:id/following?page=1&limit=10')
+     */
+    getUserFollowing(request, response) {
+        try {
+            USER_CLIENT.getUserFollowing(request.params?.id, request.query?.page ? +request.query.page : undefined, request.query?.limit ? +request.query.limit : undefined).then((following) => response.status(http_status_codes_1.default.OK)
+                .json(following)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Follow a user.
+     *
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     *!  fetch('/users/follow/:id', {
+     *!   method: 'POST',
+     *!   headers: {
+     *!     Authorization: 'Bearer YOUR_ACCESS_TOKEN'
+     *!   }
+     *! })
+     */
+    followUser(request, response) {
+        try {
+            USER_CLIENT.followUser(request.userData._id, request.params?.id).then(() => response.status(http_status_codes_1.default.OK)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
+    }
+    /**
+     *! Unfollow a user.
+     * @param request - The request object.
+     * @param response - The response object.
+     * @example
+     *! fetch('/users/unfollow/:id', {
+     *!  method: 'POST',
+     *!  headers: {
+     *!    Authorization: 'Bearer YOUR_ACCESS_TOKEN'
+     *!  }
+     *!})
+     */
+    unfollowUser(request, response) {
+        try {
+            USER_CLIENT.unfollowUser(request.userData._id, request.params?.id).then(() => response.status(http_status_codes_1.default.OK)
+                .end());
+        }
+        catch (error) {
+            response.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
+                .json({ message: error.message })
+                .end();
+            console.error(error);
+        }
     }
 }
-exports.getUsers = getUsers;
-/**
- * @param request
- * @param response
- */
-async function getAllUsers(request, response) {
-    try {
-        const r = request.query, page = Number.parseInt(r.page) || 1, limit = Number.parseInt(r.limit) || 10, userList = await USER_CLIENT.getAllUsers(page, limit);
-        response.json(userList).status(200).end();
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
-    }
-}
-exports.getAllUsers = getAllUsers;
-/**
- * @param request
- * @param response
- */
-async function getUserById(request, response) {
-    try {
-        const { id } = request.params;
-        const user = await USER_CLIENT.getUserById(id);
-        response.json(user).status(200).end();
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
-    }
-}
-exports.getUserById = getUserById;
-/**
- * @param request
- * @param response
- */
-async function getUserFollowers(request, response) {
-    try {
-        const { id } = request.params, page = Number.parseInt(request.query.page) || 1, limit = Number.parseInt(request.query.limit) || 10, followers = await USER_CLIENT.getUserFollowers(id, page, limit);
-        response.json(followers).status(200).end();
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
-    }
-}
-exports.getUserFollowers = getUserFollowers;
-/**
- * @param request
- * @param response
- */
-async function getUserFollowing(request, response) {
-    try {
-        const { id } = request.params, page = Number.parseInt(request.query.page) || 1, limit = Number.parseInt(request.query.limit) || 10, following = await USER_CLIENT.getUserFollowing(id, page, limit);
-        response.json(following).status(200).end();
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
-    }
-}
-exports.getUserFollowing = getUserFollowing;
-/**
- * @param request
- * @param response
- */
-async function followUser(request, response) {
-    try {
-        const { id } = request.params, currentUser = request.userData;
-        await USER_CLIENT.followUser(currentUser._id, id);
-        response.status(200).end();
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
-    }
-}
-exports.followUser = followUser;
-/**
- * @param request
- * @param response
- */
-async function unfollowUser(request, response) {
-    try {
-        const { id } = request.params, currentUser = request.userData;
-        await USER_CLIENT.unfollowUser(currentUser._id, id);
-        response.status(200).end();
-    }
-    catch (error) {
-        console.error(error);
-        response.json({ message: error.message }).status(500).end();
-    }
-}
-exports.unfollowUser = unfollowUser;
+exports.default = UserController;
 // /**
 //  *
 //  * @param request
 //  * @param response
 //  */
-// Async function getUserComments(request: Request, response: Response): Promise<void> {
+// Async function getUserComments(request: Request, response: Response): void {
 // 	Try {
 // 		Const { id } = request.params;
 // 		Const comments = await USER_CLIENT.getUserComments(id);
-// 		Response.json(comments).status(200).end();
+// 		Response.json(comments).status(StatusCode.OK).end();
 // 	} catch (error: Error | any) {
 // 		Console.error(error);
-// 		Response.json({ message: error.message }).status(500).end();
+// 		Response.json({ message: error.message }).status(StatusCode.INTERNAL_SERVER_ERROR).end();
 // 	}
 // }

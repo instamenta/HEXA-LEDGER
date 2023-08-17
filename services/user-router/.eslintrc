@@ -30,7 +30,7 @@ parserOptions:
   tsconfigRootDir: ./
 rules:
   #  ESLINT
-  indent: [ "error", 4 , { "SwitchCase": 1 } ]
+  indent: [ "error", 3 , { "SwitchCase": 1 } ]
   linebreak-style: [ "error", "windows" ]
   quotes: [ "error", "single" ]
   semi: [ "error", "always" ]
@@ -48,7 +48,6 @@ rules:
   require-atomic-updates: 1
   block-scoped-var: 1
   capitalized-comments: 1
-  class-methods-use-this: 1
   eqeqeq: 1
   grouped-accessor-pairs: 1
   no-empty: 1
@@ -100,21 +99,21 @@ rules:
   sonarjs/cognitive-complexity: off
   sonarjs/no-identical-functions: off
   "@typescript-eslint/no-unused-vars": off
+  # NEW WAVE
+  class-methods-use-this: 0
 
   #  JAVASCRIPT DOC BLOCK
   jsdoc/require-param-description: 0
   jsdoc/require-returns-description: 0
   jsdoc/require-property-description: 0
-
+  jsdoc/check-indentation: 0
   jsdoc/check-access: 1
   jsdoc/check-alignment: 1
   jsdoc/check-examples: 0
-  jsdoc/check-indentation: 1
   jsdoc/check-line-alignment: 1
   jsdoc/check-param-names: 1
   jsdoc/check-property-names: 1
   jsdoc/check-syntax: 1
-  jsdoc/check-tag-names: 1
   jsdoc/check-types: 1
   jsdoc/check-values: 0
   jsdoc/empty-tags: 1
@@ -126,7 +125,7 @@ rules:
   jsdoc/no-blank-block-descriptions: 1
   jsdoc/no-defaults: 0
   jsdoc/no-missing-syntax: 0
-  jsdoc/no-multi-asterisks: 1
+  jsdoc/no-multi-asterisks: 0
   jsdoc/no-restricted-syntax: 0
   jsdoc/no-types: 1
   jsdoc/no-undefined-types: 0
@@ -140,6 +139,7 @@ rules:
   jsdoc/require-param: 1
   jsdoc/require-param-name: 1
   jsdoc/require-param-type: 0
+  jsdoc/check-tag-names: 0
   jsdoc/require-property: 1
   jsdoc/require-property-name: 1
   jsdoc/require-property-type: 0
@@ -150,12 +150,10 @@ rules:
   jsdoc/require-yields: 1
   jsdoc/require-yields-check: 1
   jsdoc/sort-tags: 1
-  jsdoc/tag-lines: 1
+  jsdoc/tag-lines: 0
   jsdoc/valid-types: 1
   security/detect-object-injection: off
   promise/catch-or-return: off
-
-
 plugins:
   - "@typescript-eslint"
   - import
@@ -166,7 +164,6 @@ plugins:
   - security
   - sonarjs
   - unicorn
-
 ignorePatterns: [
   "generated/"
 ]

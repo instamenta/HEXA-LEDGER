@@ -1,43 +1,44 @@
-/** @file Router for users. */
+/** @file Router for User. */
+
 import {Router} from 'express';
-import {isAuthenticated, notOwner} from '../middleware/auth-middleware';
+import {isAuthenticated as isAuth, notOwner} from '../middleware/auth-middleware';
 import {pageLimit, pageLimitFilter} from '../validator/user-validator';
-import {
-    getAllUsers,
-    getUserById,
-    getUsers,
-    // GetUserPosts,
-    // GetUserComments,
-    getUserFollowers,
-    getUserFollowing,
-    followUser,
-    unfollowUser,
-} from '../controller/user-controller';
+import UserController from '../controller/user-controller';
 
-const USER_ROUTER: Router = Router();
+/**
+ * @class UserRouter
+ * @property router
+ * @property userController
+ */
+class UserRouter {
+   private router: Router = Router();
+   private userController: UserController;
 
-USER_ROUTER.route('/')
-    .get(pageLimit, getAllUsers);
+   /**
+    * @constructor UserRouter
+    * @param userController
+    */
+   constructor(userController: UserController) {
+      this.userController = userController;
 
-USER_ROUTER.route('/find')
-    .get(pageLimitFilter, getUsers);
+      this.router.get('/', pageLimit, <any>this.userController.getAllUsers);
 
-USER_ROUTER.route('/:id')
-    .get(getUserById);
+      this.router.get('/find', pageLimitFilter, <any>this.userController.getUsers);
 
-// USER_ROUTER.route('/:id/comments')
-// 	.get(getUserComments);
+      this.router.get('/:id', <any>this.userController.getUserById);
 
-USER_ROUTER.route('/:id/followers')
-    .get(pageLimit, getUserFollowers);
+      this.router.get('/:id/followers', pageLimit, <any>this.userController.getUserFollowers);
 
-USER_ROUTER.route('/:id/following')
-    .get(pageLimit, getUserFollowing);
+      this.router.get('/:id/following', pageLimit, <any>this.userController.getUserFollowing);
 
-USER_ROUTER.route('/:id/follow')
-    .put(<any>isAuthenticated, <any>notOwner, <any>followUser);
+      this.router.put('/:id/follow', <any>isAuth, <any>notOwner, <any>this.userController.followUser);
 
-USER_ROUTER.route('/:id/unfollow')
-    .put(<any>isAuthenticated, <any>notOwner, <any>unfollowUser);
+      this.router.put('/:id/unfollow', <any>isAuth, <any>notOwner, <any>this.userController.unfollowUser);
+   }
 
-export default USER_ROUTER;
+   public getRouter(): Router {
+      return this.router;
+   }
+}
+
+export default UserRouter;

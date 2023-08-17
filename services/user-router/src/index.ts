@@ -1,82 +1,46 @@
 /** @file Start and initializes all services and the router. */
-import EXPRESS, {Express, Request, Response, NextFunction} from 'express';
+
+import EXPRESS, {Express} from 'express';
 import CORS from 'cors';
 import MORGAN from 'morgan';
+import HELMET from 'helmet';
 import COOKIER_PARSER from 'cookie-parser';
-import AUTH_ROUTER from './routes/auth-routes';
-import USER_ROUTER from './routes/user-routes';
+import UserRouter from './routes/user-routes';
 import ERROR_MIDDLEWARE from './middleware/error-middleware';
-import {collectDefaultMetrics, Counter, register} from 'prom-client';
+import {collectDefaultMetrics} from 'prom-client';
+import AuthController from './controller/auth-controller';
+import AuthRouter from './routes/auth-routes';
+import UserController from './controller/user-controller';
+import {Dot, SCRAPE_ENDPOINT, processOn, processOnce, metricsMiddleware} from './utility/hexa-tools';
 
-const API_PORT: string = process.env.ROUTER_PORT || '5085'
-    , SERVICE_NAME: string = process.env.SERVICE_NAME || 'User-Router-Service'
-    , API: Express = EXPRESS()
+const API_PORT = Dot.GET('ROUTER_PORT', 5085)
+   , SERVICE_NAME = Dot.GET('SERVICE_NAME', 'User-Router-Service')
+   , API: Express = EXPRESS()
+   , authController = new AuthController()
+   , authRouter: EXPRESS.Router = new AuthRouter(authController).getRouter()
+   , userController = new UserController()
+   , userRouter: EXPRESS.Router = new UserRouter(userController).getRouter()
 ;
 collectDefaultMetrics();
-const httpRequestCount = new Counter({
-    name: 'http_requests_total',
-    help: 'Total number of HTTP requests',
-    labelNames: ['method', 'route', 'status'],
-});
-
 API.use(CORS());
+API.use(HELMET());
 API.use(COOKIER_PARSER());
 API.use(MORGAN('combined'));
 API.use(EXPRESS.json());
 API.use(metricsMiddleware);
-
-API.use('/auth', AUTH_ROUTER);
-API.use('/user', USER_ROUTER);
-
-API.get('/metrics', (req: Request, res: Response) => {
-    res.set('Content-Type', register.contentType);
-    res.end(register.metrics());
-});
-
+API.use('/auth', authRouter);
+API.use('/user', userRouter);
+API.get('/metrics', SCRAPE_ENDPOINT);
 API.use(ERROR_MIDDLEWARE);
 
-(async function initializeService(): Promise<void> {
-    await API.listen(Number(API_PORT), () => {
-        console.log(`${SERVICE_NAME}  is running on port: ${API_PORT}`);
-    });
-    API.on('error', (error: Error | any) => {
-        console.log('API ran into Error:', error);
-    });
-})().catch((error) => console.log(error));
+(function initializeService(): void {
+   API.listen(Number(API_PORT), () => {
+      console.log(`${SERVICE_NAME}  is running on port: ${API_PORT}`);
+   });
+   API.on('error', (error: Error | any) => {
+      console.log('API ran into Error:', error);
+   });
+})();
 
-/**
- * @param req
- * @param res
- * @param next
- */
-function metricsMiddleware(req: Request, res: Response, next: NextFunction) {
-    res.on('finish', () => httpRequestCount.inc({
-            method: req.method,
-            route: req.route ? req.route.path : 'unknown',
-            status: res.statusCode,
-        })
-    );
-    next();
-}
-
-['unhandledRejection', 'uncaughtException'].forEach((type) => {
-    process.on(type, (error: Error) => {
-        try {
-            console.error(`${SERVICE_NAME} - process.on ${type}`);
-            console.error(error);
-        } catch {
-            process.exit(1);
-        }
-    });
-});
-
-['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
-    process.once(type, (error: Error) => {
-        try {
-            console.error(`${SERVICE_NAME} - process.on ${type}`, error);
-            process.exit(0);
-        } finally {
-            process.kill(process.pid, type);
-        }
-    });
-});
+processOn(['unhandledRejection', 'uncaughtException']);
+processOnce(['SIGTERM', 'SIGINT', 'SIGUSR2']);

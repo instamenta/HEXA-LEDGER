@@ -3,8 +3,6 @@ import DotConfig from 'dot_configurator';
 import {NextFunction, Request, Response} from 'express';
 import {Counter, Histogram, register} from 'prom-client';
 
-export const Dot: DotConfig = new DotConfig(process.env as Record<string, string>);
-
 const httpRequestCount = getPrometheusCounter();
 const responseTimeHistogram = getPrometheusHistogram();
 

@@ -6,19 +6,23 @@ import MORGAN from 'morgan';
 import HELMET from 'helmet';
 import COOKIER_PARSER from 'cookie-parser';
 import UserRouter from './routes/user-routes';
+import DotConfig from 'dot_configurator';
 import ERROR_MIDDLEWARE from './middleware/error-middleware';
 import {collectDefaultMetrics} from 'prom-client';
+import VLogger from '@instamenta/vlogger'
 import AuthController from './controller/auth-controller';
 import AuthRouter from './routes/auth-routes';
 import UserController from './controller/user-controller';
-import {Dot, SCRAPE_ENDPOINT, processOn, processOnce, metricsMiddleware} from './utility/hexa-tools';
+import {SCRAPE_ENDPOINT, processOn, processOnce, metricsMiddleware} from './utility/hexa-tools';
 
-const API_PORT = Dot.GET('ROUTER_PORT', 5085)
+const Dot: DotConfig = new DotConfig(process.env as Record<string, string>)
+   , API_PORT = Dot.GET('ROUTER_PORT', 5085)
    , SERVICE_NAME = Dot.GET('SERVICE_NAME', 'User-Router-Service')
    , API: Express = EXPRESS()
-   , authController = new AuthController()
+   , vlogger = new VLogger(Dot.GET('DEBUG_LEVEL', true))
+   , authController = new AuthController(vlogger)
    , authRouter: EXPRESS.Router = new AuthRouter(authController).getRouter()
-   , userController = new UserController()
+   , userController = new UserController(vlogger)
    , userRouter: EXPRESS.Router = new UserRouter(userController).getRouter()
 ;
 collectDefaultMetrics();

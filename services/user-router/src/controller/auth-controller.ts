@@ -5,6 +5,8 @@ import StatusCode from '@instamenta/http-status-codes';
 
 export default class AuthController {
 
+constructor(vlogger: ) {
+}
 
    /**
     *! Register a new user.

@@ -5,6 +5,8 @@ import {iRequestWithUser} from '../utility/types/base-types';
 import StatusCode from '@instamenta/http-status-codes';
 import {VLogger, IVlog} from '@instamenta/vlogger';
 import PostClient from '../client/post-client';
+import {zParse} from '../validator/zod';
+import * as zod from '../validator/validation-schemas';
 
 export default class PostController {
 
@@ -40,16 +42,14 @@ export default class PostController {
     *!   }
     *! })
     */
-   public getPosts(req: Request, res: Response): void {
+   public async getPosts(req: Request, res: Response): Promise<void> {
       try {
-         const {ids} = req.body;
-         this.client.getPosts(
-            ids,
-            req.query?.limit ? +req.query!.limit : undefined,
-            req.query?.page ? +req.query!.page : undefined,
-            req.query?.filter as string,
-            req.query?.match as string,
-         )
+         const {
+            query: {limit, page, filter, match},
+            body: {ids},
+         } = await zParse(zod.getPostsSchema, req);
+
+         this.client.getPosts(ids, limit, page, filter, match)
             .then((posts) =>
                res.status(StatusCode.OK)
                   .json(posts)
@@ -88,23 +88,28 @@ export default class PostController {
     *!     tags: ['tag1', 'tag2']
     *! }),
     */
-   public createPost(
-      req: Request<NonNullable<unknown>, NonNullable<unknown> /** ,Z_CreatePostSchema.*/>,
+   public async createPost(
+      req: Request,
       res: Response,
-   ): void {
+   ): Promise<void> {
       try {
+         const {
+            body: {
+               title,
+               description,
+               authorId,
+               pictures,
+               isPromoted,
+               tags,
+            },
+         } = await zParse(zod.createPostSchema, req);
+
          this.client.createPost(
-            req.body.title,
-            req.body.description,
-            req.body.authorId,
-            req.body.pictures,
-            req.body.isPromoted,
-            req.body.tags,
-         )
-            .then((post) =>
-               res.status(StatusCode.OK)
-                  .json(post)
-                  .end());
+            title, description, authorId, pictures, isPromoted, tags,
+         ).then((post) =>
+            res.status(StatusCode.OK)
+               .json(post)
+               .end());
       } catch (e: any) {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -130,11 +135,11 @@ export default class PostController {
     *!   }
     *! })
     */
-   public getPostById(req: Request, res: Response): void {
+   public async getPostById(req: Request, res: Response): Promise<void> {
       try {
-         this.client.getPostById(
-            req.params.id,
-         )
+         const {params: {id}} = await zParse(zod.idSchema, req);
+
+         this.client.getPostById(id)
             .then((post) =>
                res.status(StatusCode.OK)
                   .json(post)
@@ -174,22 +179,27 @@ export default class PostController {
     *!   .then(data => console.log(data))
     *!   .catch(error => console.error(error));
     */
-   public updatePost(req: iRequestWithUser, res: Response): void {
+   public async updatePost(req: iRequestWithUser, res: Response): Promise<void> {
       try {
+         const {
+            params: {id},
+            userData: {_id},
+            body: {
+               title,
+               description,
+               authorId,
+               pictures,
+               isPromoted,
+               tags,
+            },
+         } = await zParse(zod.updatePostSchema, req);
+
          this.client.updatePost(
-            req.params.id,
-            req.body.title,
-            req.body.description,
-            req.body.authorId,
-            req.body.pictures,
-            req.body.isPromoted,
-            req.body.tags,
-            req.userData._id,
-         )
-            .then((post) =>
-               res.status(StatusCode.OK)
-                  .json(post)
-                  .end());
+            id, title, description, authorId, pictures, isPromoted, tags, _id,
+         ).then((post) =>
+            res.status(StatusCode.OK)
+               .json(post)
+               .end());
       } catch (e: any) {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -216,9 +226,14 @@ export default class PostController {
     *!   }
     *! })
     */
-   public deletePost(req: iRequestWithUser, res: Response): void {
+   public async deletePost(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.deletePost(req.params.id, req.userData._id)
+         const {
+            params: {id},
+            userData: {_id},
+         } = await zParse(zod.idAndAuthSchema, req);
+
+         this.client.deletePost(id, _id)
             .then(() =>
                res.status(StatusCode.OK)
                   .end());
@@ -248,14 +263,17 @@ export default class PostController {
     *!   }
     *! })
     */
-   public upvotePost(req: iRequestWithUser, res: Response): void {
+   public async upvotePost(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.upvotePost(
-            req.params.id,
-            req.userData._id,
-         ).then(() =>
-            res.status(StatusCode.OK)
-               .end());
+         const {
+            params: {id},
+            userData: {_id},
+         } = await zParse(zod.idAndAuthSchema, req);
+
+         this.client.upvotePost(id, _id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
       } catch (e: any) {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -282,12 +300,14 @@ export default class PostController {
     *!   }
     *! })
     */
-   public downvotePost(req: iRequestWithUser, res: Response): void {
+   public async downvotePost(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.downvotePost(
-            req.params.id,
-            req.userData._id,
-         )
+         const {
+            params: {id},
+            userData: {_id},
+         } = await zParse(zod.idAndAuthSchema, req);
+
+         this.client.downvotePost(id, _id)
             .then(() =>
                res.status(StatusCode.OK)
                   .end());
@@ -317,14 +337,15 @@ export default class PostController {
     *!   method: 'GET',
     *! })
     */
-   public getUserPosts(req: Request, res: Response): void {
+   public async getUserPosts(req: Request, res: Response): Promise<void> {
       try {
+         const {
+            params: {userId},
+            query: {limit, page, filter, match},
+         } = await zParse(zod.getUserPostsSchema, req);
+
          this.client.getUserPosts(
-            req.params.userId,
-            req.query?.limit ? +req.query!.limit : undefined,
-            req.query?.page ? +req.query!.page : undefined,
-            req.query.filter as string,
-            req.query.match as string,
+            userId, limit, page, filter, match,
          ).then((posts) =>
             res.status(StatusCode.OK)
                .json(posts)

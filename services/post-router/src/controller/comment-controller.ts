@@ -4,8 +4,9 @@ import {Request, Response} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
 import StatusCode from '@instamenta/http-status-codes';
 import {VLogger, IVlog} from '@instamenta/vlogger';
-import {CommentModel} from '../protos/generated/types/posts_pb';
 import CommentClient from '../client/comment-client';
+import {zParse} from '../validator/zod';
+import * as zod from '../validator/validation-schemas';
 
 export default class CommentController {
    private readonly vlog: IVlog;
@@ -14,10 +15,6 @@ export default class CommentController {
    constructor(vloggger: VLogger, client: CommentClient) {
       this.vlog = vloggger.getVlog(this.constructor.name);
       this.client = client;
-   }
-
-   public static getInstance(vloggger: VLogger, client: CommentClient): CommentController {
-      return new CommentController(vloggger, client);
    }
 
    /**
@@ -37,13 +34,14 @@ export default class CommentController {
     *!   }
     *! })
     */
-   public getPostComments(req: Request, res: Response): void {
+   public async getPostComments(req: Request, res: Response): Promise<void> {
       try {
-         this.client.getPostComments(
-            req.params.postId,
-            req.query?.page ? +req.query!.page : undefined,
-            req.query?.limit ? +req.query!.limit : undefined,
-         )
+         const {
+            query: {limit, page},
+            params: {postId},
+         } = await zParse(zod.getPostCommentsSchema, req);
+
+         this.client.getPostComments(postId, limit, page)
             .then((comments) =>
                res.status(StatusCode.OK)
                   .json(comments)
@@ -79,13 +77,15 @@ export default class CommentController {
     *!   }
     *! })
     */
-   public createComment(req: iRequestWithUser, res: Response): void {
+   public async createComment(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.createComment(
-            req.userData._id,
-            req.params.postId,
-            req.body.content,
-         )
+         const {
+            params: {postId},
+            userData: {_id},
+            body: {content},
+         } = await zParse(zod.createCommentSchema, req);
+
+         this.client.createComment(_id, postId, content)
             .then((comment) =>
                res.status(StatusCode.OK)
                   .json(comment)
@@ -122,20 +122,19 @@ export default class CommentController {
     *!   }
     *! })
     */
-   public updateComment(req: iRequestWithUser, res: Response): void {
+   public async updateComment(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.updateComment(
-            req.userData._id,
-            req.params.postId,
-            req.body.content,
-            req.params.commentId,
-         ).then((comment) => comment
-            ? res.status(StatusCode.OK)
-               .json(comment)
-            : res.status(StatusCode.NOT_FOUND)
-               .json({message: 'Comment not found'}));
+         const {
+            params: {postId, commentId},
+            userData: {_id},
+            body: {content},
+         } = await zParse(zod.updateCommentSchema, req);
 
-         res.end();
+         this.client.updateComment(_id, postId, content, commentId)
+            .then((comment) =>
+               res.status(StatusCode.OK)
+                  .json(comment)
+                  .end());
       } catch (e: any) {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -162,14 +161,17 @@ export default class CommentController {
     *!   }
     *! })
     */
-   public deleteComment(req: iRequestWithUser, res: Response): void {
+   public async deleteComment(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.deleteComment(
-            req.params.commentId,
-            req.userData._id,
-         )
-            .then(() => res.status(StatusCode.OK).end());
+         const {
+            params: {commentId},
+            userData: {_id},
+         } = await zParse(zod.deleteCommentSchema, req);
 
+         this.client.deleteComment(commentId, _id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
       } catch (e: any) {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -197,13 +199,17 @@ export default class CommentController {
     *!   }
     *! })
     */
-   public upvoteComment(req: iRequestWithUser, res: Response): void {
+   public async upvoteComment(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.upvoteComment(
-            req.params?.commentId,
-            req.userData?._id,
-         )
-            .then(() => res.status(StatusCode.OK).end());
+         const {
+            params: {commentId},
+            userData: {_id},
+         } = await zParse(zod.voteCommentSchema, req);
+
+         this.client.upvoteComment(commentId, _id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
 
       } catch (e: any) {
 
@@ -232,14 +238,17 @@ export default class CommentController {
     *!   }
     *! })
     */
-   public downvoteComment(req: iRequestWithUser, res: Response): void {
+   public async downvoteComment(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         this.client.downvoteComment(
-            req.params.commentId,
-            req.userData._id,
-         )
-            .then(() => res.status(StatusCode.OK).end());
+         const {
+            params: {commentId},
+            userData: {_id},
+         } = await zParse(zod.voteCommentSchema, req);
 
+         this.client.downvoteComment(commentId, _id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
       } catch (e: any) {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -250,4 +259,7 @@ export default class CommentController {
       }
    }
 
+   public static getInstance(vloggger: VLogger, client: CommentClient): CommentController {
+      return new CommentController(vloggger, client);
+   }
 }

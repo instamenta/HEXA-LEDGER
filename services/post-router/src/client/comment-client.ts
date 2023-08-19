@@ -1,4 +1,4 @@
-/** @file Handles calls to post related endpoints on groc client. */
+/** @file Handles calls to post related endpoints on grpc client. */
 
 import * as GRPC from '@grpc/grpc-js';
 import CommentGrpcModel from '../model/comment-grpc-model';
@@ -15,15 +15,10 @@ const {
 } = require('../protos/generated/posts_pb');
 
 export default class CommentClient {
-
    private client: ServiceClient;
 
    constructor(client: ServiceClient) {
       this.client = client;
-   }
-
-   public static getInstance(client: ServiceClient): CommentClient {
-      return new CommentClient(client);
    }
 
    public createComment(
@@ -120,4 +115,7 @@ export default class CommentClient {
       });
    }
 
+   public static getInstance(client: ServiceClient): CommentClient {
+      return new CommentClient(client);
+   }
 }

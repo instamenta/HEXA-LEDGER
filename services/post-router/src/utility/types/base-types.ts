@@ -45,6 +45,3 @@ export interface ICommentData extends Document {
     content: string | null;
     wasEdited: boolean;
 }
-
-// CreatedAt: Timestamp | Date | any;
-// UpdatedAt: Timestamp | Date | any;

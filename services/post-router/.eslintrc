@@ -155,6 +155,8 @@ rules:
   jsdoc/valid-types: 1
   security/detect-object-injection: off
   promise/catch-or-return: off
+
+  node/no-unpublished-import: off
 plugins:
   - "@typescript-eslint"
   - import

@@ -57,5 +57,7 @@ API.use(errorMiddleware);
    });
 })();
 
+export default API;
+
 hexaModule.processOn(['unhandledRejection', 'uncaughtException']);
 hexaModule.processOnce(['SIGTERM', 'SIGINT', 'SIGUSR2']);

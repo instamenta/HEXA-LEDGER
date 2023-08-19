@@ -65,7 +65,7 @@ rules:
   require-await: 1
 
   spaced-comment: [ "warn", "always" ]
-  arrow-body-style: [ "warn", "as-needed" ]
+  #  arrow-body-style: [ "warn", "as-needed" ]
   quote-props: [ "warn", "consistent-as-needed" ]
   arrow-parens: [ "warn", "always" ]
   arrow-spacing: [ "warn", { "before": true, "after": true } ]
@@ -149,6 +149,7 @@ rules:
   jsdoc/require-throws: 1
   jsdoc/require-yields: 1
   jsdoc/require-yields-check: 1
+  unicorn/catch-error-name: off
   jsdoc/sort-tags: 1
   jsdoc/tag-lines: 0
   jsdoc/valid-types: 1

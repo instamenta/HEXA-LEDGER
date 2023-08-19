@@ -1,13 +1,25 @@
-/** @file Start and exports the grpc client. */
-import * as GRPC from '@grpc/grpc-js';
+/** @file Connect and export the grpc client. */
+
+import {credentials} from '@grpc/grpc-js';
 import {PostServiceClient} from '../protos/generated/posts_grpc_pb';
+import DotConfigurator from 'dot_configurator';
 
-const POST_REMOTE_REF = process.env['POST_REMOTE_REF'] || 'post-remote'
-   , POST_REMOTE_PORT = process.env['POST_REMOTE_PORT'] || 50_052
-;
-const GRPC_CLIENT = new PostServiceClient(
-   `${POST_REMOTE_REF}:${POST_REMOTE_PORT}`,
-   GRPC.credentials.createInsecure()
-);
+export default class GrpcClient {
 
-export default GRPC_CLIENT;
+   private dot: DotConfigurator;
+
+   constructor(dot: DotConfigurator) {
+      this.dot = dot;
+   }
+
+   public static getInstance(dot: DotConfigurator): GrpcClient {
+      return new GrpcClient(dot);
+   }
+
+   public connectClient() {
+      return new PostServiceClient(
+         `${this.dot.GET('POST_REMOTE_REF', 'post-remote')}:${this.dot.GET('POST_REMOTE_PORT', 50_052)}`,
+         credentials.createInsecure(),
+      );
+   }
+}

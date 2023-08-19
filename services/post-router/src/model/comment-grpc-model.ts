@@ -27,7 +27,7 @@ export default class CommentGrpcModel {
       } = commentData);
    }
 
-   static fromCommentGRPCMessage(m: CommentModel): CommentGrpcModel {
+   static fromResponse(m: CommentModel): CommentGrpcModel {
       return new CommentGrpcModel(<ICommentData>{
          _id: m.hasId() ? m.getId()!.getValue() : null,
          authorId: m.hasAuthorId() ? m.getAuthorId()!.getValue() : null,

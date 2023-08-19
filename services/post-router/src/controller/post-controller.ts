@@ -1,10 +1,25 @@
 /** @file Handles request to post routes. */
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
-import * as POST_CLIENT from '../client/post-client';
 import StatusCode from '@instamenta/http-status-codes';
+import {VLogger, IVlog} from '@instamenta/vlogger';
+// import {ServiceClient} from '@grpc/grpc-js/build/src/make-client';
+import {PostModel} from '../protos/generated/types/posts_pb';
+import PostClient from '../client/post-client';
 
 export default class PostController {
+
+   private readonly vlog: IVlog;
+   private client: PostClient;
+
+   constructor(vloggger: VLogger, client: PostClient) {
+      this.vlog = vloggger.getVlog(this.constructor.name);
+      this.client = client;
+   }
+
+   public static getInstance(vloggger: VLogger, client: PostClient): PostController {
+      return new PostController(vloggger, client);
+   }
 
    /**
     *! Gets Posts filtered by Optional Parameters.
@@ -15,8 +30,8 @@ export default class PostController {
     * * Filter - specific Tags or Characteristics
     * * Match - Regex or text.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts', {
     *!   method: 'POST',
@@ -26,24 +41,27 @@ export default class PostController {
     *!   }
     *! })
     */
-   getPosts(request: Request, response: Response): void {
+   public getPosts(req: Request, res: Response): void {
       try {
-         const {ids} = request.body;
-         POST_CLIENT.getPosts(
+         const {ids} = req.body;
+         this.client.getPosts(
             ids,
-            request.query?.limit ? +request.query!.limit : undefined,
-            request.query?.page ? +request.query!.page : undefined,
-            request.query?.filter as string,
-            request.query?.match as string
-         ).then((posts) =>
-            response.status(StatusCode.OK)
-               .json(posts)
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+            req.query?.limit ? +req.query!.limit : undefined,
+            req.query?.page ? +req.query!.page : undefined,
+            req.query?.filter as string,
+            req.query?.match as string,
+         )
+            .then((posts) =>
+               res.status(StatusCode.OK)
+                  .json(posts)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get posts'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'getPosts'});
       }
    }
 
@@ -57,8 +75,8 @@ export default class PostController {
     * * IsPromoted - Flag signalling if post is promoted
     * * Tags - used for filltering.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/create', {
     *!   method: 'POST',
@@ -71,24 +89,30 @@ export default class PostController {
     *!     tags: ['tag1', 'tag2']
     *! }),
     */
-   createPost(request: iRequestWithUser, response: Response): void {
+   public createPost(
+      req: Request<NonNullable<unknown>, NonNullable<unknown> /** ,Z_CreatePostSchema.*/>,
+      res: Response,
+   ): void {
       try {
-         POST_CLIENT.createPost(
-            request.body.title,
-            request.body.description,
-            request.body.authorId,
-            request.body.pictures,
-            request.body.isPromoted,
-            request.body.tags
-         ).then((post) =>
-            response.status(StatusCode.OK)
-               .json(post)
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+         this.client.createPost(
+            req.body.title,
+            req.body.description,
+            req.body.authorId,
+            req.body.pictures,
+            req.body.isPromoted,
+            req.body.tags,
+         )
+            .then((post) =>
+               res.status(StatusCode.OK)
+                  .json(post)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to create post'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'createPost'});
       }
    }
 
@@ -97,8 +121,8 @@ export default class PostController {
     *
     * * Id - the Id of a Post.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/upvote/:id', {
     *!   method: 'POST',
@@ -107,22 +131,22 @@ export default class PostController {
     *!   }
     *! })
     */
-   getPostById(request: Request, response: Response): void {
+   public getPostById(req: Request, res: Response): void {
       try {
-         POST_CLIENT.getPostById(
-            request.params.id
-         ).then((post) => post
-            ? response.status(StatusCode.OK)
-               .json(post)
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Post not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+         this.client.getPostById(
+            req.params.id,
+         )
+            .then((post) =>
+               res.status(StatusCode.OK)
+                  .json(post)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get post'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'getPostById'});
       }
    }
 
@@ -136,10 +160,10 @@ export default class PostController {
     * * pictures - List of pictures belonging to the Post
     * * isPromoted - Flag signalling if post is promoted
     * * tags - tags used for filtering
-    * * userId - the id of the user sending the request used for authentication.
+    * * userId - the id of the user sending the req used for authentication.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/upvote/comment/:commentId', {
     *!   method: 'POST',
@@ -147,33 +171,33 @@ export default class PostController {
     *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
     *!   }
     *! })
-    *!   .then(response => response.json())
+    *!   .then(res => res.json())
     *!   .then(data => console.log(data))
     *!   .catch(error => console.error(error));
     */
-   updatePost(request: iRequestWithUser, response: Response): void {
+   public updatePost(req: iRequestWithUser, res: Response): void {
       try {
-         POST_CLIENT.updatePost(
-            request.params.id,
-            request.body.title,
-            request.body.description,
-            request.body.authorId,
-            request.body.pictures,
-            request.body.isPromoted,
-            request.body.tags,
-            request.userData._id
-         ).then((updatedPost) => updatedPost
-            ? response.status(StatusCode.OK)
-               .json(updatedPost)
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Post not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+         this.client.updatePost(
+            req.params.id,
+            req.body.title,
+            req.body.description,
+            req.body.authorId,
+            req.body.pictures,
+            req.body.isPromoted,
+            req.body.tags,
+            req.userData._id,
+         )
+            .then((post) =>
+               res.status(StatusCode.OK)
+                  .json(post)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to update post'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'updatePost'});
       }
    }
 
@@ -183,8 +207,8 @@ export default class PostController {
     * * PostId - the id of the post that is being deleted
     * * UserId - the id of the user used for authentication.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/delete/:postId', {
     *!   method: 'DELETE',
@@ -193,179 +217,21 @@ export default class PostController {
     *!   }
     *! })
     */
-   deletePost(request: iRequestWithUser, response: Response): void {
+   public deletePost(req: iRequestWithUser, res: Response): void {
       try {
-         POST_CLIENT.deletePost(request.params.id, request.userData._id)
-            .then((post) => post
-               ? response.status(StatusCode.OK)
-                  .json({message: 'Post deleted successfully'})
-                  .end()
-               : response.status(StatusCode.NOT_FOUND)
-                  .json({message: 'Post not found'})
-                  .end()
-            );
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+         this.client.deletePost(req.params.id, req.userData._id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to delete post'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'deletePost'});
       }
    }
-
-   /**
-    *! Used for getting the Post's comments.
-    *
-    * * PostId - the id of the post
-    * * Page - Number for the Post's offset
-    * * Limit -Number for limiting the Post's count.
-    *
-    * @param request
-    * @param response
-    * @example
-    *! fetch('/posts/comments/:postId?page=1&limit=10', {
-    *!   method: 'GET',
-    *!   headers: {
-    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-    *!   }
-    *! })
-    */
-   getPostComments(request: Request, response: Response): void {
-      try {
-         POST_CLIENT.getPostComments(
-            request.params.postId,
-            request.query?.page ? +request.query!.page : undefined,
-            request.query?.limit ? +request.query!.limit : undefined
-         ).then((comments) =>
-            response.status(StatusCode.OK)
-               .json(comments)
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'Failed to get post comments'})
-            .end();
-         console.log(error);
-      }
-   }
-
-   /**
-    *! Used for Creating Comment on a Post.
-    *
-    * * UserId - the id of the user used for authentication and is being attached as Comment's author
-    * * PostId - the id of the post that is being commented
-    * * Content - Text serving as Comment's content.
-    *
-    * @param request
-    * @param response
-    * @example
-    *! fetch('/posts/comment/:postId', {
-    *!   method: 'POST',
-    *!   body: JSON.stringify({
-    *!     content: 'This is a comment.'
-    *!   }),
-    *!   headers: {
-    *!     'Content-Type': 'application/json',
-    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-    *!   }
-    *! })
-    */
-   createComment(request: iRequestWithUser, response: Response): void {
-      try {
-         POST_CLIENT.createComment(
-            request.userData._id,
-            request.params.postId,
-            request.body.content
-         ).then((comment) =>
-            response.status(StatusCode.OK)
-               .json(comment)
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'Failed to create comment'})
-            .end();
-         console.log(error);
-      }
-   }
-
-   /**
-    *! Used for Updating Comment.
-    *
-    * * UserId - the id of the user used for authentication
-    * * PostId - the id of the post
-    * * Content - the new Content of the comment
-    * * CommentId - the id of the Comment.
-    *
-    * @param request
-    * @param response
-    * @example
-    *! fetch('/posts/comment/:postId/:commentId', {
-    *!   method: 'PUT',
-    *!   body: JSON.stringify({
-    *!     content: 'Updated comment content.'
-    *!   }),
-    *!   headers: {
-    *!     'Content-Type': 'application/json',
-    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-    *!   }
-    *! })
-    */
-   updateComment(request: iRequestWithUser, response: Response): void {
-      try {
-         POST_CLIENT.updateComment(
-            request.userData._id,
-            request.params.postId,
-            request.body.content,
-            request.params.commentId,
-         ).then((comment) => comment
-            ? response.status(StatusCode.OK)
-               .json(comment)
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Comment not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'Failed to update comment'})
-            .end();
-         console.log(error);
-      }
-   }
-
-   /**
-    *! Used for Deleting Comment.
-    *
-    * * CommentId - the id of the comment being deleted
-    * * UserId - the id of the user used for authentication.
-    *
-    * @param request
-    * @param response
-    * @example
-    *! fetch('/posts/comment/:commentId', {
-    *!   method: 'DELETE',
-    *!   headers: {
-    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-    *!   }
-    *! })
-    */
-   deleteComment(request: iRequestWithUser, response: Response): void {
-      try {
-         POST_CLIENT.deleteComment(
-            request.params.commentId,
-            request.userData._id
-         ).then((comment) => comment
-            ? response.status(StatusCode.OK)
-               .json({message: 'Comment deleted successfully'})
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Comment not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'Failed to delete comment'})
-            .end();
-         console.log(error);
-      }
-   }
-
 
    /**
     *! Used for Up-voting Post.
@@ -373,8 +239,8 @@ export default class PostController {
     * * Post - the id of the Post targeted
     * * UsedId - the id of the user used for authentication.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/upvote/:id', {
     *!   method: 'POST',
@@ -383,23 +249,21 @@ export default class PostController {
     *!   }
     *! })
     */
-   upvotePost(request: iRequestWithUser, response: Response): void {
+   public upvotePost(req: iRequestWithUser, res: Response): void {
       try {
-         POST_CLIENT.upvotePost(
-            request.params.id,
-            request.userData._id
-         ).then((post) => post
-            ? response.status(StatusCode.OK)
-               .json(post)
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Post not found'})
+         this.client.upvotePost(
+            req.params.id,
+            req.userData._id,
+         ).then(() =>
+            res.status(StatusCode.OK)
                .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to upvote post'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'upvotePost'});
       }
    }
 
@@ -409,8 +273,8 @@ export default class PostController {
     * * PostId - the id of the Post used for targeting
     * * UsedId - the id of the user used for authentication.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/downvote/:id', {
     *!   method: 'POST',
@@ -419,97 +283,22 @@ export default class PostController {
     *!   }
     *! })
     */
-   downvotePost(request: iRequestWithUser, response: Response): void {
+   public downvotePost(req: iRequestWithUser, res: Response): void {
       try {
-         POST_CLIENT.downvotePost(
-            request.params.id,
-            request.userData._id
-         ).then((post) => post
-            ? response.status(StatusCode.OK)
-               .json(post)
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Post not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+         this.client.downvotePost(
+            req.params.id,
+            req.userData._id,
+         )
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to downvote post'})
             .end();
-         console.log(error);
-      }
-   }
 
-   /**
-    *! Used for Up-voting Comment.
-    *
-    * * CommentId - the id of the Comment used for targeting
-    * * UsedId - the id of the user used for authentication.
-    *
-    * @param request
-    * @param response
-    * @example
-    *! fetch('/posts/upvote/comment/:commentId', {
-    *!   method: 'POST',
-    *!   headers: {
-    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-    *!   }
-    *! })
-    */
-   upvoteComment(request: iRequestWithUser, response: Response): void {
-      try {
-         POST_CLIENT.upvoteComment(
-            request.params?.commentId,
-            request.userData?._id,
-         ).then((post) => post
-            ? response.status(StatusCode.OK)
-               .json(post)
-               .end()
-            : response.status(StatusCode.NOT_FOUND)
-               .json({message: 'Post not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'Failed to upvote post'})
-            .end();
-         console.log(error);
-      }
-   }
-
-
-   /**
-    *! Used for Down-voting Comment.
-    *
-    * * CommentId - the id of the Comment used for targeting
-    * * UsedId - the id of the user used for authentication.
-    *
-    * @param request
-    * @param response
-    * @example
-    *! fetch('/posts/downvote/comment/:commentId', {
-    *!   method: 'POST',
-    *!   headers: {
-    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
-    *!   }
-    *! })
-    */
-   downvoteComment(request: iRequestWithUser, response: Response): void {
-      try {
-         POST_CLIENT.downvoteComment(
-            request.params.commentId,
-            request.userData._id
-         ).then((post) => post
-            ? response.status(StatusCode.OK)
-               .json(post)
-               .end()
-            : response
-               .status(StatusCode.NOT_FOUND)
-               .json({message: 'Post not found'})
-               .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'Failed to downvote post'})
-            .end();
-         console.log(error);
+         this.vlog.error({e, func: 'downvotePost'});
       }
    }
 
@@ -522,30 +311,32 @@ export default class PostController {
     * * Filter - specific Tags or Characteristics
     * * Match - Regex or text.
     *
-    * @param request
-    * @param response
+    * @param req
+    * @param res
     * @example
     *! fetch('/posts/user/:userId', {
     *!   method: 'GET',
     *! })
     */
-   getUserPosts(request: Request, response: Response): void {
+   public getUserPosts(req: Request, res: Response): void {
       try {
-         POST_CLIENT.getUserPosts(
-            request.params.userId,
-            request.query?.limit ? +request.query!.limit : undefined,
-            request.query?.page ? +request.query!.page : undefined,
-            request.query.filter as string,
-            request.query.match as string,
+         this.client.getUserPosts(
+            req.params.userId,
+            req.query?.limit ? +req.query!.limit : undefined,
+            req.query?.page ? +req.query!.page : undefined,
+            req.query.filter as string,
+            req.query.match as string,
          ).then((posts) =>
-            response.status(StatusCode.OK)
+            res.status(StatusCode.OK)
                .json(posts)
                .end());
-      } catch (error) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to get user posts'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'getUserPosts'});
       }
    }
 }

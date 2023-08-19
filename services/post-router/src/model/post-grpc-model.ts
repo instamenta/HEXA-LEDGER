@@ -39,7 +39,7 @@ export default class PostGrpcModel {
       } = postData);
    }
 
-   static fromPostGRPCMessage(m: PostModel): PostGrpcModel {
+   static fromResponse(m: PostModel): PostGrpcModel {
       return new PostGrpcModel({
          _id: m.hasId() ? m.getId()!.getValue() : null,
          title: m.hasTitle() ? m.getTitle()!.getValue() : null,

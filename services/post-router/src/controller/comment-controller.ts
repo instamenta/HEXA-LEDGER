@@ -1,0 +1,253 @@
+/** @file Handles request to post routes. */
+
+import {Request, Response} from 'express';
+import {iRequestWithUser} from '../utility/types/base-types';
+import StatusCode from '@instamenta/http-status-codes';
+import {VLogger, IVlog} from '@instamenta/vlogger';
+import {CommentModel} from '../protos/generated/types/posts_pb';
+import CommentClient from '../client/comment-client';
+
+export default class CommentController {
+   private readonly vlog: IVlog;
+   private client: CommentClient;
+
+   constructor(vloggger: VLogger, client: CommentClient) {
+      this.vlog = vloggger.getVlog(this.constructor.name);
+      this.client = client;
+   }
+
+   public static getInstance(vloggger: VLogger, client: CommentClient): CommentController {
+      return new CommentController(vloggger, client);
+   }
+
+   /**
+    *! Used for getting the Post's comments.
+    *
+    * * PostId - the id of the post
+    * * Page - Number for the Post's offset
+    * * Limit -Number for limiting the Post's count.
+    *
+    * @param req
+    * @param res
+    * @example
+    *! fetch('/posts/comments/:postId?page=1&limit=10', {
+    *!   method: 'GET',
+    *!   headers: {
+    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
+    *!   }
+    *! })
+    */
+   public getPostComments(req: Request, res: Response): void {
+      try {
+         this.client.getPostComments(
+            req.params.postId,
+            req.query?.page ? +req.query!.page : undefined,
+            req.query?.limit ? +req.query!.limit : undefined,
+         )
+            .then((comments) =>
+               res.status(StatusCode.OK)
+                  .json(comments)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'Failed to get post comments'})
+            .end();
+
+         this.vlog.error({e, func: 'getPostComments'});
+      }
+   }
+
+   /**
+    *! Used for Creating Comment on a Post.
+    *
+    * * UserId - the id of the user used for authentication and is being attached as Comment's author
+    * * PostId - the id of the post that is being commented
+    * * Content - Text serving as Comment's content.
+    *
+    * @param req
+    * @param res
+    * @example
+    *! fetch('/posts/comment/:postId', {
+    *!   method: 'POST',
+    *!   body: JSON.stringify({
+    *!     content: 'This is a comment.'
+    *!   }),
+    *!   headers: {
+    *!     'Content-Type': 'application/json',
+    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
+    *!   }
+    *! })
+    */
+   public createComment(req: iRequestWithUser, res: Response): void {
+      try {
+         this.client.createComment(
+            req.userData._id,
+            req.params.postId,
+            req.body.content,
+         )
+            .then((comment) =>
+               res.status(StatusCode.OK)
+                  .json(comment)
+                  .end());
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'Failed to create comment'})
+            .end();
+
+         this.vlog.error({e, func: 'createComment'});
+      }
+   }
+
+   /**
+    *! Used for Updating Comment.
+    *
+    * * UserId - the id of the user used for authentication
+    * * PostId - the id of the post
+    * * Content - the new Content of the comment
+    * * CommentId - the id of the Comment.
+    *
+    * @param req
+    * @param res
+    * @example
+    *! fetch('/posts/comment/:postId/:commentId', {
+    *!   method: 'PUT',
+    *!   body: JSON.stringify({
+    *!     content: 'Updated comment content.'
+    *!   }),
+    *!   headers: {
+    *!     'Content-Type': 'application/json',
+    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
+    *!   }
+    *! })
+    */
+   public updateComment(req: iRequestWithUser, res: Response): void {
+      try {
+         this.client.updateComment(
+            req.userData._id,
+            req.params.postId,
+            req.body.content,
+            req.params.commentId,
+         ).then((comment) => comment
+            ? res.status(StatusCode.OK)
+               .json(comment)
+            : res.status(StatusCode.NOT_FOUND)
+               .json({message: 'Comment not found'}));
+
+         res.end();
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'Failed to update comment'})
+            .end();
+
+         this.vlog.error({e, func: 'updateComment'});
+      }
+   }
+
+   /**
+    *! Used for Deleting Comment.
+    *
+    * * CommentId - the id of the comment being deleted
+    * * UserId - the id of the user used for authentication.
+    *
+    * @param req
+    * @param res
+    * @example
+    *! fetch('/posts/comment/:commentId', {
+    *!   method: 'DELETE',
+    *!   headers: {
+    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
+    *!   }
+    *! })
+    */
+   public deleteComment(req: iRequestWithUser, res: Response): void {
+      try {
+         this.client.deleteComment(
+            req.params.commentId,
+            req.userData._id,
+         )
+            .then(() => res.status(StatusCode.OK).end());
+
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'Failed to delete comment'})
+            .end();
+
+         this.vlog.error({e, func: 'deleteComment'});
+      }
+   }
+
+
+   /**
+    *! Used for Up-voting Comment.
+    *
+    * * CommentId - the id of the Comment used for targeting
+    * * UsedId - the id of the user used for authentication.
+    *
+    * @param req
+    * @param res
+    * @example
+    *! fetch('/posts/upvote/comment/:commentId', {
+    *!   method: 'POST',
+    *!   headers: {
+    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
+    *!   }
+    *! })
+    */
+   public upvoteComment(req: iRequestWithUser, res: Response): void {
+      try {
+         this.client.upvoteComment(
+            req.params?.commentId,
+            req.userData?._id,
+         )
+            .then(() => res.status(StatusCode.OK).end());
+
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'Failed to upvote post'})
+            .end();
+
+         this.vlog.error({e, func: 'upvoteComment'});
+      }
+   }
+
+
+   /**
+    *! Used for Down-voting Comment.
+    *
+    * * CommentId - the id of the Comment used for targeting
+    * * UsedId - the id of the user used for authentication.
+    *
+    * @param req
+    * @param res
+    * @example
+    *! fetch('/posts/downvote/comment/:commentId', {
+    *!   method: 'POST',
+    *!   headers: {
+    *!     'Authorization': 'Bearer YOUR_ACCESS_TOKEN'
+    *!   }
+    *! })
+    */
+   public downvoteComment(req: iRequestWithUser, res: Response): void {
+      try {
+         this.client.downvoteComment(
+            req.params.commentId,
+            req.userData._id,
+         )
+            .then(() => res.status(StatusCode.OK).end());
+
+      } catch (e: any) {
+
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'Failed to downvote post'})
+            .end();
+
+         this.vlog.error({e, func: 'downvoteComment'});
+      }
+   }
+
+}

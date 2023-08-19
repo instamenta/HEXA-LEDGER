@@ -1,10 +1,9 @@
 /** @file Handles request to post routes. */
+
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
 import StatusCode from '@instamenta/http-status-codes';
 import {VLogger, IVlog} from '@instamenta/vlogger';
-// import {ServiceClient} from '@grpc/grpc-js/build/src/make-client';
-import {PostModel} from '../protos/generated/types/posts_pb';
 import PostClient from '../client/post-client';
 
 export default class PostController {

@@ -17,6 +17,22 @@ import {Request, Response, NextFunction} from 'express';
 //       }
 //    };
 
+/**
+ * @param schema
+ * @param req
+ * @returns
+ */
+export async function zParse<T extends AnyZodObject>(
+   schema: T,
+   req: Request,
+): Promise<z.infer<T>> {
+   return await schema.parseAsync(req)
+      .catch((e) => {
+         console.log(e);
+         throw new TypeError(e);
+      });
+}
+
 export const createPostSchema = z.object({
    title: z.string({required_error: 'Title is required', invalid_type_error: 'Title must be at least 2 symbols long '}),
    description: z.string().optional(),

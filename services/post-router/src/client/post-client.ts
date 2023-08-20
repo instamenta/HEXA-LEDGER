@@ -43,8 +43,9 @@ export default class PostClient {
             .setPicturesList(pictures.map((pic) => new StringValue().setValue(pic)))
             .setIsPromoted(new BoolValue().setValue(isPromoted))
             .setTagsList(tags.map((tag) => new StringValue().setValue(tag)));
-         this.client.createPost(m, (err: GRPC.ServiceError, res: IPostModel) =>
-            err ? reject(err) : resolve(PostGrpcModel.fromResponse(res)));
+
+         this.client.createPost(m, (e: GRPC.ServiceError, r: IPostModel) =>
+            e ? reject(e) : resolve(PostGrpcModel.fromResponse(r)));
       });
    }
 
@@ -69,31 +70,36 @@ export default class PostClient {
             .setTagsList(tags.map((tag) => new StringValue().setValue(tag)))
             .setAuthId(new StringValue().setValue(authId));
 
-         this.client.updatePost(m, (err: GRPC.ServiceError, res: IPostModel) =>
-            err ? reject(err) : resolve(PostGrpcModel.fromResponse(res)));
+         this.client.updatePost(m, (e: GRPC.ServiceError, r: IPostModel) =>
+            e ? reject(e) : resolve(PostGrpcModel.fromResponse(r)));
       });
    }
 
-   public deletePost(id: string, authId: string): Promise<Empty> {
+   public deletePost(
+      id: string,
+      authId: string,
+   ): Promise<Empty> {
       return new Promise((resolve, reject) => {
          const m = new DeleteByObjectId()
             .setId(new StringValue().setValue(id))
             .setUserId(new StringValue().setValue(authId));
 
-         this.client.deletePost(m, (err: GRPC.ServiceError, res: Empty) => {
-            err ? reject(err) : resolve(res);
+         this.client.deletePost(m, (e: GRPC.ServiceError, r: Empty) => {
+            e ? reject(e) : resolve(r);
          });
       });
    }
 
-   public getPostById(id: string): Promise<PostGrpcModel> {
+   public getPostById(
+      id: string,
+   ): Promise<PostGrpcModel> {
       return new Promise((resolve, reject) => {
          console.log(id);
          const m = new GetByObjectId()
             .setId(new StringValue().setValue(id));
 
-         this.client.getPostById(m, (err: GRPC.ServiceError, res: IPostModel) =>
-            err ? reject(err) : resolve(PostGrpcModel.fromResponse(res)));
+         this.client.getPostById(m, (e: GRPC.ServiceError, r: IPostModel) =>
+            e ? reject(e) : resolve(PostGrpcModel.fromResponse(r)));
       });
    }
 
@@ -112,12 +118,12 @@ export default class PostClient {
             .setFilter(new StringValue().setValue(filter))
             .setMatch(new StringValue().setValue(match));
 
-         const $ = this.client.getPosts(m),
-            posts: PostGrpcModel[] = [];
+         const $ = this.client.getPosts(m);
+         const arr: PostGrpcModel[] = [];
 
-         $.on('data', (res: IPostModel) => posts.push(PostGrpcModel.fromResponse(res)));
-         $.on('error', (err: GRPC.ServiceError) => reject(err.message));
-         $.on('end', () => resolve(posts));
+         $.on('data', (r: IPostModel) => arr.push(PostGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
+         $.on('end', () => resolve(arr));
       });
    }
 
@@ -136,11 +142,11 @@ export default class PostClient {
             .setFilter(new StringValue().setValue(filter))
             .setMatch(new StringValue().setValue(match));
 
-         const $ = this.client.getUserPosts(m)
-            , arr: PostGrpcModel[] = [];
+         const $ = this.client.getUserPosts(m);
+         const arr: PostGrpcModel[] = [];
 
-         $.on('data', (res: IPostModel) => arr.push(PostGrpcModel.fromResponse(res)));
-         $.on('error', (err: GRPC.ServiceError) => reject(err.message));
+         $.on('data', (r: IPostModel) => arr.push(PostGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
          $.on('end', () => resolve(arr));
       });
    }
@@ -154,8 +160,8 @@ export default class PostClient {
             .setId(new StringValue().setValue(postId))
             .setCurrentUserId(new StringValue().setValue(userId));
 
-         this.client.upvotePost(m, (err: GRPC.ServiceError, res: Empty) =>
-            err ? reject(err) : resolve(res));
+         this.client.upvotePost(m, (e: GRPC.ServiceError, r: Empty) =>
+            e ? reject(e) : resolve(r));
       });
    }
 
@@ -168,8 +174,8 @@ export default class PostClient {
             .setId(new StringValue().setValue(postId))
             .setCurrentUserId(new StringValue().setValue(userId));
 
-         this.client.downvotePost(m, (err: GRPC.ServiceError, res: Empty) =>
-            err ? reject(err) : resolve(res));
+         this.client.downvotePost(m, (e: GRPC.ServiceError, r: Empty) =>
+            e ? reject(e) : resolve(r));
       });
    }
 

@@ -6,12 +6,13 @@ import StatusCode from '@instamenta/http-status-codes';
 import {VLogger, IVlog} from '@instamenta/vlogger';
 import PostClient from '../client/post-client';
 import {zParse} from '../validator/zod';
-import * as zod from '../validator/validation-schemas';
+import * as zod from '../validator/zod-schema';
+
 
 export default class PostController {
 
-   private readonly vlog: IVlog;
-   private client: PostClient;
+   vlog: IVlog;
+   client: PostClient;
 
    constructor(vloggger: VLogger, client: PostClient) {
       this.vlog = vloggger.getVlog(this.constructor.name);
@@ -110,13 +111,13 @@ export default class PostController {
             res.status(StatusCode.OK)
                .json(post)
                .end());
-      } catch (e: any) {
+      } catch {
 
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
             .json({message: 'Failed to create post'})
             .end();
 
-         this.vlog.error({e, func: 'createPost'});
+         // This.vlog.error({e, func: 'createPost'});
       }
    }
 

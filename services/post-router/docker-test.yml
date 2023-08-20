@@ -1,6 +1,5 @@
 version: '3.8'
 services:
-
   api:
     build:
       context: .
@@ -15,6 +14,13 @@ services:
       - ./:/var/data
     networks:
       - redpanda-network
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    depends_on:
+      - api
 
 networks:
   redpanda-network:

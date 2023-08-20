@@ -7,3 +7,4 @@ docker-compose.yml
 .gitignore
 tsconfig.json
 .env.dist
+jest.config.js

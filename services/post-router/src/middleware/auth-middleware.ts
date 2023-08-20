@@ -1,4 +1,5 @@
 /** @file Middleware for validating auth request. */
+
 import {decodeToken} from '../utility/token-tools';
 import {Request, Response, NextFunction} from 'express';
 import {iRequestWithUser} from '../utility/types/base-types';
@@ -11,7 +12,7 @@ import {iRequestWithUser} from '../utility/types/base-types';
  * @param response
  * @param next
  */
-async function isAuthenticated(request: iRequestWithUser, response: Response, next: NextFunction): Promise<void> {
+export async function isAuthenticated(request: iRequestWithUser, response: Response, next: NextFunction): Promise<void> {
    try {
       const token: string | string[] | undefined = request.headers['x-authorization-token'];
       if (!token) {
@@ -39,7 +40,7 @@ async function isAuthenticated(request: iRequestWithUser, response: Response, ne
  * @param response
  * @param next
  */
-function isGuest(request: Request, response: Response, next: NextFunction): void {
+export function isGuest(request: Request, response: Response, next: NextFunction): void {
    try {
       const token: string | string[] | undefined = request.headers['x-authorization-token'];
       if (token) throw new Error('Valid authorization token');
@@ -57,10 +58,10 @@ function isGuest(request: Request, response: Response, next: NextFunction): void
  * @param response
  * @param next
  */
-function isOwner(
+export function isOwner(
    request: iRequestWithUser,
    response: Response,
-   next: NextFunction
+   next: NextFunction,
 ): void {
    const resourceId: string = request.params?.id as string;
    const authenticatedUserId: string | undefined = request.userData._id;
@@ -79,7 +80,7 @@ function isOwner(
  * @param response
  * @param next
  */
-function notOwner(request: iRequestWithUser, response: Response, next: NextFunction): void {
+export function notOwner(request: iRequestWithUser, response: Response, next: NextFunction): void {
    const resourceId: string = request.params?.id;
    const authenticatedUserId: string | undefined = request.userData?._id;
    (authenticatedUserId === resourceId) /* Validates User !== Owner */
@@ -87,5 +88,3 @@ function notOwner(request: iRequestWithUser, response: Response, next: NextFunct
          .status(403).end()
       : next();
 }
-
-export {isGuest, isOwner, notOwner, isAuthenticated};

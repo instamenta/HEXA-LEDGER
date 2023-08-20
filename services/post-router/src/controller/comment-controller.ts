@@ -6,7 +6,7 @@ import StatusCode from '@instamenta/http-status-codes';
 import {VLogger, IVlog} from '@instamenta/vlogger';
 import CommentClient from '../client/comment-client';
 import {zParse} from '../validator/zod';
-import * as zod from '../validator/validation-schemas';
+import * as zod from '../validator/zod-schema';
 
 export default class CommentController {
    private readonly vlog: IVlog;
@@ -15,6 +15,10 @@ export default class CommentController {
    constructor(vloggger: VLogger, client: CommentClient) {
       this.vlog = vloggger.getVlog(this.constructor.name);
       this.client = client;
+   }
+
+   public static getInstance(vloggger: VLogger, client: CommentClient): CommentController {
+      return new CommentController(vloggger, client);
    }
 
    /**
@@ -259,7 +263,5 @@ export default class CommentController {
       }
    }
 
-   public static getInstance(vloggger: VLogger, client: CommentClient): CommentController {
-      return new CommentController(vloggger, client);
-   }
+
 }

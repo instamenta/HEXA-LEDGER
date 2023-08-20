@@ -2,7 +2,6 @@
 
 import {Router} from 'express';
 import {isAuthenticated as isAuth, notOwner, isOwner} from '../middleware/auth-middleware';
-
 import CommentController from '../controller/comment-controller';
 
 export default class CommentRouter {
@@ -13,12 +12,12 @@ export default class CommentRouter {
    constructor(commentController: CommentController) {
       this.commentController = commentController;
 
-      this.router.get('/:postId/comments', <any>this.commentController.getPostComments);
-      this.router.post('/:postId/comments', <any>isAuth, <any>this.commentController.createComment);
-      this.router.put('/:commentId/upvote', <any>isAuth, <any>this.commentController.upvoteComment);
-      this.router.put('/:commentId/downvote', <any>isAuth, <any>this.commentController.downvoteComment);
-      this.router.put('/:commentId/:postId', <any>isAuth, <any>this.commentController.updateComment);
-      this.router.delete('/:commentId/:postId', <any>isAuth, <any>this.commentController.deleteComment);
+      this.router.get('/:postId/comments', this.commentController.getPostComments.bind(commentController));
+      this.router.post('/:postId/comments', <any>isAuth, <any>this.commentController.createComment.bind(commentController));
+      this.router.put('/:commentId/upvote', <any>isAuth, <any>this.commentController.upvoteComment.bind(commentController));
+      this.router.put('/:commentId/downvote', <any>isAuth, <any>this.commentController.downvoteComment.bind(commentController));
+      this.router.put('/:commentId/:postId', <any>isAuth, <any>this.commentController.updateComment.bind(commentController));
+      this.router.delete('/:commentId/:postId', <any>isAuth, <any>this.commentController.deleteComment.bind(commentController));
    }
 
    public static getInstance(commentController: CommentController): CommentRouter {

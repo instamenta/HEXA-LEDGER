@@ -21,6 +21,10 @@ export default class CommentClient {
       this.client = client;
    }
 
+   public static getInstance(client: ServiceClient): CommentClient {
+      return new CommentClient(client);
+   }
+
    public createComment(
       authorId: string,
       postId: string,
@@ -32,8 +36,8 @@ export default class CommentClient {
             .setContent(new StringValue().setValue(content))
             .setPostId(new StringValue().setValue(postId));
 
-         this.client.createComment(m, (err: GRPC.ServiceError, res: IComment) =>
-            err ? reject(err) : resolve(CommentGrpcModel.fromResponse(res)));
+         this.client.createComment(m, (e: GRPC.ServiceError, r: IComment) =>
+            e ? reject(e) : resolve(CommentGrpcModel.fromResponse(r)));
       });
    }
 
@@ -50,8 +54,8 @@ export default class CommentClient {
             .setPostId(new StringValue().setValue(postId))
             .setId(new StringValue().setValue(commentId));
 
-         this.client.updateComment(m, (err: GRPC.ServiceError, res: IComment) =>
-            err ? reject(err) : resolve(CommentGrpcModel.fromResponse(res)));
+         this.client.updateComment(m, (e: GRPC.ServiceError, r: IComment) =>
+            e ? reject(e) : resolve(CommentGrpcModel.fromResponse(r)));
       });
    }
 
@@ -61,8 +65,8 @@ export default class CommentClient {
             .setId(new StringValue().setValue(id))
             .setUserId(new StringValue().setValue(authId));
 
-         this.client.deleteComment(m, (err: GRPC.ServiceError, res: Empty) =>
-            err ? reject(err) : resolve(res));
+         this.client.deleteComment(m, (e: GRPC.ServiceError, r: Empty) =>
+            e ? reject(e) : resolve(r));
       });
    }
 
@@ -80,8 +84,8 @@ export default class CommentClient {
          const $ = this.client.getPostComments(m)
             , arr: CommentGrpcModel[] = [];
 
-         $.on('data', (res: IComment) => arr.push(CommentGrpcModel.fromResponse(res)));
-         $.on('error', (err: GRPC.ServiceError) => reject(err));
+         $.on('data', (r: IComment) => arr.push(CommentGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
          $.on('end', () => resolve(arr));
       });
    }
@@ -95,8 +99,8 @@ export default class CommentClient {
             .setId(new StringValue().setValue(commentId))
             .setCurrentUserId(new StringValue().setValue(userId));
 
-         this.client.upvoteComment(m, (err: GRPC.ServiceError, res: Empty) => {
-            err ? reject(err) : resolve(res);
+         this.client.upvoteComment(m, (e: GRPC.ServiceError, r: Empty) => {
+            e ? reject(e) : resolve(r);
          });
       });
    }
@@ -110,12 +114,9 @@ export default class CommentClient {
             .setId(new StringValue().setValue(commentId))
             .setCurrentUserId(new StringValue().setValue(userId));
 
-         this.client.downvoteComment(m, (err: GRPC.ServiceError, res: Empty) =>
-            err ? reject(err) : resolve(res));
+         this.client.downvoteComment(m, (e: GRPC.ServiceError, r: Empty) =>
+            e ? reject(e) : resolve(r));
       });
    }
 
-   public static getInstance(client: ServiceClient): CommentClient {
-      return new CommentClient(client);
-   }
 }

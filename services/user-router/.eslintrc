@@ -29,7 +29,6 @@ parserOptions:
   project: ./tsconfig.json
   tsconfigRootDir: ./
 rules:
-  #  ESLINT
   indent: [ "error", 3 , { "SwitchCase": 1 } ]
   linebreak-style: [ "error", "windows" ]
   quotes: [ "error", "single" ]
@@ -54,7 +53,6 @@ rules:
   no-empty-function: 1
   no-empty-static-block: 1
   no-extend-native: 1
-
   no-extra-semi: 1
   no-label-var: 1
   no-lonely-if: 1
@@ -63,9 +61,8 @@ rules:
   no-new-wrappers: 1
   prefer-const: 1
   require-await: 1
-
   spaced-comment: [ "warn", "always" ]
-  arrow-body-style: [ "warn", "as-needed" ]
+  #  arrow-body-style: [ "warn", "as-needed" ]
   quote-props: [ "warn", "consistent-as-needed" ]
   arrow-parens: [ "warn", "always" ]
   arrow-spacing: [ "warn", { "before": true, "after": true } ]
@@ -73,7 +70,6 @@ rules:
   brace-style: [ "warn", "1tbs" ]
   comma-dangle: [ "warn",  "only-multiline" ]
   comma-spacing: [ "warn",{ "before": false, "after": true } ]
-
   node/no-unsupported-features/node-builtins: off
   node/no-unsupported-features/es-syntax: off
   unicorn/prevent-abbreviation: off
@@ -101,7 +97,6 @@ rules:
   "@typescript-eslint/no-unused-vars": off
   # NEW WAVE
   class-methods-use-this: 0
-
   #  JAVASCRIPT DOC BLOCK
   jsdoc/require-param-description: 0
   jsdoc/require-returns-description: 0
@@ -149,11 +144,13 @@ rules:
   jsdoc/require-throws: 1
   jsdoc/require-yields: 1
   jsdoc/require-yields-check: 1
+  unicorn/catch-error-name: off
   jsdoc/sort-tags: 1
   jsdoc/tag-lines: 0
   jsdoc/valid-types: 1
   security/detect-object-injection: off
   promise/catch-or-return: off
+  node/no-unpublished-import: off
 plugins:
   - "@typescript-eslint"
   - import

@@ -1,147 +1,174 @@
 /** @file The controller that handles routes request for user. */
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../middleware/auth-middleware';
-import * as USER_CLIENT from '../client/user-client';
 
 import StatusCode from '@instamenta/http-status-codes';
+import {IVlog, VLogger} from '@instamenta/vlogger';
+import UserClient from '../client/user-client';
+import * as zod from '../validator/zod-schema';
+import {zParse} from '../validator/zod';
+import {idAndAuthSchema, idPageLimitSchema, limitPageFilterSchema, limitPageSchema} from '../validator/zod-schema';
 
-/** @class UserController */
 export default class UserController {
+
+   private readonly vlog: IVlog;
+   private client: UserClient;
+
+   constructor(vloggger: VLogger, client: UserClient) {
+      this.vlog = vloggger.getVlog(this.constructor.name);
+      this.client = client;
+   }
+
+   public static getInstance(vloggger: VLogger, client: UserClient): UserController {
+      return new UserController(vloggger, client);
+   }
 
    /**
     *! Get a list of users.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     * ! fetch('/users?page=1&limit=10')
     */
-   getUsers(request: Request, response: Response): void {
+   public async getUsers(req: Request, res: Response): Promise<void> {
       try {
-         USER_CLIENT.getUsers(
-            request.query?.page ? +request.query!.page : undefined,
-            request.query?.limit ? +request.query!.limit : undefined,
-            request.query?.filter as string,
-         ).then((userList) =>
-            response.status(StatusCode.OK)
-               .json(userList)
-               .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+         const {
+            query: {limit, page, filter},
+         } = await zParse(zod.limitPageFilterSchema, req);
+
+         this.client.getUsers(page, limit, filter)
+            .then((users) =>
+               res.status(StatusCode.OK)
+                  .json(users)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to get users'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'getUsers'});
       }
    }
-
 
    /**
     *! Get a list of all users.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     * ! fetch('/users/all?page=1&limit=10')
     */
-   getAllUsers(request: Request, response: Response): void {
+   async getAllUsers(req: Request, res: Response): Promise<void> {
       try {
-         USER_CLIENT.getAllUsers(
-            request.query?.page ? +request.query!.page : undefined,
-            request.query?.limit ? +request.query!.limit : undefined,
-         ).then((userList) =>
-            response.status(StatusCode.OK)
+         const {
+            query: {limit, page},
+         } = await zParse(zod.limitPageSchema, req);
+
+         this.client.getAllUsers(page, limit).then((userList) =>
+            res.status(StatusCode.OK)
                .json(userList)
                .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to get all users'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'getAllUsers'});
       }
    }
 
    /**
     *! Get a user by their ID.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     * ! fetch('/users/:id')
     */
-   getUserById(request: Request, response: Response): void {
+   async getUserById(req: Request, res: Response): Promise<void> {
       try {
-         USER_CLIENT.getUserById(
-            request.params?.id
-         ).then((user) =>
-            response.status(StatusCode.OK)
-               .json(user)
-               .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+         const {
+            params: {id},
+         } = await zParse(zod.idSchema, req);
+
+         this.client.getUserById(id)
+            .then((user) =>
+               res.status(StatusCode.OK)
+                  .json(user)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to get user user'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'getUserById'});
       }
    }
-
 
    /**
     *! Get followers of a user.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     * ! fetch('/users/:id/followers?page=1&limit=10')
     */
-   getUserFollowers(request: Request, response: Response): void {
+   async getUserFollowers(req: Request, res: Response): Promise<void> {
       try {
-         USER_CLIENT.getUserFollowers(
-            request.params?.id,
-            request.query?.page ? +request.query!.page : undefined,
-            request.query?.limit ? +request.query!.limit : undefined,
-         ).then((followers) =>
-            response.status(StatusCode.OK)
-               .json(followers)
-               .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+         const {
+            params: {id},
+            query: {page, limit},
+         } = await zParse(zod.idPageLimitSchema, req);
+
+         this.client.getUserFollowers(id, page, limit)
+            .then((followers) =>
+               res.status(StatusCode.OK)
+                  .json(followers)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to get user followers'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'getUserFollowers'});
       }
    }
 
    /**
     *! Get users that a user is following.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     * ! fetch('/users/:id/following?page=1&limit=10')
     */
-   getUserFollowing(request: Request, response: Response): void {
+   async getUserFollowing(req: Request, res: Response): Promise<void> {
       try {
-         USER_CLIENT.getUserFollowing(
-            request.params?.id,
-            request.query?.page ? +request.query!.page : undefined,
-            request.query?.limit ? +request.query!.limit : undefined,
-         ).then((following) =>
-            response.status(StatusCode.OK)
-               .json(following)
-               .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+         const {
+            params: {id},
+            query: {page, limit},
+         } = await zParse(zod.idPageLimitSchema, req);
+
+         this.client.getUserFollowing(id, page, limit)
+            .then((following) =>
+               res.status(StatusCode.OK)
+                  .json(following)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to get user following '})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'getUserFollowing'});
       }
    }
 
    /**
     *! Follow a user.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     *!  fetch('/users/follow/:id', {
     *!   method: 'POST',
@@ -150,26 +177,30 @@ export default class UserController {
     *!   }
     *! })
     */
-   followUser(request: iRequestWithUser, response: Response): void {
+   async followUser(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         USER_CLIENT.followUser(
-            request.userData._id,
-            request.params?.id,
-         ).then(() =>
-            response.status(StatusCode.OK)
-               .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+         const {
+            userData: {_id},
+            params: {id},
+         } = await zParse(zod.idAndAuthSchema, req);
+
+         this.client.followUser(_id, id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to follow user'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'followUser'});
       }
    }
 
    /**
     *! Unfollow a user.
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     *! fetch('/users/unfollow/:id', {
     *!  method: 'POST',
@@ -178,19 +209,23 @@ export default class UserController {
     *!  }
     *!})
     */
-   unfollowUser(request: iRequestWithUser, response: Response): void {
+   async unfollowUser(req: iRequestWithUser, res: Response): Promise<void> {
       try {
-         USER_CLIENT.unfollowUser(
-            request.userData._id,
-            request.params?.id
-         ).then(() =>
-            response.status(StatusCode.OK)
-               .end());
-      } catch (error: Error | any) {
-         response.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: error.message})
+         const {
+            userData: {_id},
+            params: {id},
+         } = await zParse(zod.idAndAuthSchema, req);
+
+         this.client.unfollowUser(_id, id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to unfollow user'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'unfollowUser'});
       }
    }
 }
@@ -198,16 +233,16 @@ export default class UserController {
 
 // /**
 //  *
-//  * @param request
-//  * @param response
+//  * @param req
+//  * @param res
 //  */
-// Async function getUserComments(request: Request, response: Response): void {
+// Async function getUserComments(req: Request, res: Response): void {
 // 	Try {
-// 		Const { id } = request.params;
-// 		Const comments = await USER_CLIENT.getUserComments(id);
+// 		Const { id } = req.params;
+// 		Const comments = await this.client.getUserComments(id);
 // 		Response.json(comments).status(StatusCode.OK).end();
-// 	} catch (error: Error | any) {
-// 		Console.error(error);
-// 		Response.json({ message: error.message }).status(StatusCode.INTERNAL_SERVER_ERROR).end();
+// 	} catch (e: Error | any) {
+// 		Console.e(e);
+// 		Response.json({ message: e.message }).status(StatusCode.INTERNAL_SERVER_ERROR).end();
 // 	}
 // }

@@ -1,12 +1,25 @@
-/** @file Initializes exports and connects to grpc client. */
-import * as GRPC from '@grpc/grpc-js';
+/** @file Connect and export the grpc client. */
+
+import {credentials} from '@grpc/grpc-js';
 import {UserServiceClient} from '../protos/generated/users_grpc_pb';
+import DotConfigurator from 'dot_configurator';
 
-const USER_REMOTE_REF = process.env['USER_REMOTE_REF'] || 'user-remote-api'
-   , USER_REMOTE_PORT = process.env['USER_REMOTE_PORT'] || 50_051
-   , GRPC_CLIENT = new UserServiceClient(
-      `${USER_REMOTE_REF}:${USER_REMOTE_PORT}`,
-      GRPC.credentials.createInsecure()
-   );
+export default class GrpcClient {
 
-export default GRPC_CLIENT;
+   private dot: DotConfigurator;
+
+   constructor(dot: DotConfigurator) {
+      this.dot = dot;
+   }
+
+   public static getInstance(dot: DotConfigurator): GrpcClient {
+      return new GrpcClient(dot);
+   }
+
+   public connectClient() {
+      return new UserServiceClient(
+         `${this.dot.GET('USER_REMOTE_REF', 'user-remote-api')}:${this.dot.GET('USER_REMOTE_PORT', 50_051)}`,
+         credentials.createInsecure(),
+      );
+   }
+}

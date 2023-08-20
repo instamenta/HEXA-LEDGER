@@ -4,6 +4,7 @@ import GRPC_CLIENT from './grpc-client';
 import {UserModel as IUserModel} from '../protos/generated/types/users_pb';
 import {StringValue, Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import UserGrpcModel from '../model/user-grpc-model';
+import {ServiceClient} from '@grpc/grpc-js/build/src/make-client';
 
 const {
    GetUsersRequest,
@@ -12,169 +13,164 @@ const {
    GetUserFollowersRequest,
    GetUserFollowingRequest,
    FollowUserRequest,
-   UnfollowUserRequest
+   UnfollowUserRequest,
 } = require('../protos/generated/users_pb');
 
 
-/**
- * @param page
- * @param limit
- * @param filter
- * @returns
- */
-export function getUsers(page = 1, limit = 5, filter?: string): Promise<UserGrpcModel[]> {
-   return new Promise((resolve, reject) => {
-      const m = new GetUsersRequest();
-      m.setLimit(new Int32Value().setValue(limit));
-      m.setPage(new Int32Value().setValue(page));
-      if (filter) m.setFilter(new StringValue().setValue(filter));
-      const users: UserGrpcModel[] = [];
-      const $stream = GRPC_CLIENT.getUsers(m);
+export default class UserClient {
 
-      $stream.on('data', (response: IUserModel) => {
-         users.push(UserGrpcModel.fromUserGRPCMessage(response));
+   private client: ServiceClient;
+
+   constructor(client: ServiceClient) {
+      this.client = client;
+   }
+
+   public static getInstance(client: ServiceClient): UserClient {
+      return new UserClient(client);
+   }
+
+   /**
+    * @param page
+    * @param limit
+    * @param filter
+    * @returns
+    */
+   public getUsers(
+      page = 1,
+      limit = 5,
+      filter?: string,
+   ): Promise<UserGrpcModel[]> {
+      return new Promise((resolve, reject) => {
+         const m = new GetUsersRequest()
+            .setLimit(new Int32Value().setValue(limit))
+            .setPage(new Int32Value().setValue(page));
+
+         if (filter) m.setFilter(new StringValue().setValue(filter));
+
+         const arr: UserGrpcModel[] = [];
+         const $ = this.client.getUsers(m);
+
+         $.on('data', (r: IUserModel) => arr.push(UserGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
+         $.on('end', () => resolve(arr));
       });
-      $stream.on('error', (err: GRPC.ServiceError) => {
-         reject(err.message);
+   }
+
+   /**
+    * @param page
+    * @param limit
+    * @returns
+    */
+   public getAllUsers(page = 1, limit = 5): Promise<UserGrpcModel[]> {
+      return new Promise((resolve, reject) => {
+         const m = new GetAllUsersRequest()
+            .setLimit(new Int32Value().setValue(limit))
+            .setPage(new Int32Value().setValue(page));
+
+         const arr: UserGrpcModel[] = [];
+         const $ = this.client.getAllUsers(m);
+
+         $.on('data', (r: IUserModel) => arr.push(UserGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
+         $.on('end', () => resolve(arr));
       });
-      $stream.on('end', () => {
-         resolve(users);
+   }
+
+
+   /**
+    * @param id
+    * @returns
+    */
+   public getUserById(id: string): Promise<UserGrpcModel> {
+      return new Promise((resolve, reject) => {
+         const m = new GetUserByIdRequest()
+            .setId(new StringValue().setValue(id));
+
+         this.client.getUserById(m, (e: GRPC.ServiceError, r: IUserModel) =>
+            e ? reject(e) : resolve(UserGrpcModel.fromResponse(r)));
       });
-   });
+   }
+
+   /**
+    * @param id
+    * @param page
+    * @param limit
+    * @returns
+    */
+   public getUserFollowers(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
+      return new Promise((resolve, reject) => {
+         const m = new GetUserFollowersRequest()
+            .setId(new StringValue().setValue(id))
+            .setPage(new Int32Value().setValue(page))
+            .setLimit(new Int32Value().setValue(limit));
+
+         const arr: UserGrpcModel[] = [];
+         const $ = this.client.getUserFollowers(m);
+
+         $.on('data', (r: IUserModel) => arr.push(UserGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
+         $.on('end', () => resolve(arr));
+      });
+   }
+
+   /**
+    * @param id
+    * @param page
+    * @param limit
+    * @returns
+    */
+   public getUserFollowing(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
+      return new Promise((resolve, reject) => {
+         const m = new GetUserFollowingRequest();
+         m.setId(new StringValue().setValue(id));
+         m.setPage(new Int32Value().setValue(page));
+         m.setLimit(new Int32Value().setValue(limit));
+
+         const arr: UserGrpcModel[] = [];
+         const $ = this.client.getUserFollowing(m);
+
+         $.on('data', (r: IUserModel) => arr.push(UserGrpcModel.fromResponse(r)));
+         $.on('error', (e: GRPC.ServiceError) => reject(e));
+         $.on('end', () => resolve(arr));
+      });
+   }
+
+   /**
+    * @param currentUserId
+    * @param id
+    * @returns
+    */
+   public followUser(currentUserId: string, id: string): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+         const m = new FollowUserRequest();
+         m.setId(new StringValue().setValue(id));
+         m.setCurrentUserId(new StringValue().setValue(currentUserId));
+
+         this.client.followUser(m, (e: GRPC.ServiceError) =>
+            e ? reject(e.message) : resolve(true));
+      });
+   }
+
+   /**
+    * @param currentUserId
+    * @param id
+    * @returns
+    */
+   public unfollowUser(currentUserId: string, id: string): Promise<boolean> {
+      return new Promise((resolve, reject) => {
+         const m = new UnfollowUserRequest()
+            .setId(new StringValue().setValue(id))
+            .setCurrentUserId(new StringValue().setValue(currentUserId));
+
+         this.client.unfollowUser(m, (e: GRPC.ServiceError) =>
+            e ? reject(e) : resolve(true));
+      });
+   }
+
+
 }
 
-/**
- * @param page
- * @param limit
- * @returns
- */
-export function getAllUsers(page = 1, limit = 5): Promise<UserGrpcModel[]> {
-   return new Promise((resolve, reject) => {
-      const m = new GetAllUsersRequest();
-      m.setLimit(new Int32Value().setValue(limit));
-      m.setPage(new Int32Value().setValue(page));
-
-      const users: UserGrpcModel[] = [];
-      const $stream = GRPC_CLIENT.getAllUsers(m);
-      $stream.on('data', (response: IUserModel) => {
-         users.push(UserGrpcModel.fromUserGRPCMessage(response));
-      });
-      $stream.on('error', (err: GRPC.ServiceError) => {
-         reject(err.message);
-      });
-      $stream.on('end', () => {
-         resolve(users);
-      });
-   });
-}
-
-
-/**
- * @param id
- * @returns
- */
-export function getUserById(id: string): Promise<UserGrpcModel> {
-   return new Promise((resolve, reject) => {
-      const m = new GetUserByIdRequest();
-      m.setId(new StringValue().setValue(id));
-
-      GRPC_CLIENT.getUserById(m, (err: GRPC.ServiceError, response: IUserModel) => {
-         err ? reject(err.message)
-            : resolve(UserGrpcModel.fromUserGRPCMessage(response));
-      });
-   });
-}
-
-/**
- * @param id
- * @param page
- * @param limit
- * @returns
- */
-export function getUserFollowers(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
-   return new Promise((resolve, reject) => {
-      const m = new GetUserFollowersRequest();
-      m.setId(new StringValue().setValue(id));
-      m.setPage(new Int32Value().setValue(page));
-      m.setLimit(new Int32Value().setValue(limit));
-
-      const followers: UserGrpcModel[] = [];
-      const $stream = GRPC_CLIENT.getUserFollowers(m);
-      $stream.on('data', (response: IUserModel) => {
-         followers.push(UserGrpcModel.fromUserGRPCMessage(response));
-      });
-      $stream.on('error', (err: GRPC.ServiceError) => {
-         reject(err.message);
-      });
-      $stream.on('end', () => {
-         resolve(followers);
-      });
-   });
-}
-
-/**
- * @param id
- * @param page
- * @param limit
- * @returns
- */
-export function getUserFollowing(id: string, page = 1, limit = 5): Promise<UserGrpcModel[]> {
-   return new Promise((resolve, reject) => {
-      const m = new GetUserFollowingRequest();
-      m.setId(new StringValue().setValue(id));
-      m.setPage(new Int32Value().setValue(page));
-      m.setLimit(new Int32Value().setValue(limit));
-
-      const following: UserGrpcModel[] = [];
-      const $stream = GRPC_CLIENT.getUserFollowing(m);
-      $stream.on('data', (response: IUserModel) => {
-         following.push(UserGrpcModel.fromUserGRPCMessage(response));
-      });
-      $stream.on('error', (err: GRPC.ServiceError) => {
-         reject(err.message);
-      });
-      $stream.on('end', () => {
-         resolve(following);
-      });
-   });
-}
-
-/**
- * @param currentUserId
- * @param id
- * @returns
- */
-export function followUser(currentUserId: string, id: string): Promise<boolean> {
-   return new Promise((resolve, reject) => {
-      const m = new FollowUserRequest();
-      m.setId(new StringValue().setValue(id));
-      m.setCurrentUserId(new StringValue().setValue(currentUserId));
-
-      GRPC_CLIENT.followUser(m, (err: GRPC.ServiceError) => {
-         err ? reject(err.message)
-            : resolve(true);
-      });
-   });
-}
-
-/**
- * @param currentUserId
- * @param id
- * @returns
- */
-export function unfollowUser(currentUserId: string, id: string): Promise<boolean> {
-   return new Promise((resolve, reject) => {
-      const m = new UnfollowUserRequest();
-      m.setId(new StringValue().setValue(id));
-      m.setCurrentUserId(new StringValue().setValue(currentUserId));
-
-      GRPC_CLIENT.unfollowUser(m, (err: GRPC.ServiceError) => {
-         err ? reject(err.message)
-            : resolve(true);
-      });
-   });
-}
-
+//
 // Function getUserPosts(id: string): Promise<PostClass[]> {
 //     Return new Promise((resolve, reject) => {
 //         // Create a gRPC request message
@@ -183,19 +179,19 @@ export function unfollowUser(currentUserId: string, id: string): Promise<boolean
 //
 //         Const posts: PostClass[] = [];
 //
-//         Const $stream = GRPC_CLIENT.getUserPosts(m);
+//         Const $ = this.client.getUserPosts(m);
 //
-//         // Handle the $stream events
-//         $stream.on("data", (response: PostModel) => {
-//             Const post = PostClass.fromPostGRPCMessage(response);
+//         // Handle the $ events
+//         $.on("data", (res: PostModel) => {
+//             Const post = PostClass.fromPostGRPCMessage(res);
 //             Posts.push(post);
 //         });
 //
-//         $stream.on("error", (err: GRPC.ServiceError) => {
+//         $.on("error", (err: GRPC.ServiceError) => {
 //             Reject(err.message);
 //         });
 //
-//         $stream.on("end", () => {
+//         $.on("end", () => {
 //             Resolve(posts);
 //         });
 //     });
@@ -209,19 +205,19 @@ export function unfollowUser(currentUserId: string, id: string): Promise<boolean
 //
 //         Const comments: CommentClass[] = [];
 //
-//         Const $stream = GRPC_CLIENT.getUserComments(m);
+//         Const $ = this.client.getUserComments(m);
 //
-//         // Handle the $stream events
-//         $stream.on("data", (response: CommentModel) => {
-//             Const comment = CommentClass.fromCommentGRPCMessage(response);
+//         // Handle the $ events
+//         $.on("data", (res: CommentModel) => {
+//             Const comment = CommentClass.fromCommentGRPCMessage(res);
 //             Comments.push(comment);
 //         });
 //
-//         $stream.on("error", (err: GRPC.ServiceError) => {
+//         $.on("error", (err: GRPC.ServiceError) => {
 //             Reject(err.message);
 //         });
 //
-//         $stream.on("end", () => {
+//         $.on("end", () => {
 //             Resolve(comments);
 //         });
 //     });

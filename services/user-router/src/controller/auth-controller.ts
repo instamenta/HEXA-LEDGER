@@ -1,18 +1,31 @@
 /** @file Controller used for handling auth related requests. */
-import * as AUTH_CLIENT from '../client/auth-client';
+
 import {Request, Response} from 'express';
 import StatusCode from '@instamenta/http-status-codes';
+import AuthClient from '../client/auth-client';
+import {IVlog, VLogger} from '@instamenta/vlogger';
+import {zParse} from '../validator/zod';
+import * as zod from '../validator/zod-schema';
 
 export default class AuthController {
 
-constructor(vlogger: ) {
-}
+   private readonly vlog: IVlog;
+   private client: AuthClient;
+
+   constructor(vloggger: VLogger, client: AuthClient) {
+      this.vlog = vloggger.getVlog(this.constructor.name);
+      this.client = client;
+   }
+
+   public static getInstance(vloggger: VLogger, client: AuthClient): AuthController {
+      return new AuthController(vloggger, client);
+   }
 
    /**
     *! Register a new user.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     *! fetch('/auth/register', {
     *!   method: 'POST',
@@ -26,29 +39,31 @@ constructor(vlogger: ) {
     *!   }
     *! })
     */
-   register(request: Request, response: Response): void {
+   async register(req: Request, res: Response): Promise<void> {
       try {
-         AUTH_CLIENT.registerUser(
-            request.body?.username,
-            request.body?.email,
-            request.body?.password
-         ).then((User) =>
-            response.status(StatusCode.OK)
-               .json(User)
-               .end());
-      } catch (error: Error | any) {
-         response.status(400)
-            .json({message: error.message})
+         const {
+            body: {username, email, password},
+         } = await zParse(zod.registerSchema, req);
+
+         this.client.registerUser(username, email, password)
+            .then((User) =>
+               res.status(StatusCode.OK)
+                  .json(User)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to register user'})
             .end();
-         console.log(error);
+
+         this.vlog.error({e, func: 'register'});
       }
    }
 
    /**
     *! Log in a user.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     *! fetch('/auth/login', {
     *!   method: 'POST',
@@ -61,28 +76,31 @@ constructor(vlogger: ) {
     *!   }
     *! })
     */
-   login(request: Request, response: Response): void {
+   async login(req: Request, res: Response): Promise<void> {
       try {
-         AUTH_CLIENT.loginUser(
-            request.body?.email,
-            request.body?.password
-         ).then((User) =>
-            response.status(StatusCode.OK)
-               .json(User)
-               .end());
-      } catch (error: Error | any) {
-         response.status(400)
-            .json({message: error.message})
+         const {
+            body: {email, password},
+         } = await zParse(zod.loginSchema, req);
+
+         this.client.loginUser(email, password)
+            .then((User) =>
+               res.status(StatusCode.OK)
+                  .json(User)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to login user'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'login'});
       }
    }
 
    /**
     *! Update a user by their ID.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     *! fetch('/auth/update', {
     *!   method: 'PUT',
@@ -97,30 +115,33 @@ constructor(vlogger: ) {
     *!   }
     *! })
     */
-   updateUserById(request: Request, response: Response): void {
+   async updateUser(req: Request, res: Response): Promise<void> {
       try {
-         AUTH_CLIENT.updateUserById(
-            request.body?.id,
-            request.body?.username,
-            request.body?.email,
-            request.body?.password
-         ).then((User) =>
-            response.status(StatusCode.OK)
-               .json(User)
-               .end());
-      } catch (error: Error | any) {
-         response.status(400)
-            .json({message: error.message})
+         const {
+            params: {id},
+            body: {username, email, password},
+         } = await zParse(zod.updateUserSchema, req);
+
+
+         this.client.updateUserById(id, username, email, password)
+            .then((User) =>
+               res.status(StatusCode.OK)
+                  .json(User)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to update user'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'updateUser'});
       }
    }
 
    /**
     *! Delete a user by their ID.
     *
-    * @param request - The request object.
-    * @param response - The response object.
+    * @param req - The req object.
+    * @param res - The res object.
     * @example
     *! fetch('/auth/delete', {
     *!   method: 'DELETE',
@@ -132,18 +153,22 @@ constructor(vlogger: ) {
     *!   }
     *! })
     */
-   deleteUserById(request: Request, response: Response): void {
+   async deleteUser(req: Request, res: Response): Promise<void> {
       try {
-         AUTH_CLIENT.deleteUserById(
-            request.body?.id
-         ).then(() =>
-            response.status(StatusCode.OK)
-               .end());
-      } catch (error: Error | any) {
-         response.status(400)
-            .json({message: error.message})
+         const {
+            params: {id},
+         } = await zParse(zod.idSchema, req);
+
+         this.client.deleteUserById(id)
+            .then(() =>
+               res.status(StatusCode.OK)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to delete user'})
             .end();
-         console.error(error);
+
+         this.vlog.error({e, func: 'deleteUserById'});
       }
    }
 }

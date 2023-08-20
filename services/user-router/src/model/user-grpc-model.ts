@@ -28,7 +28,7 @@ export default class UserGrpcModel {
       } = userData);
    }
 
-   static fromUserGRPCMessage(m: UserModel): UserGrpcModel {
+   static fromResponse(m: UserModel): UserGrpcModel {
       return new UserGrpcModel({
          _id: m.hasId() ? m.getId()!.getValue() : null,
          username: m.hasUsername() ? m.getUsername()!.getValue() : null,

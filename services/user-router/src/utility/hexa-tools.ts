@@ -1,5 +1,4 @@
 /** @file Has all cool tools. */
-import DotConfig from 'dot_configurator';
 import {NextFunction, Request, Response} from 'express';
 import {Counter, Histogram, register} from 'prom-client';
 
@@ -39,7 +38,7 @@ export function processOnce(CASES: Array<string>): void {
  * @param req
  * @param res
  */
-export async function SCRAPE_ENDPOINT (req: Request, res: Response) {
+export async function SCRAPE_ENDPOINT(req: Request, res: Response) {
    res.set('Content-Type', register.contentType);
    res.end(await register.metrics());
 }
@@ -63,7 +62,7 @@ export function metricsMiddleware(req: Request, res: Response, next: NextFunctio
             route: req.route ? req.route.path : 'unknown',
             status: res.statusCode,
          },
-         getElapsedTimeInSeconds(process.hrtime())
+         getElapsedTimeInSeconds(process.hrtime()),
       );
    });
    next();

@@ -13,7 +13,7 @@ import AuthRouter from './routes/auth-routes';
 import UserController from './controller/user-controller';
 import {collectDefaultMetrics} from 'prom-client';
 import errorMiddleware from './middleware/error-middleware';
-import {SCRAPE_ENDPOINT, processOn, processOnce, metricsMiddleware} from './utility/hexa-tools';
+import {SCRAPE_ENDPOINT, processOn, processOnce, metricsMiddleware, metricsEndpoint} from './utility/hexa-module';
 import GrpcClient from './client/grpc-client';
 import AuthClient from './client/auth-client';
 import UserClient from './client/user-client';
@@ -43,7 +43,7 @@ export const dot = new DotConfig(process.env as Record<string, string>);
    API.use(MORGAN('combined'));
 
    API.use(metricsMiddleware);
-   API.get('/metrics', SCRAPE_ENDPOINT);
+   API.get('/metrics', metricsEndpoint);
    API.use('/auth', authRouter);
    API.use('/user', userRouter);
    API.use(errorMiddleware);

@@ -1,67 +1,42 @@
 /** @file File initializes and attaches methods to GRPC Server. */
-require('dotenv').config();
-import * as GRPC from '@grpc/grpc-js';
-import connectDatabase from './mongodb';
-// Import {connectProducer, disconnectProducer} from './producer';
-import Log from './utility/logger';
-import {
-    deleteUserById,
-    followUser, getAllUsers,
-    getUserById, getUserFollowers,
-    getUserFollowing, getUsers,
-    login, register,
-    unfollowUser, updateUserById,
-} from './service/wrapper';
 
-const {UserServiceService} = require('./protos/generated/users_grpc_pb')
-    , GRPC_PORT = process.env['GRPC_PORT'] || 50_051
-;
+import {Server, ServerCredentials} from '@grpc/grpc-js';
+import Wrapper from './service/wrapper';
+import connectDatabase from './mongodb';
+import {VLogger} from '@instamenta/vlogger';
+import DotConfig from 'dot_configurator';
+import {processOn, processOnce} from './utility/hexa-modules';
+
+const {UserServiceService} = require('./protos/generated/users_grpc_pb');
 
 (function StartService() {
-    const Server = new GRPC.Server();
-    Server.addService(UserServiceService, {
-        getUserById,
-        login, register,
-        getUsers, getAllUsers,
-        followUser, unfollowUser,
-        updateUserById, deleteUserById,
-        getUserFollowers, getUserFollowing,
-    });
-    Server.bindAsync(`0.0.0.0:${GRPC_PORT}`,
-        GRPC.ServerCredentials.createInsecure(),
-        async (error, port) => {
-            if (error) {
-                Log['grpc_disconnect_log'](port, error);
-                process.exit(1);
-            }
-            Server.start();
-            Log['grpc_start_log'](port);
-            await connectDatabase();
-            // Await connectProducer();
-        });
+   const dot = new DotConfig(process.env as Record<string, string>);
+   const vlogger = VLogger.getInstance(dot.GET('DEBUG_LEVEL', true));
+   const grpc_server = new Server();
+
+   const w = Wrapper.getInstance(vlogger);
+
+   grpc_server.addService(UserServiceService, {
+      getUserById: w.getUserById.bind(w),
+      login: w.login.bind(w),
+      register: w.register.bind(w),
+      getUsers: w.getUsers.bind(w),
+      getAllUsers: w.getAllUsers.bind(w),
+      followUser: w.followUser.bind(w),
+      unfollowUser: w.unfollowUser.bind(w),
+      updateUserById: w.updateUserById.bind(w),
+      deleteUserById: w.deleteUserById.bind(w),
+      getUserFollowers: w.getUserFollowers.bind(w),
+      getUserFollowing: w.getUserFollowing.bind(w),
+   });
+   grpc_server.bindAsync(`0.0.0.0:${dot.GET('GRPC_PORT', 50_051)}`, ServerCredentials.createInsecure(), (e, port): void => {
+      if (e) process.exit(1);
+      console.log('Service running on port', port);
+      grpc_server.start();
+      connectDatabase();
+   });
 })();
 
-['unhandledRejection', 'uncaughtException'].forEach((type) => {
-    process.on(type, (error: Error) => {
-        try {
-            Log['process_disconnect_log'](type, error);
-            // Await disconnectProducer();
-        } catch {
-            console.log('Exit...');
-            process.exit(1);
-        }
-    });
-});
 
-['SIGTERM', 'SIGINT', 'SIGUSR2'].forEach((type) => {
-    process.once(type, (error: Error) => {
-        try {
-            Log['process_disconnect_log'](type, error);
-            process.exit(0);
-        } finally {
-            // Await disconnectProducer();
-            // Log['kafka_disconnect_log'](error);
-            process.kill(process.pid, type);
-        }
-    });
-});
+processOn(['unhandledRejection', 'uncaughtException']);
+processOnce(['SIGTERM', 'SIGINT', 'SIGUSR2']);

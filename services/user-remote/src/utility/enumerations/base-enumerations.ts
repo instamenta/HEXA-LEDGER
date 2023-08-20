@@ -9,12 +9,3 @@ export enum UAttr {
     FOLLOWERS = 'followers',
     FOLLOWING = 'following',
 }
-
-export enum LogAttr {
-    DEFAULT = 'DEFAULT',
-    ERROR = 'ERROR',
-    DEBUG = 'DEBUG',
-    COLLECT = 'COLLECT',
-    CRITICAL = 'CRITICAL',
-    INFO = 'INFO',
-}

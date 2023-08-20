@@ -6,8 +6,8 @@ const MONGODB_URI = process.env['MONGODB_URI'] || 'NO URI';
 
 /** Connect MongoDB. */
 export default function connectDatabase(): void {
-    const options: ConnectOptions = {dbName: 'user-router', retryWrites: true};
-    Mongoose.connect(MONGODB_URI, options)
-        .then(() => Log['mongo_start_log']())
-        .catch((error: Error) => Log['mongo_disconnect_log'](MONGODB_URI, error));
+   const options: ConnectOptions = {dbName: 'user-router', retryWrites: true};
+   Mongoose.connect(MONGODB_URI, options)
+      .then(() => Log['mongo_start_log']())
+      .catch((error: Error) => Log['mongo_disconnect_log'](MONGODB_URI, error));
 }

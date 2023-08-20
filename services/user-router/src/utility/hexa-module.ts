@@ -1,17 +1,29 @@
 /** @file Has all cool tools. */
 import {NextFunction, Request, Response} from 'express';
 import {Counter, Histogram, register} from 'prom-client';
+import {dot} from '../index';
 
-const httpRequestCount = getPrometheusCounter();
-const responseTimeHistogram = getPrometheusHistogram();
+const httpRequestCount = new Counter({
+   name: 'http_requests_total',
+   help: 'Total number of HTTP requests',
+   labelNames: ['method', 'route', 'status'],
+});
 
-/** @param CASES */
+const responseTimeHistogram = new Histogram({
+   name: 'http_response_time_seconds',
+   help: 'Histogram of response times',
+   labelNames: ['method', 'route', 'status'],
+   buckets: [0.1, 0.5, 1, 2, 5],
+});
+
+/**
+ * @param CASES
+ */
 export function processOn(CASES: Array<string>): void {
    CASES.forEach((TYPE: string) => {
-      process.on(TYPE, (error: Error) => {
+      process.on(TYPE, (e: Error) => {
          try {
-            console.error(`${Dot.GET('SERVICE_NAME', 'User-Router-Service')} - process.on ${TYPE}`);
-            console.error(error);
+            console.error({e, msg: `${dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`});
          } catch {
             process.exit(1);
          }
@@ -19,12 +31,14 @@ export function processOn(CASES: Array<string>): void {
    });
 }
 
-/** @param CASES */
+/**
+ * @param CASES
+ */
 export function processOnce(CASES: Array<string>): void {
    CASES.forEach((TYPE: string) => {
-      process.once(TYPE, (error: Error) => {
+      process.once(TYPE, (e: Error) => {
          try {
-            console.error(`${Dot.GET('SERVICE_NAME', 'User-Router-Service')} - process.on ${TYPE}`, error);
+            console.error({e, msg: `${dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`});
             process.exit(0);
          } finally {
             process.kill(process.pid, TYPE);
@@ -34,17 +48,15 @@ export function processOnce(CASES: Array<string>): void {
 }
 
 /**
- * Handler used for Scraping Data for Prometheus.
  * @param req
  * @param res
  */
-export async function SCRAPE_ENDPOINT(req: Request, res: Response) {
+export async function metricsEndpoint(req: Request, res: Response) {
    res.set('Content-Type', register.contentType);
    res.end(await register.metrics());
 }
 
 /**
- * Middleware that handles collecting data for Prometheus and Grafana.
  * @param req
  * @param res
  * @param next
@@ -69,36 +81,10 @@ export function metricsMiddleware(req: Request, res: Response, next: NextFunctio
 }
 
 /**
- * Gets the Elapsed time used from Prometheus.
  * @param startTime
  * @returns
  */
 function getElapsedTimeInSeconds(startTime: [number, number]): number {
    const elapsedNanoseconds = process.hrtime(startTime);
    return elapsedNanoseconds[0] + elapsedNanoseconds[1] * 1e-9;
-}
-
-/**
- * Returns a Prometheus Counter with the specified label names.
- * @returns
- */
-function getPrometheusCounter(): Counter<string> {
-   return new Counter({
-      name: 'http_requests_total',
-      help: 'Total number of HTTP requests',
-      labelNames: ['method', 'route', 'status'],
-   });
-}
-
-/**
- * Returns a Prometheus Histogram with the specified label names and buckets.
- * @returns
- */
-function getPrometheusHistogram(): Histogram<string> {
-   return new Histogram({
-      name: 'http_response_time_seconds',
-      help: 'Histogram of response times',
-      labelNames: ['method', 'route', 'status'],
-      buckets: [0.1, 0.5, 1, 2, 5],
-   });
 }

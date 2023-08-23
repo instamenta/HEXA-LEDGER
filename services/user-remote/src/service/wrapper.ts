@@ -12,31 +12,24 @@ import {
    UserModel as IUserModel, UnfollowUserRequest, UpdateForm, idRequest,
 } from '../protos/generated/types/users_pb';
 
-import {
-   DELETE_USER_BY_ID,
-   LOGIN,
-   REGISTER,
-   UPDATE_USER_BY_ID,
-} from './auth-service';
-
-import {
-   FOLLOW_USER,
-   GET_ALL_USERS, GET_USERS,
-   GET_USER_BY_ID, GET_USER_FOLLOWERS,
-   GET_USER_FOLLOWING, UNFOLLOW_USER,
-} from './user-service';
 import {IVlog, VLogger} from '@instamenta/vlogger';
+import AuthService from './auth-service';
+import UserService from './user-service';
 
 export default class Wrapper {
 
    vlog: IVlog;
+   authService: AuthService;
+   userService: UserService;
 
-   constructor(logger: VLogger) {
+   constructor(logger: VLogger, authService: AuthService, userService: UserService) {
       this.vlog = logger.getVlog('Wrapper');
+      this.authService = authService;
+      this.userService = userService;
    }
 
-   public static getInstance(logger: VLogger): Wrapper {
-      return new Wrapper(logger);
+   public static getInstance(logger: VLogger, authService: AuthService, userService: UserService): Wrapper {
+      return new Wrapper(logger, authService, userService);
    }
 
    /**
@@ -53,7 +46,7 @@ export default class Wrapper {
    ): Promise<void> {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling login'});
-         await LOGIN(call, callback);
+         await this.authService.LOGIN(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'login'});
@@ -74,7 +67,7 @@ export default class Wrapper {
    ): void {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling register'});
-         REGISTER(call, callback);
+         this.authService.REGISTER(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'register'});
@@ -95,7 +88,7 @@ export default class Wrapper {
    ): void {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling deleteUserById'});
-         DELETE_USER_BY_ID(call, callback);
+         this.authService.DELETE_USER_BY_ID(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'deleteUserById'});
@@ -116,7 +109,7 @@ export default class Wrapper {
    ): void {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling updateUserById'});
-         UPDATE_USER_BY_ID(call, callback);
+         this.authService.UPDATE_USER_BY_ID(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'updateUserById'});
@@ -135,7 +128,7 @@ export default class Wrapper {
    ): void {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getUsers'});
-         GET_USERS(call);
+         this.userService.GET_USERS(call);
          call.end();
       } catch (e: IError) {
          call.emit(e);
@@ -155,7 +148,7 @@ export default class Wrapper {
    ): void {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getAllUsers'});
-         GET_ALL_USERS(call);
+         this.userService.GET_ALL_USERS(call);
          call.end();
       } catch (e: IError) {
          call.emit(e);
@@ -177,7 +170,7 @@ export default class Wrapper {
    ): Promise<void> {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getUserById'});
-         await GET_USER_BY_ID(call, callback);
+         await this.userService.GET_USER_BY_ID(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'getUserById'});
@@ -197,7 +190,7 @@ export default class Wrapper {
    ): Promise<void> {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getUserFollowers'});
-         await GET_USER_FOLLOWERS(call);
+         await this.userService.GET_USER_FOLLOWERS(call);
          call.end();
       } catch (e: IError) {
          call.emit(e);
@@ -217,7 +210,7 @@ export default class Wrapper {
    ): Promise<void> {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getUserFollowing'});
-         await GET_USER_FOLLOWING(call);
+         await this.userService.GET_USER_FOLLOWING(call);
          call.end();
       } catch (e: IError) {
          call.emit(e);
@@ -238,7 +231,7 @@ export default class Wrapper {
    ): Promise<void> {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling followUser'});
-         await FOLLOW_USER(call, callback);
+         await this.userService.FOLLOW_USER(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'followUser'});
@@ -258,7 +251,7 @@ export default class Wrapper {
    ): Promise<void> {
       try {
          this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling unfollowUser'});
-         await UNFOLLOW_USER(call, callback);
+         await this.userService.UNFOLLOW_USER(call, callback);
       } catch (e: IError) {
          callback(e);
          this.vlog.error({e, func: 'unfollowUser'});

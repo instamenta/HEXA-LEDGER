@@ -1,20 +1,25 @@
 /** @file File initializes and attaches methods to GRPC Server. */
 
 import {Server, ServerCredentials} from '@grpc/grpc-js';
-import Wrapper from './service/wrapper';
+import {processOn, processOnce} from './utility/hexa-modules';
 import connectDatabase from './mongodb';
 import {VLogger} from '@instamenta/vlogger';
 import DotConfig from 'dot_configurator';
-import {processOn, processOnce} from './utility/hexa-modules';
+import Wrapper from './service/wrapper';
+import AuthService from './service/auth-service';
+import UserService from './service/user-service';
 
 const {UserServiceService} = require('./protos/generated/users_grpc_pb');
 
+export const dot = new DotConfig(process.env as Record<string, string>);
+
 (function StartService() {
-   const dot = new DotConfig(process.env as Record<string, string>);
    const vlogger = VLogger.getInstance(dot.GET('DEBUG_LEVEL', true));
    const grpc_server = new Server();
 
-   const w = Wrapper.getInstance(vlogger);
+   const authService = AuthService.getInstance();
+   const userService = UserService.getInstance();
+   const w = Wrapper.getInstance(vlogger, authService, userService);
 
    grpc_server.addService(UserServiceService, {
       getUserById: w.getUserById.bind(w),

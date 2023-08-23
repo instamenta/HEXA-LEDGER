@@ -16,91 +16,76 @@ import {
 } from '../protos/generated/types/users_pb';
 
 
-/**
- * @param call
- * @param callback
- * @async
- * @throws
- */
-export async function LOGIN(
-   call: ServerUnaryCall<ILoginForm, IUserModel>,
-   callback: sendUnaryData<IUserModel>
-): Promise<void> {
-   const u = <IUser>await MongooseUserModel.findOne({
-      email: call.request.hasEmail() ? call.request.getEmail()!.getValue() : null
-   });
-   await Validator['VALIDATE_PASSWORD'](
-      call.request.hasPassword() ? call.request.getPassword()!.getValue() : null,
-        u as IUser
-   );
-   callback(null, GrpcTools.convertUserModel(u as IUser)
-      .setToken(new StringValue().setValue(await TokenTools['GENERATE_TOKEN'](u))));
-}
+export default class AuthService {
 
-/**
- * @param call
- * @param callback
- * @async
- * @throws
- */
-export function REGISTER(
-   call: ServerUnaryCall<IRegisterForm, IUserModel>,
-   callback: sendUnaryData<IUserModel>
-): void {
-   Validator['VALIDATE_REGISTER'](
-      call.request.hasUsername() ? call.request.getUsername()!.getValue() : null,
-      call.request.hasEmail() ? call.request.getEmail()!.getValue() : null,
-      call.request.hasPassword() ? call.request.getPassword()!.getValue() : null
-   ).then(async (u: IUser) => callback(null, GrpcTools.convertUserModel(u as IUser)
-      .setToken(new StringValue().setValue(await TokenTools['GENERATE_TOKEN'](u))))
-   );
-}
+   public static getInstance(): AuthService {
+      return new AuthService();
+   }
 
-/**
- * @param call
- * @param callback
- * @async
- * @throws
- */
-export function DELETE_USER_BY_ID(
-   call: ServerUnaryCall<idRequest, Empty>,
-   callback: sendUnaryData<Empty>
-): void {
-   MongooseUserModel.deleteOne({
-      _id: Validator['CONVERT_TO_OBJECT_ID'](call.request.hasId() ? call.request.getId()!.getValue() : null)
-   }).then((res: DeleteResult) => (res.deletedCount === 1)
-      ? callback(null, new Empty())
-      : Validator['THROWER']('ERROR WHILE DELETING USER'));
-}
+   public async LOGIN(
+      call: ServerUnaryCall<ILoginForm, IUserModel>,
+      callback: sendUnaryData<IUserModel>
+   ): Promise<void> {
+      const u = <IUser>await MongooseUserModel.findOne({
+         email: call.request.hasEmail() ? call.request.getEmail()!.getValue() : null
+      });
+      await Validator['VALIDATE_PASSWORD'](
+         call.request.hasPassword() ? call.request.getPassword()!.getValue() : null,
+         u as IUser
+      );
+      callback(null, GrpcTools.convertUserModel(u as IUser)
+         .setToken(new StringValue().setValue(await TokenTools['GENERATE_TOKEN'](u))));
+   }
 
-/**
- * @param call
- * @param callback
- * @async
- * @throws
- */
-export function UPDATE_USER_BY_ID(
-   call: ServerUnaryCall<UpdateForm, IUserModel>,
-   callback: sendUnaryData<IUserModel>
-): void {
-   const username = call.request.hasUsername() ? call.request.getUsername()!.getValue() : null
-      , email = call.request.hasEmail() ? call.request.getEmail()!.getValue() : null
-      , password = call.request.hasPassword() ? call.request.getPassword()!.getValue() : null
-    ;
-   Validator['VALIDATE_USER_DATA'](username, email, password);
-   MongooseUserModel.findOneAndUpdate(
-      {_id: Validator['CONVERT_TO_OBJECT_ID'](call.request.hasId() ? call.request.getId()!.getValue() : null)},
-      {
-         $set: {
-            username,
-            email,
-            password
-         }
-      },
-      {new: true}
-   ).then(async (updatedUser: IUser | null) =>
-      updatedUser ? callback(null, GrpcTools.convertUserModel(updatedUser)
-         .setToken(new StringValue().setValue(await TokenTools['GENERATE_TOKEN'](updatedUser))))
-         : Validator['THROWER']('ERROR WHILE UPDATING USER')
-   );
+   public REGISTER(
+      call: ServerUnaryCall<IRegisterForm, IUserModel>,
+      callback: sendUnaryData<IUserModel>
+   ): void {
+      Validator['VALIDATE_REGISTER'](
+         call.request.hasUsername() ? call.request.getUsername()!.getValue() : null,
+         call.request.hasEmail() ? call.request.getEmail()!.getValue() : null,
+         call.request.hasPassword() ? call.request.getPassword()!.getValue() : null
+      ).then(async (u: IUser) => callback(null, GrpcTools.convertUserModel(u as IUser)
+         .setToken(new StringValue().setValue(await TokenTools['GENERATE_TOKEN'](u))))
+      );
+   }
+
+   public DELETE_USER_BY_ID(
+      call: ServerUnaryCall<idRequest, Empty>,
+      callback: sendUnaryData<Empty>
+   ): void {
+      MongooseUserModel.deleteOne({
+         _id: Validator['CONVERT_TO_OBJECT_ID'](call.request.hasId() ? call.request.getId()!.getValue() : null)
+      }).then((res: DeleteResult) => (res.deletedCount === 1)
+         ? callback(null, new Empty())
+         : Validator['THROWER']('ERROR WHILE DELETING USER'));
+   }
+
+   public UPDATE_USER_BY_ID(
+      call: ServerUnaryCall<UpdateForm, IUserModel>,
+      callback: sendUnaryData<IUserModel>
+   ): void {
+      const username = call.request.hasUsername() ? call.request.getUsername()!.getValue() : null
+         , email = call.request.hasEmail() ? call.request.getEmail()!.getValue() : null
+         , password = call.request.hasPassword() ? call.request.getPassword()!.getValue() : null
+      ;
+      Validator['VALIDATE_USER_DATA'](username, email, password);
+      MongooseUserModel.findOneAndUpdate(
+         {_id: Validator['CONVERT_TO_OBJECT_ID'](call.request.hasId() ? call.request.getId()!.getValue() : null)},
+         {
+            $set: {
+               username,
+               email,
+               password
+            }
+         },
+         {new: true}
+      ).then(async (updatedUser: IUser | null) =>
+         updatedUser ? callback(null, GrpcTools.convertUserModel(updatedUser)
+               .setToken(new StringValue().setValue(await TokenTools['GENERATE_TOKEN'](updatedUser))))
+            : Validator['THROWER']('ERROR WHILE UPDATING USER')
+      );
+   }
+
+
 }

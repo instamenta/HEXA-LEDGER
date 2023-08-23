@@ -1,6 +1,6 @@
 /** @file Has all cool tools. */
 
-import {dot} from '../index';
+import {dot} from '../server';
 
 /**
  * @param CASES

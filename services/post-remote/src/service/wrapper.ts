@@ -1,6 +1,5 @@
 /** @file Wrapper used for reducing boiler template and handling errors out of the box. */
 import {sendUnaryData, ServerUnaryCall, ServerWritableStream} from '@grpc/grpc-js';
-import Log from '../utility/logger';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {
    CommentForm,
@@ -14,276 +13,207 @@ import {
    PostModel as IPostModel,
    VoteCommentRequest, VotePostRequest
 } from '../protos/generated/types/posts_pb';
+import {IVlog, VLogger} from '@instamenta/vlogger';
 
-import {
-   CREATE_COMMENT, CREATE_POST,
-   DELETE_COMMENT, DELETE_POST,
-   DOWNVOTE_COMMENT,
-   DOWNVOTE_POST, GET_POST_BY_ID,
-   GET_POSTS,
-   GET_POSTS_COMMENTS,
-   GET_USER_POSTS, UPDATE_COMMENT, UPDATE_POST,
-   UPVOTE_COMMENT, UPVOTE_POST
-} from './post-service';
+import PostService from './post-service';
+import CommentService from './comment-service';
 
-/**
- * @param call
- * @returns
- */
-export async function getPosts(
-   call: ServerWritableStream<GetPostsRequest, IPostModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING GET_POSTS...');
-      await GET_POSTS(call);
-      await Log['log']('info', '☕ FINISHED GET_POSTS');
-      call.end();
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      call.emit(error);
+export default class Wrapper {
+
+   vlog: IVlog;
+   postService: PostService;
+   commentService: CommentService;
+
+   constructor(logger: VLogger, postService: PostService, commentService: CommentService) {
+      this.vlog = logger.getVlog('Wrapper');
+      this.postService = postService;
+      this.commentService = commentService;
    }
-}
 
-/**
- * @param call
- */
-export async function getPostComments(
-   call: ServerWritableStream<GetCommentsRequest, CommentModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING GET_POSTS_COMMENTS...');
-      await GET_POSTS_COMMENTS(call);
-      await Log['log']('info', '☕ FINISHED GET_POSTS_COMMENTS');
-      call.end();
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      call.emit(error);
+   public static getInstance(logger: VLogger, postService: PostService, commentService: CommentService): Wrapper {
+      return new Wrapper(logger, postService, commentService);
    }
-}
 
-/**
- * @param call
- */
-export async function getUserPosts(
-   call: ServerWritableStream<GetUserPostsRequest, IPostModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING GET_USER_POSTS...');
-      await GET_USER_POSTS(call);
-      await Log['log']('info', '☕ FINISHED GET_USER_POSTS');
-      call.end();
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      call.emit(error);
+   public async getPosts(
+      call: ServerWritableStream<GetPostsRequest, IPostModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getPosts'});
+         await this.postService.GET_POSTS(call);
+         call.end();
+      } catch (e: Error | any) {
+         call.emit(e);
+         this.vlog.error({e, func: 'getPosts'});
+      }
    }
-}
 
-/* --------------------------------------------------------------*/
-/**
- * @param call
- * @param callback
- */
-export async function createPost(
-   call: ServerUnaryCall<PostForm, IPostModel>,
-   callback: sendUnaryData<IPostModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING CREATE_POST...');
-      await CREATE_POST(call, callback);
-      await Log['log']('info', '☕ FINISHED CREATE_POST');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async getPostComments(
+      call: ServerWritableStream<GetCommentsRequest, CommentModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getPostComments'});
+         await this.commentService.GET_POSTS_COMMENTS(call);
+         call.end();
+      } catch (e: Error | any) {
+         call.emit(e);
+         this.vlog.error({e, func: 'getPostComments'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function updatePost(
-   call: ServerUnaryCall<PostForm, IPostModel>,
-   callback: sendUnaryData<IPostModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING UPDATE_POST...');
-      await UPDATE_POST(call, callback);
-      await Log['log']('info', '☕ FINISHED UPDATE_POST');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async getUserPosts(
+      call: ServerWritableStream<GetUserPostsRequest, IPostModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getUserPosts'});
+         await this.postService.GET_USER_POSTS(call);
+         call.end();
+      } catch (e: Error | any) {
+         call.emit(e);
+         this.vlog.error({e, func: 'getUserPosts'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function deletePost(
-   call: ServerUnaryCall<DeleteByObjectId, Empty>,
-   callback: sendUnaryData<Empty>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING DELETE_POST...');
-      await DELETE_POST(call, callback);
-      await Log['log']('info', '☕ FINISHED DELETE_POST');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async createPost(
+      call: ServerUnaryCall<PostForm, IPostModel>,
+      callback: sendUnaryData<IPostModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling createPost'});
+         await this.postService.CREATE_POST(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'createPost'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function createComment(
-   call: ServerUnaryCall<CommentForm, CommentModel>,
-   callback: sendUnaryData<CommentModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING CREATE_COMMENT...');
-      await CREATE_COMMENT(call, callback);
-      await Log['log']('info', '☕ FINISHED CREATE_COMMENT');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async updatePost(
+      call: ServerUnaryCall<PostForm, IPostModel>,
+      callback: sendUnaryData<IPostModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling updatePost'});
+         await this.postService.UPDATE_POST(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'updatePost'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function updateComment(
-   call: ServerUnaryCall<CommentForm, CommentModel>,
-   callback: sendUnaryData<CommentModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING UPDATE_COMMENT...');
-      await UPDATE_COMMENT(call, callback);
-      await Log['log']('info', '☕ FINISHED UPDATE_COMMENT');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async deletePost(
+      call: ServerUnaryCall<DeleteByObjectId, Empty>,
+      callback: sendUnaryData<Empty>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling deletePost'});
+         await this.postService. DELETE_POST(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'deletePost'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function deleteComment(
-   call: ServerUnaryCall<DeleteByObjectId, Empty>,
-   callback: sendUnaryData<Empty>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING DELETE_COMMENT...');
-      await DELETE_COMMENT(call, callback);
-      await Log['log']('info', '☕ FINISHED DELETE_COMMENT');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async createComment(
+      call: ServerUnaryCall<CommentForm, CommentModel>,
+      callback: sendUnaryData<CommentModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling createComment'});
+         await this.commentService.CREATE_COMMENT(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'createComment'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function getPostById(
-   call: ServerUnaryCall<GetByObjectId, IPostModel>,
-   callback: sendUnaryData<IPostModel>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING GET_POST_BY_ID...');
-      await GET_POST_BY_ID(call, callback);
-      await Log['log']('info', '☕ FINISHED GET_POST_BY_ID');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async updateComment(
+      call: ServerUnaryCall<CommentForm, CommentModel>,
+      callback: sendUnaryData<CommentModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling updateComment'});
+         await this.commentService.UPDATE_COMMENT(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'updateComment'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function upvotePost(
-   call: ServerUnaryCall<VotePostRequest, Empty>,
-   callback: sendUnaryData<Empty>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING UPVOTE_POST...');
-      await UPVOTE_POST(call, callback);
-      await Log['log']('info', '☕ FINISHED UPVOTE_POST');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async deleteComment(
+      call: ServerUnaryCall<DeleteByObjectId, Empty>,
+      callback: sendUnaryData<Empty>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling deleteComment'});
+         await this.commentService.DELETE_COMMENT(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'deleteComment'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function downvotePost(
-   call: ServerUnaryCall<VotePostRequest, Empty>,
-   callback: sendUnaryData<Empty>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING DOWNVOTE_POST...');
-      await DOWNVOTE_POST(call, callback);
-      await Log['log']('info', '☕ FINISHED DOWNVOTE_POST');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async getPostById(
+      call: ServerUnaryCall<GetByObjectId, IPostModel>,
+      callback: sendUnaryData<IPostModel>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling getPostById'});
+         await this.postService.GET_POST_BY_ID(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'getPostById'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function upvoteComment(
-   call: ServerUnaryCall<VoteCommentRequest, Empty>,
-   callback: sendUnaryData<Empty>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING UPVOTE_COMMENT...');
-      await UPVOTE_COMMENT(call, callback);
-      await Log['log']('info', '☕ FINISHED UPVOTE_COMMENT');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async upvotePost(
+      call: ServerUnaryCall<VotePostRequest, Empty>,
+      callback: sendUnaryData<Empty>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling upvotePost'});
+         await this.postService.UPVOTE_POST(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'upvotePost'});
+      }
    }
-}
 
-
-/**
- * @param call
- * @param callback
- */
-export async function downvoteComment(
-   call: ServerUnaryCall<VoteCommentRequest, Empty>,
-   callback: sendUnaryData<Empty>
-): Promise<void> {
-   try {
-      await Log['log']('debug', '⌛ CALLING DOWNVOTE_COMMENT...');
-      await DOWNVOTE_COMMENT(call, callback);
-      await Log['log']('info', '☕ FINISHED DOWNVOTE_COMMENT');
-   } catch (error: Error | any) {
-      await Log['log']('error', error);
-      callback(error);
+   public async downvotePost(
+      call: ServerUnaryCall<VotePostRequest, Empty>,
+      callback: sendUnaryData<Empty>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling downvotePost'});
+         await this.postService.DOWNVOTE_POST(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'downvotePost'});
+      }
    }
-}
 
+   public async upvoteComment(
+      call: ServerUnaryCall<VoteCommentRequest, Empty>,
+      callback: sendUnaryData<Empty>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling upvoteComment'});
+         await this.commentService.UPVOTE_COMMENT(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'upvoteComment'});
+      }
+   }
+
+   public async downvoteComment(
+      call: ServerUnaryCall<VoteCommentRequest, Empty>,
+      callback: sendUnaryData<Empty>
+   ): Promise<void> {
+      try {
+         this.vlog.warn({data: () => call.request.toObject(), msg: 'Calling downvoteComment'});
+         await this.commentService.DOWNVOTE_COMMENT(call, callback);
+      } catch (e: Error | any) {
+         callback(e);
+         this.vlog.error({e, func: 'downvoteComment'});
+      }
+   }
+
+}

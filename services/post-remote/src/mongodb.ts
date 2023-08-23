@@ -1,6 +1,5 @@
 /** @file Connects to mongodbDatabase and makes it generally available. */
 import Mongoose, {ConnectOptions} from 'mongoose';
-import Log from './utility/logger';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'NO URI';
 
@@ -11,8 +10,8 @@ function connectDatabase(): void {
       retryWrites: true,
    };
    Mongoose.connect(MONGODB_URI, options)
-      .then(() => Log['mongo_start_log']())
-      .catch((error: Error) => Log['mongo_disconnect_log'](MONGODB_URI, error));
+      .then(() => console.log('Connected to MongoDB'))
+      .catch((e: Error) => console.log('Disconnected from MongoDB:', e));
 }
 
 export default connectDatabase;

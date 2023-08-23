@@ -17,8 +17,11 @@ import {
    VoteCommentRequest,
 } from '../protos/generated/types/posts_pb';
 
+export default class CommentService {
 
-class CommentService {
+   public static getInstance(): CommentService {
+      return new CommentService();
+   }
 
    public async GET_POSTS_COMMENTS(
       call: ServerWritableStream<GetCommentsRequest, CommentModel>
@@ -51,11 +54,8 @@ class CommentService {
          , content = r.hasContent() ? r.getContent()!.getValue() : ''
          , authorB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](authorId)
          , postB_Id: ObjectId = Validator['CONVERT_TO_OBJECT_ID'](postId);
-      const c: IComment = await Validator['VALIDATE_CREATE_COMMENT'](
-         content,
-         authorB_Id,
-         postB_Id,
-      );
+      const c: IComment = await Validator['VALIDATE_CREATE_COMMENT'](content, authorB_Id, postB_Id);
+
       await MongoosePostModel.findOneAndUpdate(
          {_id: postB_Id},
          {$push: {comments: c._id}}

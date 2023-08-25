@@ -8,13 +8,9 @@ import {Request} from 'express';
  * @param req
  * @returns
  */
-export async function zParse<T extends AnyZodObject>(
+export function zParse<T extends AnyZodObject>(
    schema: T,
    req: Request,
 ): Promise<z.infer<T>> {
-   return await schema.parseAsync(req)
-      .catch((e) => {
-         console.log(e);
-         throw new TypeError(e);
-      });
+   return schema.parseAsync(req);
 }

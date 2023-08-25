@@ -13,7 +13,7 @@ import AuthRouter from './routes/auth-routes';
 import UserController from './controller/user-controller';
 import {collectDefaultMetrics} from 'prom-client';
 import errorMiddleware from './middleware/error-middleware';
-import {SCRAPE_ENDPOINT, processOn, processOnce, metricsMiddleware, metricsEndpoint} from './utility/hexa-module';
+import {processOn, processOnce, metricsMiddleware, metricsEndpoint} from './utility/hexa-module';
 import GrpcClient from './client/grpc-client';
 import AuthClient from './client/auth-client';
 import UserClient from './client/user-client';

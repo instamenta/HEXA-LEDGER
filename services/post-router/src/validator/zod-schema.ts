@@ -40,12 +40,8 @@ export const updatePostSchema = z.object({
 
 export const getPostsSchema = z.object({
    query: z.object({
-      limit: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Limit must be a positive number',
-      }).optional(),
-      page: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Page must be a positive number',
-      }).optional(),
+      limit: z.string().transform((v) => +v).optional(),
+      page: z.string().transform((v) => +v).optional(),
       filter: z.string().optional(),
       match: z.string().optional(),
    }),
@@ -84,12 +80,8 @@ export const getUserPostsSchema = z.object({
       }),
    }),
    query: z.object({
-      limit: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Limit must be a positive number',
-      }).optional(),
-      page: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Page must be a positive number',
-      }).optional(),
+      limit: z.string().transform((v) => +v).optional(),
+      page: z.string().transform((v) => +v).optional(),
       filter: z.string().optional(),
       match: z.string().optional(),
    }),
@@ -102,12 +94,8 @@ export const getPostCommentsSchema = z.object({
       }),
    }),
    query: z.object({
-      limit: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Limit must be a positive number',
-      }).optional(),
-      page: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Page must be a positive number',
-      }).optional(),
+      limit: z.string().transform((v) => +v).optional(),
+      page: z.string().transform((v) => +v).optional(),
    }),
 });
 

@@ -4,24 +4,16 @@ import {z} from 'zod';
 
 export const limitPageFilterSchema = z.object({
    query: z.object({
-      limit: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Limit must be a positive number',
-      }).optional(),
-      page: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Page must be a positive number',
-      }).optional(),
+      limit: z.string().transform((v) => +v).optional(),
+      page: z.string().transform((v) => +v).optional(),
       filter: z.string().optional(),
    }),
 });
 
 export const limitPageSchema = z.object({
    query: z.object({
-      limit: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Limit must be a positive number',
-      }).optional(),
-      page: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Page must be a positive number',
-      }).optional(),
+      limit: z.string().transform((v) => +v).optional(),
+      page: z.string().transform((v) => +v).optional(),
    }),
 });
 
@@ -40,12 +32,8 @@ export const idPageLimitSchema = z.object({
       }),
    }),
    query: z.object({
-      limit: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Limit must be a positive number',
-      }).optional(),
-      page: z.string().transform((v) => +v).refine((v) => v > 0, {
-         message: 'Page must be a positive number',
-      }).optional(),
+      limit: z.string().transform((v) => +v).optional(),
+      page: z.string().transform((v) => +v).optional(),
    }),
 });
 

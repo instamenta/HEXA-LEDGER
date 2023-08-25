@@ -12,13 +12,13 @@ class UserRouter {
    constructor(userController: UserController) {
       this.userController = userController;
 
-      this.router.get('/', this.userController.getAllUsers.bind(UserController));
-      this.router.get('/find', this.userController.getUsers.bind(UserController));
-      this.router.get('/:id', this.userController.getUserById.bind(UserController));
-      this.router.get('/:id/followers', this.userController.getUserFollowers.bind(UserController));
-      this.router.get('/:id/following', this.userController.getUserFollowing.bind(UserController));
-      this.router.put('/:id/follow', <any>isAuth, <any>notOwner, <any>this.userController.followUser.bind(UserController));
-      this.router.put('/:id/unfollow', <any>isAuth, <any>notOwner, <any>this.userController.unfollowUser.bind(UserController));
+      this.router.get('/', this.userController.getAllUsers.bind(this.userController));
+      this.router.get('/find', this.userController.getUsers.bind(this.userController));
+      this.router.get('/:id', this.userController.getUserById.bind(this.userController));
+      this.router.get('/:id/followers', this.userController.getUserFollowers.bind(this.userController));
+      this.router.get('/:id/following', this.userController.getUserFollowing.bind(this.userController));
+      this.router.put('/:id/follow', <any>isAuth, <any>notOwner, <any>this.userController.followUser.bind(this.userController));
+      this.router.put('/:id/unfollow', <any>isAuth, <any>notOwner, <any>this.userController.unfollowUser.bind(this.userController));
    }
 
    public static getInstance(postController: UserController): UserRouter {

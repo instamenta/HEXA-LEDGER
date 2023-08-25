@@ -31,10 +31,10 @@ spec:
   selector:
     app: user-router-api
   ports:
-    - protocol: TCP
-      port: 5085
-      targetPort: 5085
-      nodePort: 30085
+  - protocol: TCP
+    port: 5085
+    targetPort: 5085
+    nodePort: 30085
 
 ---
 
@@ -56,56 +56,34 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       containers:
-        - name: user-router-api
-          image: janoopsi/user-router-api:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 5085
-          env:
-            - name: ROUTER_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: user-router-configmap
-                  key: ROUTER_PORT
-            - name: MONGODB_URI
-              valueFrom:
-                configMapKeyRef:
-                  name: user-router-configmap
-                  key: MONGODB_URI
-            - name: SERVICE_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: user-router-configmap
-                  key: SERVICE_NAME
-            - name: USER_REMOTE_REF
-              valueFrom:
-                configMapKeyRef:
-                  name: user-router-configmap
-                  key: USER_REMOTE_REF
-            - name: USER_REMOTE_PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: user-router-configmap
-                  key: USER_REMOTE_PORT
-
-#          env:
-#            - name: MONGODB_URI
-#              valueFrom:
-#                secretKeyRef:
-#                  name: user-router-secret
-#                  key: MONGODB_URI
-#            - name: TOKEN_SECRET
-#              valueFrom:
-#                secretKeyRef:
-#                  name: user-router-secret
-#                  key: TOKEN_SECRET
-#            - name: ROUTER_PORT
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: user-router-configmap
-#                  key: ROUTER_PORT
-#            - name: SERVICE_NAME
-#              valueFrom:
-#                configMapKeyRef:
-#                  name: user-router-configmap
-#                  key: SERVICE_NAME
+      - name: user-router-api
+        image: janoopsi/user-router-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5085
+        env:
+        - name: ROUTER_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: user-router-configmap
+              key: ROUTER_PORT
+        - name: MONGODB_URI
+          valueFrom:
+            configMapKeyRef:
+              name: user-router-configmap
+              key: MONGODB_URI
+        - name: SERVICE_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: user-router-configmap
+              key: SERVICE_NAME
+        - name: USER_REMOTE_REF
+          valueFrom:
+            configMapKeyRef:
+              name: user-router-configmap
+              key: USER_REMOTE_REF
+        - name: USER_REMOTE_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: user-router-configmap
+              key: USER_REMOTE_PORT

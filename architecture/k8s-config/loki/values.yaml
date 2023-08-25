@@ -1,0 +1,14 @@
+global:
+  namespace: default
+loki:
+  enabled: true
+  persistence:
+    enabled: true
+    accessModes:
+    - ReadWriteOnce
+    size: 1Gi
+    annotations: {}
+promtail:
+  enabled: true
+  config:
+    lokiAddress: http://loki-loki-distributed-gateway/loki/api/v1/push

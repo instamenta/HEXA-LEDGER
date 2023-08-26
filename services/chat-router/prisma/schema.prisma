@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String         @id @default(uuid())
+  username         String         @unique
+  jwt              String
+  authID           String
+  createdAt        DateTime       @default(now())
+  sentMessages     Message[]      @relation("SentMessages")
+  receivedMessages Message[]      @relation("RecievedMessages")
+  groupMembers     GroupMember[]
+  GroupMessage     GroupMessage[] @relation("SendGroupMessages")
+
+  @@index([id, username])
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  sender      User     @relation(name: "SentMessages", fields: [senderId], references: [id])
+  senderId    String
+  reciever    User     @relation(name: "RecievedMessages", fields: [recieverId], references: [id])
+  recieverId  String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+  reactions   String
+  reactionsId String
+
+  @@index([id, createdAt])
+}
+
+model Group {
+  id        String         @id @default(uuid())
+  name      String
+  createdAt DateTime       @default(now())
+  members   GroupMember[]
+  messages  GroupMessage[]
+}
+
+model GroupMember {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  createdAt DateTime @default(now())
+}
+
+model GroupMessage {
+  id        String   @id @default(uuid())
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  sender    User     @relation(name: "SendGroupMessages", fields: [senderId], references: [id])
+  senderId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([id, createdAt])
+}

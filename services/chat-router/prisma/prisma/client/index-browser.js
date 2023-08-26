@@ -121,9 +121,7 @@ exports.Prisma.MessageScalarFieldEnum = {
   recieverId: 'recieverId',
   content: 'content',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  reactions: 'reactions',
-  reactionsId: 'reactionsId'
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.GroupScalarFieldEnum = {
@@ -144,7 +142,8 @@ exports.Prisma.GroupMessageScalarFieldEnum = {
   groupId: 'groupId',
   senderId: 'senderId',
   content: 'content',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {

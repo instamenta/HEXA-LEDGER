@@ -1,7 +1,14 @@
-/** @file Has all cool tools. */
-import {NextFunction, Request, Response} from 'express';
-import {Counter, Histogram, register} from 'prom-client';
+/** @file Has all cool tools. */ 'use strict'
+
+import EXPRESS, {Express, NextFunction, Request, Response} from 'express';
+import {collectDefaultMetrics, Counter, Histogram, register} from 'prom-client';
 import {dot, prisma} from '../index';
+
+import CORS from 'cors';
+import MORGAN from 'morgan';
+import HELMET from 'helmet';
+import COMPRESSION from 'compression';
+import COOKIER_PARSER from 'cookie-parser';
 
 const httpRequestCount = new Counter({
    name: 'http_requests_total',
@@ -89,4 +96,21 @@ export function metricsMiddleware(req: Request, res: Response, next: NextFunctio
 function getElapsedTimeInSeconds(startTime: [number, number]): number {
    const elapsedNanoseconds = process.hrtime(startTime);
    return elapsedNanoseconds[0] + elapsedNanoseconds[1] * 1e-9;
+}
+
+export function getExpressAPI(): Express {
+   const API: Express = EXPRESS();
+
+   API.use(CORS());
+   API.use(HELMET());
+   API.use(COMPRESSION());
+   API.use(EXPRESS.json());
+   API.use(COOKIER_PARSER());
+   API.use(MORGAN('combined'));
+   collectDefaultMetrics();
+
+   API.use(metricsMiddleware);
+   API.get('/metrics', metricsEndpoint);
+
+   return API;
 }

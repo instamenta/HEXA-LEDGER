@@ -23,16 +23,14 @@ model User {
 }
 
 model Message {
-  id          String   @id @default(uuid())
-  sender      User     @relation(name: "SentMessages", fields: [senderId], references: [id])
-  senderId    String
-  reciever    User     @relation(name: "RecievedMessages", fields: [recieverId], references: [id])
-  recieverId  String
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-  reactions   String
-  reactionsId String
+  id         String   @id @default(uuid())
+  sender     User     @relation(name: "SentMessages", fields: [senderId], references: [id])
+  senderId   String
+  reciever   User     @relation(name: "RecievedMessages", fields: [recieverId], references: [id])
+  recieverId String
+  content    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
 
   @@index([id, createdAt])
 }
@@ -62,6 +60,7 @@ model GroupMessage {
   senderId  String
   content   String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([id, createdAt])
 }

@@ -1,19 +1,16 @@
 /** @file Error handling middleware. */
 import {Request, Response} from 'express';
+import HttpStatus from "@instamenta/http-status-codes";
 
 /**
- * @param error
- * @param request
- * @param response
+ * @param e
+ * @param req
+ * @param res
  */
-function errorMiddleware(error: Error, request: Request, response: Response): void {
-   console.error(error.stack);
-   console.error('Non-existing Uri:', request.url);
-   response
-      .status(500)
-      .json({error: 'Path not existing'})
-      .send('Path not existing')
+export default function errorMiddleware(e: Error, req: Request, res: Response): void {
+   console.error('[Non-existing Uri:', req.url, '] Error: ', e);
+
+   res.status(HttpStatus.NOT_FOUND)
+      .json({error: `Path is not handled by service ${req.url}`})
       .end();
 }
-
-export default errorMiddleware;

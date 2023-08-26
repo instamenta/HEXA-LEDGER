@@ -1,5 +1,4 @@
-/** @file The controller that handles routes request for chat. */ 'use strict'
-
+/** @file The controller that handles routes request for auth. */ 'use strict'
 import {Request, Response} from 'express';
 import {iRequestWithUser} from '../middleware/auth-middleware';
 import StatusCode from '@instamenta/http-status-codes';
@@ -8,7 +7,7 @@ import * as zod from '../validator/zod-schema';
 import {zParse} from '../validator/zod';
 import {PrismaClient} from '../../prisma/prisma/client'
 
-export default class ChatController {
+export default class AuthController {
 
    private readonly vlog: IVlog;
    private readonly prisma: PrismaClient
@@ -18,11 +17,11 @@ export default class ChatController {
       this.prisma = prisma;
    }
 
-   public static getInstance(vloggger: VLogger, prisma: PrismaClient): ChatController {
-      return new ChatController(vloggger, prisma);
+   public static getInstance(vloggger: VLogger, prisma: PrismaClient): AuthController {
+      return new AuthController(vloggger, prisma);
    }
 
-   public async getMessages(req: Request, res: Response): Promise<void> {
+   public async getUsers(req: Request, res: Response): Promise<void> {
       try {
          const {
             query: {limit, page, filter},
@@ -42,7 +41,7 @@ export default class ChatController {
       }
    }
 
-   async sendMessage(req: Request, res: Response): Promise<void> {
+   async getUser(req: Request, res: Response): Promise<void> {
       try {
          const {
             query: {limit, page},
@@ -61,7 +60,7 @@ export default class ChatController {
       }
    }
 
-   async editMessage(req: Request, res: Response): Promise<void> {
+   async createUser(req: Request, res: Response): Promise<void> {
       try {
          const {
             params: {id},
@@ -81,7 +80,7 @@ export default class ChatController {
       }
    }
 
-   async getUserFollowers(req: Request, res: Response): Promise<void> {
+   async editUsername(req: Request, res: Response): Promise<void> {
       try {
          const {
             params: {id},

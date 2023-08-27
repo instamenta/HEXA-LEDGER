@@ -1,72 +1,40 @@
-/** @file The controller that handles routes request for auth. */ 'use strict'
-import {Request, Response} from 'express';
-import {iRequestWithUser} from '../middleware/auth-middleware';
+/** @file Controller for handling user request. */
+
+import {Response, Request} from 'express';
 import StatusCode from '@instamenta/http-status-codes';
 import {IVlog, VLogger} from '@instamenta/vlogger';
-import * as zod from '../validator/zod-schema';
+import * as zod from '../validator/zod-auth-schema';
 import {zParse} from '../validator/zod';
-import {PrismaClient} from '../../prisma/prisma/client'
+import AuthService from '../service/auth-service';
+import {AnyZodObject} from 'zod';
+
+interface IClassParams {
+   vlogger: VLogger,
+   authService: AuthService
+}
 
 export default class AuthController {
 
    private readonly vlog: IVlog;
-   private readonly prisma: PrismaClient
+   private readonly service: AuthService;
 
-   constructor(vloggger: VLogger, prisma: PrismaClient) {
+   constructor(vloggger: VLogger, service: AuthService) {
       this.vlog = vloggger.getVlog(this.constructor.name);
-      this.prisma = prisma;
+      this.service = service;
    }
 
-   public static getInstance(vloggger: VLogger, prisma: PrismaClient): AuthController {
-      return new AuthController(vloggger, prisma);
+   public static getInstance({vlogger, authService}: IClassParams): AuthController {
+      return new AuthController(vlogger, authService);
    }
 
-   public async getUsers(req: Request, res: Response): Promise<void> {
+   public async createUser(req: Request, res: Response): Promise<void> {
       try {
          const {
-            query: {limit, page, filter},
-         } = await zParse(zod.limitPageFilterSchema, req);
+            body: {username},
+            userData: {_id: authId}
+         } = await zParse(zod.userSchema as AnyZodObject, req);
 
-         this.client.getUsers(page, limit, filter)
-            .then((users) =>
-               res.status(StatusCode.OK)
-                  .json(users)
-                  .end());
-      } catch (e: Error | any) {
-         res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get users'})
-            .end();
-
-         this.vlog.error({e, func: 'getUsers'});
-      }
-   }
-
-   async getUser(req: Request, res: Response): Promise<void> {
-      try {
-         const {
-            query: {limit, page},
-         } = await zParse(zod.limitPageSchema, req);
-
-         this.client.getAllUsers(page, limit).then((userList) =>
-            res.status(StatusCode.OK)
-               .json(userList)
-               .end());
-      } catch (e: Error | any) {
-         res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get all users'})
-            .end();
-
-         this.vlog.error({e, func: 'getAllUsers'});
-      }
-   }
-
-   async createUser(req: Request, res: Response): Promise<void> {
-      try {
-         const {
-            params: {id},
-         } = await zParse(zod.idSchema, req);
-
-         this.client.getUserById(id)
+         this.service.createUser(username, authId)
             .then((user) =>
                res.status(StatusCode.OK)
                   .json(user)
@@ -80,17 +48,17 @@ export default class AuthController {
       }
    }
 
-   async editUsername(req: Request, res: Response): Promise<void> {
+   public async editUser(req: Request, res: Response): Promise<void> {
       try {
          const {
-            params: {id},
-            query: {page, limit},
-         } = await zParse(zod.idPageLimitSchema, req);
+            body: {username},
+            userData: {_id: authId}
+         } = await zParse(zod.userSchema as AnyZodObject, req);
 
-         this.client.getUserFollowers(id, page, limit)
-            .then((followers) =>
+         this.service.editUser(res, username, authId)
+            .then((user) =>
                res.status(StatusCode.OK)
-                  .json(followers)
+                  .json(user)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
@@ -101,64 +69,44 @@ export default class AuthController {
       }
    }
 
-   async getUserFollowing(req: Request, res: Response): Promise<void> {
+   public async getUsers(req: Request, res: Response): Promise<void> {
       try {
          const {
-            params: {id},
-            query: {page, limit},
-         } = await zParse(zod.idPageLimitSchema, req);
+            query: {limit, page, filter},
+         } = await zParse(zod.limitPageFilterSchema as AnyZodObject, req);
 
-         this.client.getUserFollowing(id, page, limit)
-            .then((following) =>
+         this.service.getUsers(page, limit, filter)
+            .then((users) =>
                res.status(StatusCode.OK)
-                  .json(following)
+                  .json(users)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get user following '})
+            .json({message: 'failed to get users'})
             .end();
 
-         this.vlog.error({e, func: 'getUserFollowing'});
+         this.vlog.error({e, func: 'getUsers'});
       }
    }
 
-   async followUser(req: iRequestWithUser, res: Response): Promise<void> {
+   public async getUser(req: Request, res: Response): Promise<void> {
       try {
          const {
-            userData: {_id},
-            params: {id},
-         } = await zParse(zod.idAndAuthSchema, req);
+            param: {userId: id},
+         } = await zParse(zod.getUserSchema as AnyZodObject, req);
 
-         this.client.followUser(_id, id)
-            .then(() =>
+         this.service.getUser(id)
+            .then((user) =>
                res.status(StatusCode.OK)
+                  .json(user)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to follow user'})
+            .json({message: 'failed to get all users'})
             .end();
 
-         this.vlog.error({e, func: 'followUser'});
+         this.vlog.error({e, func: 'getAllUsers'});
       }
    }
 
-   async unfollowUser(req: iRequestWithUser, res: Response): Promise<void> {
-      try {
-         const {
-            userData: {_id},
-            params: {id},
-         } = await zParse(zod.idAndAuthSchema, req);
-
-         this.client.unfollowUser(_id, id)
-            .then(() =>
-               res.status(StatusCode.OK)
-                  .end());
-      } catch (e: Error | any) {
-         res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to unfollow user'})
-            .end();
-
-         this.vlog.error({e, func: 'unfollowUser'});
-      }
-   }
 }

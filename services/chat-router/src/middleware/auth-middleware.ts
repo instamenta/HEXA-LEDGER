@@ -1,44 +1,46 @@
 /** @file Middleware used for auth and token related events. */
-import {decodeToken} from '../utility/token-tools';
-import {Request, Response, NextFunction} from 'express';
-import HttpResponse from '@instamenta/http-status-codes'
 
-export type ITokenData = {
-   _id: string;
-   username: string;
-   email: string;
-   picture: string;
-   iat: number;
-   exp: number;
-}
+import {Request, Response, NextFunction} from 'express';
+import HttpResponse from '@instamenta/http-status-codes';
+import TokenTools, {IParsedAuthToken, IUserToken} from '../utility/token-tools';
 
 export interface iRequestWithUser extends Request {
-   userData: ITokenData
+   userData: IUserToken;
+}
+
+export interface iRequestWithAuth extends Request {
+   authData: IParsedAuthToken;
 }
 
 export default class AuthMiddleware {
 
-   public static getInstance(): AuthMiddleware {
-      return new AuthMiddleware();
+   private readonly tokenTools: TokenTools;
+
+   constructor(tokenTools: TokenTools) {
+      this.tokenTools = tokenTools;
    }
 
-   public isAuth(req: iRequestWithUser, res: Response, next: NextFunction): void {
+   public static getInstance(tokenTools: TokenTools): AuthMiddleware {
+      return new AuthMiddleware(tokenTools);
+   }
+
+   public isAuth(req: iRequestWithAuth, res: Response, next: NextFunction): void {
       try {
          const {headers: {'x-authorization-token': xAuthToken}} = req;
-         !xAuthToken
-            ? res.status(HttpResponse.UNAUTHORIZED)
-               .json({message: 'X-Authorization-Token not provided!'})
-               .end()
-            : decodeToken(xAuthToken.toString())
-               .then((userData) => {
-                  req.userData = userData;
+         xAuthToken
+            ? this.tokenTools.parseAuthToken(xAuthToken.toString())
+               .then((authData) => {
+                  req.authData = authData;
                   next();
                })
                .catch(() => {
                   res.status(HttpResponse.I_AM_A_TEAPOT)
                      .json({message: 'X-Authorization-Token is expired or invalid'})
-                     .end()
-               });
+                     .end();
+               })
+            : res.status(HttpResponse.UNAUTHORIZED)
+               .json({message: 'X-Authorization-Token not provided!'})
+               .end();
       } catch (e: Error | any) {
          res.status(HttpResponse.INTERNAL_SERVER_ERROR)
             .json({message: e.message})
@@ -46,12 +48,22 @@ export default class AuthMiddleware {
       }
    }
 
-   public isGuest(req: Request, res: Response, next: NextFunction): void {
+   public isUser(req: iRequestWithUser, res: Response, next: NextFunction): void {
       try {
-         const {headers: {'x-authorization-token': token}} = req;
-         !token ? next()
-            : res.status(HttpResponse.CONFLICT)
-               .json({message: 'This resource is only for Guest users'})
+         const {headers: {'x-UserData-token': xAuthToken}} = req;
+         xAuthToken
+            ? this.tokenTools.parseUserToken(xAuthToken.toString())
+               .then((userData) => {
+                  req.userData = userData;
+                  next();
+               })
+               .catch(() => {
+                  res.status(HttpResponse.I_AM_A_TEAPOT)
+                     .json({message: 'X-UserData-Token is expired or invalid'})
+                     .end();
+               })
+            : res.status(HttpResponse.UNAUTHORIZED)
+               .json({message: 'X-UserData-Token not provided!'})
                .end();
       } catch (e: Error | any) {
          res.status(HttpResponse.INTERNAL_SERVER_ERROR)
@@ -63,7 +75,7 @@ export default class AuthMiddleware {
    public isOwner(req: iRequestWithUser, res: Response, next: NextFunction): void {
       const {
          params: {id: resource},
-         userData: {_id: user},
+         userData: {id: user},
       } = req;
       (user === resource) ? next()
          : res.status(HttpResponse.FORBIDDEN)
@@ -74,12 +86,12 @@ export default class AuthMiddleware {
    public notOwner(req: iRequestWithUser, res: Response, next: NextFunction): void {
       const {
          params: {id: resource},
-         userData: {_id: user},
+         userData: {id: user},
       } = req;
-      (user !== resource) ? next()
-         : res.status(HttpResponse.CONFLICT)
-            .json({message: "Interaction forbidden for resource owner"})
-            .end();
+      (user === resource) ? res.status(HttpResponse.CONFLICT)
+         .json({message: 'Interaction forbidden for resource owner'})
+         .end()
+         : next();
    }
 
 }

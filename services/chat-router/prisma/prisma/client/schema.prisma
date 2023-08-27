@@ -1,6 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "./prisma/client"
+  provider      = "prisma-client-js"
+  output        = "./prisma/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -9,28 +10,33 @@ datasource db {
 }
 
 model User {
-  id               String         @id @default(uuid())
-  username         String         @unique
-  jwt              String
-  authID           String
-  createdAt        DateTime       @default(now())
-  sentMessages     Message[]      @relation("SentMessages")
-  receivedMessages Message[]      @relation("RecievedMessages")
+  id               String              @id @default(uuid())
+  username         String              @unique
+  authId           String              @unique
+  picture          String              @default("https://openseauserdata.com/files/3d825b936774e0ae3c8247613c91d436.png")
+  createdAt        DateTime            @default(now())
+  sentMessages     Message[]           @relation("SentMessages")
+  receivedMessages Message[]           @relation("RecievedMessages")
+  replies          MessageReply[]      @relation("RepliedMessages")
   groupMembers     GroupMember[]
-  GroupMessage     GroupMessage[] @relation("SendGroupMessages")
+  groupMessage     GroupMessage[]      @relation("SendGroupMessages")
+  groupReplies     GroupMessageReply[] @relation("RepliedGroupMessages")
 
   @@index([id, username])
 }
 
 model Message {
-  id         String   @id @default(uuid())
-  sender     User     @relation(name: "SentMessages", fields: [senderId], references: [id])
+  id         String         @id @default(uuid())
+  sender     User           @relation(name: "SentMessages", fields: [senderId], references: [id])
   senderId   String
-  reciever   User     @relation(name: "RecievedMessages", fields: [recieverId], references: [id])
+  reciever   User           @relation(name: "RecievedMessages", fields: [recieverId], references: [id])
   recieverId String
   content    String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @default(now()) @updatedAt
+  createdAt  DateTime       @default(now()) @db.Date
+  updatedAt  DateTime       @updatedAt @db.Date
+  replies    MessageReply[]
+  upvotes    String[]
+  downvotes  String[]
 
   @@index([id, createdAt])
 }
@@ -38,7 +44,7 @@ model Message {
 model Group {
   id        String         @id @default(uuid())
   name      String
-  createdAt DateTime       @default(now())
+  createdAt DateTime       @default(now()) @db.Date
   members   GroupMember[]
   messages  GroupMessage[]
 }
@@ -49,18 +55,51 @@ model GroupMember {
   userId    String
   group     Group    @relation(fields: [groupId], references: [id])
   groupId   String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Date
 }
 
 model GroupMessage {
-  id        String   @id @default(uuid())
-  group     Group    @relation(fields: [groupId], references: [id])
+  id        String              @id @default(uuid())
+  group     Group               @relation(fields: [groupId], references: [id])
   groupId   String
-  sender    User     @relation(name: "SendGroupMessages", fields: [senderId], references: [id])
+  sender    User                @relation(name: "SendGroupMessages", fields: [senderId], references: [id])
   senderId  String
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime            @default(now()) @db.Date
+  updatedAt DateTime            @updatedAt @db.Date
+  replies   GroupMessageReply[]
+  upvotes   String[]
+  downvotes String[]
+
+  @@index([id, createdAt])
+}
+
+model MessageReply {
+  id        String   @id @default(uuid())
+  message   Message  @relation(fields: [messageId], references: [id])
+  messageId String
+  sender    User     @relation(name: "RepliedMessages", fields: [senderId], references: [id])
+  senderId  String
+  content   String
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+  upvotes   String[]
+  downvotes String[]
+
+  @@index([id, createdAt])
+}
+
+model GroupMessageReply {
+  id             String       @id @default(uuid())
+  groupMessage   GroupMessage @relation(fields: [groupMessageId], references: [id])
+  groupMessageId String
+  sender         User         @relation(name: "RepliedGroupMessages", fields: [senderId], references: [id])
+  senderId       String
+  content        String
+  createdAt      DateTime     @default(now()) @db.Date
+  updatedAt      DateTime     @updatedAt @db.Date
+  upvotes        String[]
+  downvotes      String[]
 
   @@index([id, createdAt])
 }

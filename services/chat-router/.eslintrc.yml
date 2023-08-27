@@ -1,0 +1,169 @@
+env:
+  browser: true
+  commonjs: true
+  es2022: true
+  node: true
+  jest: true
+  mongo: true
+extends:
+  - eslint:recommended
+  - "plugin:@typescript-eslint/recommended"
+  - plugin:import/errors
+  - plugin:import/warnings
+  - plugin:import/typescript
+  - plugin:jest/recommended
+  - plugin:jsdoc/recommended-typescript
+  - plugin:node/recommended
+  - plugin:promise/recommended
+  - plugin:security/recommended
+  - plugin:sonarjs/recommended
+  - plugin:unicorn/recommended
+overrides:
+  - files: [ '*.test.ts' ]
+    extends:
+      - "plugin:jest/recommended"
+parser: "@typescript-eslint/parser"
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+  project: ./tsconfig.json
+  tsconfigRootDir: ./
+rules:
+  indent: [ "error", 3 , { "SwitchCase": 1 } ]
+  linebreak-style: [ "error", "windows" ]
+  quotes: [ "error", "single" ]
+  semi: [ "error", "always" ]
+  no-unused-vars: off
+  no-process-exit: off
+  no-constant-binary-expression: 1
+  no-constructor-return: 1
+  no-duplicate-imports: 1
+  no-new-native-nonconstructor: 1
+  no-promise-executor-return: 1
+  no-self-compare: 1
+  no-template-curly-in-string: 1
+  no-unreachable-loop: 1
+  no-unused-private-class-members: 1
+  require-atomic-updates: 1
+  block-scoped-var: 1
+  capitalized-comments: 1
+  eqeqeq: 1
+  grouped-accessor-pairs: 1
+  no-empty: 1
+  no-empty-function: 1
+  no-empty-static-block: 1
+  no-extend-native: 1
+  no-extra-semi: 1
+  no-label-var: 1
+  no-lonely-if: 1
+  no-lone-blocks: 1
+  no-new-func: 1
+  no-new-wrappers: 1
+  prefer-const: 1
+  require-await: 1
+  spaced-comment: [ "warn", "always" ]
+  #  arrow-body-style: [ "warn", "as-needed" ]
+  quote-props: [ "warn", "consistent-as-needed" ]
+  arrow-parens: [ "warn", "always" ]
+  arrow-spacing: [ "warn", { "before": true, "after": true } ]
+  block-spacing: [ "warn", "always" ]
+  brace-style: [ "warn", "1tbs" ]
+  comma-dangle: [ "warn",  "only-multiline" ]
+  comma-spacing: [ "warn",{ "before": false, "after": true } ]
+  node/no-unsupported-features/node-builtins: off
+  node/no-unsupported-features/es-syntax: off
+  unicorn/prevent-abbreviation: off
+  unicorn/no-empty-file: off
+  unicorn/prefer-top-level-await: off
+  unicorn/prevent-abbreviations: off
+  unicorn/no-null: off
+  unicorn/no-process-exit: off
+  unicorn/filename-case: off
+  unicorn/no-array-for-each: off
+  unicorn/prefer-module: off
+  node/no-missing-import: off
+  import/no-unresolved: off
+  "@typescript-eslint/no-var-requires": off
+  "@typescript-eslint/no-explicit-any": off
+  "@typescript-eslint/no-non-null-assertion": off
+  promise/always-return: off
+  no-prototype-builtins: off
+  sonarjs/no-duplicate-string: off
+  promise/no-callback-in-promise: off
+  no-unexpected-multiline: off
+  "@typescript-eslint/ban-ts-comment": off
+  sonarjs/cognitive-complexity: off
+  sonarjs/no-identical-functions: off
+  "@typescript-eslint/no-unused-vars": off
+  # NEW WAVE
+  class-methods-use-this: 0
+  #  JAVASCRIPT DOC BLOCK
+  jsdoc/require-param-description: 0
+  jsdoc/require-returns-description: 0
+  jsdoc/require-property-description: 0
+  jsdoc/check-indentation: 0
+  jsdoc/check-access: 1
+  jsdoc/check-alignment: 1
+  jsdoc/check-examples: 0
+  jsdoc/check-line-alignment: 1
+  jsdoc/check-param-names: 1
+  jsdoc/check-property-names: 1
+  jsdoc/check-syntax: 1
+  jsdoc/check-types: 1
+  jsdoc/check-values: 0
+  jsdoc/empty-tags: 1
+  jsdoc/implements-on-classes: 0
+  jsdoc/informative-docs: 0
+  jsdoc/match-description: 0
+  jsdoc/multiline-blocks: 1
+  jsdoc/no-bad-blocks: 1
+  jsdoc/no-blank-block-descriptions: 1
+  jsdoc/no-defaults: 0
+  jsdoc/no-missing-syntax: 0
+  jsdoc/no-multi-asterisks: 0
+  jsdoc/no-restricted-syntax: 0
+  jsdoc/no-types: 1
+  jsdoc/no-undefined-types: 0
+  jsdoc/require-asterisk-prefix: 0
+  jsdoc/require-description: 0
+  jsdoc/require-description-complete-sentence: 1
+  jsdoc/require-example: 0
+  jsdoc/require-file-overview: 1
+  jsdoc/require-hyphen-before-param-description: 1
+  jsdoc/require-jsdoc: 1
+  jsdoc/require-param: 1
+  jsdoc/require-param-name: 1
+  jsdoc/require-param-type: 0
+  jsdoc/check-tag-names: 0
+  jsdoc/require-property: 1
+  jsdoc/require-property-name: 1
+  jsdoc/require-property-type: 0
+  jsdoc/require-returns: 1
+  jsdoc/require-returns-check: 1
+  jsdoc/require-returns-type: 0
+  jsdoc/require-throws: 1
+  jsdoc/require-yields: 1
+  jsdoc/require-yields-check: 1
+  unicorn/catch-error-name: off
+  jsdoc/sort-tags: 1
+  jsdoc/tag-lines: 0
+  jsdoc/valid-types: 1
+  security/detect-object-injection: off
+  promise/catch-or-return: off
+  node/no-unpublished-import: off
+plugins:
+  - "@typescript-eslint"
+  - import
+  - jest
+  - jsdoc
+  - node
+  - promise
+  - security
+  - sonarjs
+  - unicorn
+ignorePatterns: [
+  "generated/"
+]
+settings:
+  jest:
+    version: 27.2.1

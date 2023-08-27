@@ -110,8 +110,8 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   username: 'username',
-  jwt: 'jwt',
-  authID: 'authID',
+  authId: 'authId',
+  picture: 'picture',
   createdAt: 'createdAt'
 };
 
@@ -121,7 +121,9 @@ exports.Prisma.MessageScalarFieldEnum = {
   recieverId: 'recieverId',
   content: 'content',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  upvotes: 'upvotes',
+  downvotes: 'downvotes'
 };
 
 exports.Prisma.GroupScalarFieldEnum = {
@@ -143,7 +145,31 @@ exports.Prisma.GroupMessageScalarFieldEnum = {
   senderId: 'senderId',
   content: 'content',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  upvotes: 'upvotes',
+  downvotes: 'downvotes'
+};
+
+exports.Prisma.MessageReplyScalarFieldEnum = {
+  id: 'id',
+  messageId: 'messageId',
+  senderId: 'senderId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  upvotes: 'upvotes',
+  downvotes: 'downvotes'
+};
+
+exports.Prisma.GroupMessageReplyScalarFieldEnum = {
+  id: 'id',
+  groupMessageId: 'groupMessageId',
+  senderId: 'senderId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  upvotes: 'upvotes',
+  downvotes: 'downvotes'
 };
 
 exports.Prisma.SortOrder = {
@@ -162,7 +188,9 @@ exports.Prisma.ModelName = {
   Message: 'Message',
   Group: 'Group',
   GroupMember: 'GroupMember',
-  GroupMessage: 'GroupMessage'
+  GroupMessage: 'GroupMessage',
+  MessageReply: 'MessageReply',
+  GroupMessageReply: 'GroupMessageReply'
 };
 
 /**

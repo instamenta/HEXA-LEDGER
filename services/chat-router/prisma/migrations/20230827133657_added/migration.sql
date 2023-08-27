@@ -1,0 +1,22 @@
+-- AlterTable
+ALTER TABLE "Group" ALTER COLUMN "createdAt" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "GroupMember" ALTER COLUMN "createdAt" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "GroupMessage" ALTER COLUMN "createdAt" SET DATA TYPE DATE,
+ALTER COLUMN "updatedAt" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "GroupMessageReply" ALTER COLUMN "createdAt" SET DATA TYPE DATE,
+ALTER COLUMN "updatedAt" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "Message" ALTER COLUMN "createdAt" SET DATA TYPE DATE,
+ALTER COLUMN "updatedAt" DROP DEFAULT,
+ALTER COLUMN "updatedAt" SET DATA TYPE DATE;
+
+-- AlterTable
+ALTER TABLE "MessageReply" ALTER COLUMN "createdAt" SET DATA TYPE DATE,
+ALTER COLUMN "updatedAt" SET DATA TYPE DATE;

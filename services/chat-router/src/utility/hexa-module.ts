@@ -1,9 +1,8 @@
-/** @file Has all cool tools. */ 'use strict'
+/** @file Has all cool tools. */
 
 import EXPRESS, {Express, NextFunction, Request, Response} from 'express';
 import {collectDefaultMetrics, Counter, Histogram, register} from 'prom-client';
 import {dot, prisma} from '../index';
-
 import CORS from 'cors';
 import MORGAN from 'morgan';
 import HELMET from 'helmet';
@@ -30,7 +29,7 @@ export function processOn(CASES: Array<string>): void {
    CASES.forEach((TYPE: string) => {
       process.on(TYPE, (e: Error) => {
          try {
-            prisma.$disconnect().then(() => console.log('Prisma Client Disconnected...'))
+            prisma.$disconnect().then(() => console.log('Prisma Client Disconnected...'));
             console.error({e, msg: `${dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`});
          } catch {
             process.exit(1);
@@ -46,7 +45,7 @@ export function processOnce(CASES: Array<string>): void {
    CASES.forEach((TYPE: string) => {
       process.once(TYPE, (e: Error) => {
          try {
-            prisma.$disconnect().then(() => console.log('Prisma Client Disconnected...'))
+            prisma.$disconnect().then(() => console.log('Prisma Client Disconnected...'));
             console.error({e, msg: `${dot.GET('SERVICE_NAME', 'Post-Router-Service')} - process.on ${TYPE}`});
             process.exit(0);
          } finally {
@@ -98,6 +97,9 @@ function getElapsedTimeInSeconds(startTime: [number, number]): number {
    return elapsedNanoseconds[0] + elapsedNanoseconds[1] * 1e-9;
 }
 
+/**
+ * @returns
+ */
 export function getExpressAPI(): Express {
    const API: Express = EXPRESS();
 

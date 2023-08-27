@@ -1,165 +1,266 @@
-/** @file The controller that handles routes request for chat. */ 'use strict'
+/** @file Controller for handling chat request. */
 
 import {Request, Response} from 'express';
-import {iRequestWithUser} from '../middleware/auth-middleware';
 import StatusCode from '@instamenta/http-status-codes';
 import {IVlog, VLogger} from '@instamenta/vlogger';
-import * as zod from '../validator/zod-schema';
+import * as zod from '../validator/zod-chat-schema';
 import {zParse} from '../validator/zod';
-import {PrismaClient} from '../../prisma/prisma/client'
+import ChatService from '../service/chat-service';
+import {AnyZodObject} from 'zod';
+
+interface IClassParams {
+   vlogger: VLogger,
+   chatService: ChatService
+}
 
 export default class ChatController {
 
    private readonly vlog: IVlog;
-   private readonly prisma: PrismaClient
+   private readonly service: ChatService;
 
-   constructor(vloggger: VLogger, prisma: PrismaClient) {
+   constructor(vloggger: VLogger, service: ChatService) {
       this.vlog = vloggger.getVlog(this.constructor.name);
-      this.prisma = prisma;
+      this.service = service;
    }
 
-   public static getInstance(vloggger: VLogger, prisma: PrismaClient): ChatController {
-      return new ChatController(vloggger, prisma);
+   public static getInstance({vlogger, chatService}: IClassParams): ChatController {
+      return new ChatController(vlogger, chatService);
    }
 
    public async getMessages(req: Request, res: Response): Promise<void> {
       try {
          const {
             query: {limit, page, filter},
-         } = await zParse(zod.limitPageFilterSchema, req);
+            params: {userId},
+            userData: {id: senderId}
+         } = await zParse(zod.getMessagesSchema as AnyZodObject, req);
 
-         this.client.getUsers(page, limit, filter)
-            .then((users) =>
+         this.service.getMessages({page, limit, filter, userId, senderId})
+            .then((messages) =>
                res.status(StatusCode.OK)
-                  .json(users)
+                  .json(messages)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get users'})
+            .json({message: 'failed to get Messages'})
             .end();
 
-         this.vlog.error({e, func: 'getUsers'});
+         this.vlog.error({e, func: 'getMessages'});
       }
    }
 
-   async sendMessage(req: Request, res: Response): Promise<void> {
+   public async sendMessage(req: Request, res: Response): Promise<void> {
       try {
          const {
-            query: {limit, page},
-         } = await zParse(zod.limitPageSchema, req);
+            params: {userId},
+            body: {content},
+            userData: {id: senderId}
+         } = await zParse(zod.sendMessageSchema as AnyZodObject, req);
 
-         this.client.getAllUsers(page, limit).then((userList) =>
-            res.status(StatusCode.OK)
-               .json(userList)
-               .end());
-      } catch (e: Error | any) {
-         res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get all users'})
-            .end();
-
-         this.vlog.error({e, func: 'getAllUsers'});
-      }
-   }
-
-   async editMessage(req: Request, res: Response): Promise<void> {
-      try {
-         const {
-            params: {id},
-         } = await zParse(zod.idSchema, req);
-
-         this.client.getUserById(id)
-            .then((user) =>
+         this.service.sendMessage(userId, content, senderId)
+            .then((message) =>
                res.status(StatusCode.OK)
-                  .json(user)
+                  .json(message)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get user user'})
+            .json({message: 'failed to send message'})
             .end();
 
-         this.vlog.error({e, func: 'getUserById'});
+         this.vlog.error({e, func: 'sendMessage'});
       }
    }
 
-   async getUserFollowers(req: Request, res: Response): Promise<void> {
+   public async editMessage(req: Request, res: Response): Promise<void> {
       try {
          const {
-            params: {id},
-            query: {page, limit},
-         } = await zParse(zod.idPageLimitSchema, req);
+            params: {messageId},
+            userData: {id: senderId},
+            body: {content}
+         } = await zParse(zod.editMessageSchema as AnyZodObject, req);
 
-         this.client.getUserFollowers(id, page, limit)
-            .then((followers) =>
+         this.service.editMessage(senderId, messageId, content)
+            .then((message) =>
                res.status(StatusCode.OK)
-                  .json(followers)
+                  .json(message)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get user followers'})
+            .json({message: 'failed to edit message'})
             .end();
 
-         this.vlog.error({e, func: 'getUserFollowers'});
+         this.vlog.error({e, func: 'editMessage'});
       }
    }
 
-   async getUserFollowing(req: Request, res: Response): Promise<void> {
+   public async deleteMessage(req: Request, res: Response): Promise<void> {
       try {
          const {
-            params: {id},
-            query: {page, limit},
-         } = await zParse(zod.idPageLimitSchema, req);
+            params: {messageId},
+            userData: {id: senderId},
+         } = await zParse(zod.userAndMessageIdSchema as AnyZodObject, req);
 
-         this.client.getUserFollowing(id, page, limit)
-            .then((following) =>
+         this.service.deleteMessage(senderId, messageId)
+            .then((message) =>
                res.status(StatusCode.OK)
-                  .json(following)
+                  .json(message)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to get user following '})
+            .json({message: 'failed to delete message'})
             .end();
 
-         this.vlog.error({e, func: 'getUserFollowing'});
+         this.vlog.error({e, func: 'deleteMessage'});
       }
    }
 
-   async followUser(req: iRequestWithUser, res: Response): Promise<void> {
+   public async upvoteMessage(req: Request, res: Response): Promise<void> {
       try {
          const {
-            userData: {_id},
-            params: {id},
-         } = await zParse(zod.idAndAuthSchema, req);
+            params: {messageId},
+            userData: {id: senderId},
+         } = await zParse(zod.userAndMessageIdSchema as AnyZodObject, req);
 
-         this.client.followUser(_id, id)
-            .then(() =>
+         this.service.upvoteMessage(senderId, messageId)
+            .then((message) =>
                res.status(StatusCode.OK)
+                  .json(message)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to follow user'})
+            .json({message: 'failed to upvote message'})
             .end();
 
-         this.vlog.error({e, func: 'followUser'});
+         this.vlog.error({e, func: 'upvoteMessage'});
       }
    }
 
-   async unfollowUser(req: iRequestWithUser, res: Response): Promise<void> {
+   public async downvoteMessage(req: Request, res: Response): Promise<void> {
       try {
          const {
-            userData: {_id},
-            params: {id},
-         } = await zParse(zod.idAndAuthSchema, req);
+            params: {messageId},
+            userData: {id: senderId}
+         } = await zParse(zod.userAndMessageIdSchema as AnyZodObject, req);
 
-         this.client.unfollowUser(_id, id)
-            .then(() =>
+         this.service.downvoteMessage(senderId, messageId)
+            .then((message) =>
                res.status(StatusCode.OK)
+                  .json(message)
                   .end());
       } catch (e: Error | any) {
          res.status(StatusCode.INTERNAL_SERVER_ERROR)
-            .json({message: 'failed to unfollow user'})
+            .json({message: 'failed to downvote message'})
             .end();
 
-         this.vlog.error({e, func: 'unfollowUser'});
+         this.vlog.error({e, func: 'downvoteMessage'});
       }
    }
+
+   public async sendReply(req: Request, res: Response): Promise<void> {
+      try {
+         const {
+            params: {messageId},
+            body: {content},
+            userData: {id: senderId},
+         } = await zParse(zod.sendReplySchema as AnyZodObject, req);
+
+         this.service.sendReply(senderId, messageId, content)
+            .then((reply) =>
+               res.status(StatusCode.OK)
+                  .json(reply)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to send reply'})
+            .end();
+
+         this.vlog.error({e, func: 'sendReply'});
+      }
+   }
+
+   public async editReply(req: Request, res: Response): Promise<void> {
+      try {
+         const {
+            params: {replyId},
+            body: {content},
+            userData: {id: senderId}
+         } = await zParse(zod.editReplySchema as AnyZodObject, req);
+
+         this.service.editReply(senderId, replyId, content)
+            .then((reply) =>
+               res.status(StatusCode.OK)
+                  .json(reply)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to edit reply'})
+            .end();
+
+         this.vlog.error({e, func: 'editReply'});
+      }
+   }
+
+   public async deleteReply(req: Request, res: Response): Promise<void> {
+      try {
+         const {
+            params: {replyId},
+            userData: {id: senderId}
+         } = await zParse(zod.userMessageAndReplyIdSchema as AnyZodObject, req);
+
+         this.service.deleteReply(senderId, replyId)
+            .then((reply) =>
+               res.status(StatusCode.OK)
+                  .json(reply)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to delete reply'})
+            .end();
+
+         this.vlog.error({e, func: 'deleteReply'});
+      }
+   }
+
+   public async upvoteReply(req: Request, res: Response): Promise<void> {
+      try {
+         const {
+            params: {replyId},
+            userData: {id: senderId}
+         } = await zParse(zod.userMessageAndReplyIdSchema as AnyZodObject, req);
+
+         this.service.upvoteReply(senderId, replyId)
+            .then((reply) =>
+               res.status(StatusCode.OK)
+                  .json(reply)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to upvote reply'})
+            .end();
+
+         this.vlog.error({e, func: 'upvoteReply'});
+      }
+   }
+
+   public async downvoteReply(req: Request, res: Response): Promise<void> {
+      try {
+         const {
+            params: {replyId},
+            userData: {id: senderId}
+         } = await zParse(zod.userMessageAndReplyIdSchema as AnyZodObject, req);
+
+         this.service.downvoteReply(senderId, replyId)
+            .then((reply) =>
+               res.status(StatusCode.OK)
+                  .json(reply)
+                  .end());
+      } catch (e: Error | any) {
+         res.status(StatusCode.INTERNAL_SERVER_ERROR)
+            .json({message: 'failed to downvote reply'})
+            .end();
+
+         this.vlog.error({e, func: 'downvoteReply'});
+      }
+   }
+
 }

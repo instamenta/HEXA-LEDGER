@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: chat-router
+    ports:
+      - '5065:5065'
+    env_file: .env
+    environment:
+      - ROUTER_PORT=5065
+      - DATABASE_URL=postgresql://admin:admin@postgres:5432/chatDB?schema=public
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda-network
+
+networks:
+  redpanda-network:
+    external:
+      name: redpanda-quickstart_redpanda_network

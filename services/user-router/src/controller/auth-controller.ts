@@ -48,6 +48,7 @@ export default class AuthController {
          this.client.registerUser(username, email, password)
             .then((User) =>
                res.status(StatusCode.OK)
+                  .cookie('x-authorization-token', User.token)
                   .json(User)
                   .end());
       } catch (e: Error | any) {
@@ -85,6 +86,7 @@ export default class AuthController {
          this.client.loginUser(email, password)
             .then((User) =>
                res.status(StatusCode.OK)
+                  .cookie('x-authorization-token', User.token)
                   .json(User)
                   .end());
       } catch (e: Error | any) {
@@ -122,10 +124,10 @@ export default class AuthController {
             body: {username, email, password},
          } = await zParse(zod.updateUserSchema, req);
 
-
          this.client.updateUserById(id, username, email, password)
             .then((User) =>
                res.status(StatusCode.OK)
+                  .cookie('x-authorization-token', User.token)
                   .json(User)
                   .end());
       } catch (e: Error | any) {

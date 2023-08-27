@@ -26,9 +26,7 @@ export interface IPostData {
     downvotes: Array<string>;
     comments: Array<string>;
     tags: Array<string>;
-
     isPromoted: boolean;
-
     tronTransaction: Array<string>;
     ethereumTransaction: Array<string>;
     donations: Array<string>;

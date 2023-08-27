@@ -1,20 +1,12 @@
 /** @file Token tools used for Authenticating. */
 
-import {sign, verify} from 'jsonwebtoken';
+import {sign, verify, VerifyErrors} from 'jsonwebtoken';
 import {ObjectId} from 'bson';
 
 const TOKEN_SECRET = process.env['TOKEN_SECRET'] || 'SECRET';
 
 class TokenTools {
 
-   /**
-    * @param u
-    * @param u.username
-    * @param u.email
-    * @param u._id
-    * @param u.picture
-    * @returns
-    */
    public static GENERATE_TOKEN(
       {
          username,
@@ -37,23 +29,15 @@ class TokenTools {
       });
    }
 
-   /**
-    * @param token
-    * @returns
-    */
    public static DECODE_TOKEN(token: string): Promise<string> {
       return new Promise((resolve, reject) => {
-         verify(token, TOKEN_SECRET,
-            (error, decoded) => error ? reject(error)
+         verify(token, TOKEN_SECRET, (err: VerifyErrors | null, decoded: any) =>
+            err ? reject(err)
                : resolve(<string>decoded)
          );
       });
    }
 
-   /**
-    * @param token
-    * @returns
-    */
    public static VERIFY_TOKEN(token: string): string {
       return <string>verify(token, TOKEN_SECRET);
    }

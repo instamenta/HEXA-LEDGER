@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+
+package auth;
+
+message AuthResponse{
+  google.protobuf.StringValue token = 1;
+}
+
+message AuthRequest{
+  google.protobuf.StringValue address = 1;
+  google.protobuf.StringValue username = 2;
+  google.protobuf.StringValue picture = 3;
+}
+
+message GetUserRequest {
+  google.protobuf.StringValue auth_id = 1 [json_name = "authId"];
+}
+
+message UserResponse {
+  google.protobuf.StringValue auth_id = 1 [json_name = "auth_id"];
+  google.protobuf.StringValue username = 2;
+  google.protobuf.StringValue picture = 3;
+  google.protobuf.StringValue address = 4;
+}
+
+message Pagination {
+  google.protobuf.Int32Value limit = 1;
+  google.protobuf.Int32Value skip = 2;
+}
+
+service AuthService {
+  rpc Auth(AuthRequest) returns (AuthResponse);
+  rpc UpdateUser(AuthRequest) returns (AuthResponse);
+
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc GetUsers(Pagination) returns (stream UserResponse);
+}

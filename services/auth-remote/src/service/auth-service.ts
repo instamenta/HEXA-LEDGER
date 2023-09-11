@@ -55,7 +55,7 @@ export default class AuthService {
          }
 
          callback(null, build_AuthResponse(
-            this.tokenTools.generateToken({
+            await this.tokenTools.generateToken({
                authId: result.insertedId.toString(),
                address: '0x' + address,
                username, picture,
@@ -83,19 +83,19 @@ export default class AuthService {
             return callback(new StatusBuilder().withCode(Status.INVALID_ARGUMENT).withDetails('Invalid Data').build());
          }
 
-         const result = await this.collection.updateOne(
+         const result = await this.collection.findOneAndUpdate(
             {a: Buffer.from(address.replace(/^0x/, ''), 'hex')},
             {p: Buffer.from(picture), u: Buffer.from(username)},
-         ) as UpdateResult<WithId<AuthData>>;
+         ) as WithId<AuthData> | null;
 
-         if (result.modifiedCount === 0) {
+         if (!result) {
             this.vlog.error({e: {username, picture, address}, msg: 'Update Failed', func: 'update'});
             return callback(new StatusBuilder().withCode(Status.CANCELLED).withDetails('Updating Failed').build());
          }
 
          callback(null, build_AuthResponse(
-            this.tokenTools.generateToken({
-               authId: result.upsertedId.toString(),
+            await this.tokenTools.generateToken({
+               authId: result._id.toString(),
                address: '0x' + address,
                username, picture,
             })
@@ -130,6 +130,7 @@ export default class AuthService {
 
          callback(null, build_UserResponse(
             result._id.toString(),
+            // @ts-ignore
             '0x' + result.a.buffer.toString('hex'),
             result.u.buffer.toString(),
             result.p.buffer.toString(),
@@ -156,6 +157,7 @@ export default class AuthService {
          for (let i = 0; i < result.length; i++) {
             call.write(build_UserResponse(
                result[i]._id.toString(),
+               //@ts-ignore
                '0x' + result[i].a.buffer.toString('hex'),
                result[i].u.buffer.toString(),
                result[i].p.buffer.toString(),

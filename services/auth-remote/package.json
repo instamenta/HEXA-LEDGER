@@ -4,7 +4,8 @@
   "description": "",
   "main": "./src/index.ts",
   "scripts": {
-    "proto-build": "grpc_tools_node_protoc  --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts  --ts_out=./src/protos/generated/types  --js_out=import_style=commonjs,binary:./src/protos/generated/  --grpc_out=grpc_js:./src/protos/generated  -I ./src/protos/  ./src/protos/auth.proto"
+    "proto-build": "grpc_tools_node_protoc  --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts  --ts_out=grpc_js:./src/protos/generated/types  --js_out=import_style=commonjs,binary:./src/protos/generated/  --grpc_out=grpc_js:./src/protos/generated  -I ./src/protos/  ./src/protos/auth.proto",
+    "build": "tsc"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.9.1",

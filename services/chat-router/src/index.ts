@@ -41,7 +41,7 @@ export const dot = new DotConfig(process.env as Record<string, string>);
 
    API.use('/chat/auth', authRouter);
    API.use('/chat', chatRouter);
-   API.use('/group', groupRouter)
+   API.use('/group', groupRouter);
 
    API.use(errorMiddleware);
 

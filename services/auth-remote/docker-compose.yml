@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-remote
+    ports:
+      - '50053:50053'
+    env_file: .env
+    environment:
+      - GRPC_PORT=50053
+    volumes:
+     - ./:/var/data
+    networks:
+      - redpanda-network
+networks:
+  redpanda-network:
+    external:
+      name: redpanda-quickstart_redpanda_network

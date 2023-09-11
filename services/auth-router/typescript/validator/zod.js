@@ -1,5 +1,4 @@
 "use strict";
-/** @file Used for validating post routes. */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.zParse = void 0;
 /**

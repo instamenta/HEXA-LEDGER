@@ -3,8 +3,7 @@ import {AuthServiceClient} from '../protos/generated/auth_grpc_pb';
 import DotConfigurator from 'dot_configurator';
 
 export default class GrpcClient {
-
-   private dot: DotConfigurator;
+   private readonly dot: DotConfigurator;
 
    constructor(dot: DotConfigurator) {
       this.dot = dot;

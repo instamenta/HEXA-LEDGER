@@ -14,6 +14,9 @@ class AuthRouter {
    private initializeRouter() {
       this.router.post('/auth', this.authController.authenticate.bind(this.authController));
       this.router.put('/auth', this.authController.update.bind(this.authController));
+      this.router.get('/user', this.authController.getUser.bind(this.authController));
+      this.router.get('/users', this.authController.getUsers.bind(this.authController));
+
    }
 
    public static getInstance(postController: AuthController): AuthRouter {

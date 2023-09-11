@@ -4,7 +4,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 import * as auth_pb from "./auth_pb";
 import * as google_protobuf_wrappers_pb from "google-protobuf/google/protobuf/wrappers_pb";
 
@@ -54,7 +54,7 @@ interface IAuthServiceService_IGetUsers extends grpc.MethodDefinition<auth_pb.Pa
 
 export const AuthServiceService: IAuthServiceService;
 
-export interface IAuthServiceServer {
+export interface IAuthServiceServer extends grpc.UntypedServiceImplementation {
     auth: grpc.handleUnaryCall<auth_pb.AuthRequest, auth_pb.AuthResponse>;
     updateUser: grpc.handleUnaryCall<auth_pb.AuthRequest, auth_pb.AuthResponse>;
     getUser: grpc.handleUnaryCall<auth_pb.GetUserRequest, auth_pb.UserResponse>;
@@ -76,7 +76,7 @@ export interface IAuthServiceClient {
 }
 
 export class AuthServiceClient extends grpc.Client implements IAuthServiceClient {
-    constructor(address: string, credentials: grpc.ChannelCredentials, options?: object);
+    constructor(address: string, credentials: grpc.ChannelCredentials, options?: Partial<grpc.ClientOptions>);
     public auth(request: auth_pb.AuthRequest, callback: (error: grpc.ServiceError | null, response: auth_pb.AuthResponse) => void): grpc.ClientUnaryCall;
     public auth(request: auth_pb.AuthRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: auth_pb.AuthResponse) => void): grpc.ClientUnaryCall;
     public auth(request: auth_pb.AuthRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: auth_pb.AuthResponse) => void): grpc.ClientUnaryCall;

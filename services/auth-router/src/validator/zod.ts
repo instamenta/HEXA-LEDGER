@@ -1,4 +1,3 @@
-/** @file Used for validating post routes. */
 
 import {z, AnyZodObject} from 'zod';
 import {Request} from 'express';

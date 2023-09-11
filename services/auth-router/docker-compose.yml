@@ -1,0 +1,20 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-router
+    ports:
+      - '5088:5088'
+    env_file: .env
+    environment:
+      - ROUTER_PORT=5088
+    volumes:
+      - ./:/var/data
+    networks:
+      - redpanda-network
+networks:
+  redpanda-network:
+    external:
+      name: redpanda-quickstart_redpanda_network

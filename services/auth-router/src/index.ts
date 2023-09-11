@@ -39,9 +39,9 @@ export const dot = new DotConfig(process.env as Record<string, string>);
 
    API.use(metricsMiddleware);
    API.get('/metrics', metricsEndpoint);
-   API.use('/api', authRouter);
+   API.use('/auth/api', authRouter);
 
-   API.get('/', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+   API.get('/auth', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
    API.use(errorMiddleware);
 
    API.listen(+dot.GET('ROUTER_PORT', 5085), () => console.log(

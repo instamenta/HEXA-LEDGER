@@ -1,0 +1,10 @@
+node_modules
+.idea
+src
+.eslintrc
+docker-compose.yml
+.dockerignore
+.gitignore
+tsconfig.json
+.env.dist
+jest.config.js

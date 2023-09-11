@@ -14,25 +14,26 @@ import {
    WithId,
    ObjectId,
    Document,
+   UpdateResult,
    InsertOneResult,
-   InsertOneModel,
 } from 'mongodb';
 import TokenTools from "../utility/token-tools";
 
-export interface AuthData {
-   u: Binary;
-   p: Binary;
-   a: Binary;
+export interface AuthData extends Document {
+   u: Buffer;
+   p: Buffer;
+   a: Buffer;
 }
 
 export default class AuthService {
    private readonly vlog: IVlog;
-   private readonly collection: Collection;
+   private readonly collection: Collection<AuthData>;
    private readonly tokenTools: TokenTools;
 
    constructor(vlogger: VLogger, db: Db, tokenTools: TokenTools) {
-      this.vlog = vlogger.getVlog(this.constructor.name)
+      this.vlog = vlogger.getVlog(this.constructor.name);
       this.collection = db.collection('auth');
+      this.tokenTools = tokenTools;
    }
 
    public static getInstance(
@@ -48,29 +49,26 @@ export default class AuthService {
    ): Promise<void> {
       try {
          const r = call.request
-         const username = r.hasUsername() ? r.getUsername()!.getValue() : null
+            , username = r.hasUsername() ? r.getUsername()!.getValue() : null
             , picture = r.hasPicture() ? r.getPicture()!.getValue() : null
             , address = r.hasAddress() ? r.getAddress()!.getValue() : null
          ;
          if (!username || !picture || !address) throw new Error('Invalid Data');
-         if (address.startsWith('0x')) address.replace('0x', '');
 
-         this.collection.insertOne(
-            {
-               a: new Binary(Buffer.from(address, 'hex'), 0),
-               u: new Binary(Buffer.from(username), 0),
-               p: new Binary(Buffer.from(picture), 0),
-            }
-         ).then((d: InsertOneResult) => {
-            callback(null, build_AuthResponse(
-               this.tokenTools.generateToken({
-                  authId: d.insertedId.toString(),
-                  username,
-                  picture,
-                  address: '0x' + address,
-               })
-            ));
-         });
+         const result = await this.collection.insertOne({
+            a: Buffer.from(address.replace(/^0x/, ''), 'hex'),
+            u: Buffer.from(username),
+            p: Buffer.from(picture),
+         }) as InsertOneResult<AuthData>;
+
+         callback(null, build_AuthResponse(
+            this.tokenTools.generateToken({
+               authId: result.insertedId.toString(),
+               address: '0x' + address,
+               username, picture,
+            })
+         ));
+
       } catch (e) {
          this.vlog.error({e, func: "login", msg: "Unknown error"})
          callback(e)
@@ -82,13 +80,28 @@ export default class AuthService {
       callback: sendUnaryData<I.AuthResponse>
    ): Promise<void> {
       try {
-         const r = call.request;
-         const username = r.hasUsername() ? r.getUsername()!.getValue() : null
+         const r = call.request
+            , username = r.hasUsername() ? r.getUsername()!.getValue() : null
             , picture = r.hasPicture() ? r.getPicture()!.getValue() : null
             , address = r.hasAddress() ? r.getAddress()!.getValue() : null
          ;
 
-         callback(null, build_AuthResponse());
+         if (!address || !picture || !username) throw new Error('Invalid data');
+
+         const result = await this.collection.updateOne(
+            {a: Buffer.from(address.replace(/^0x/, ''), 'hex')},
+            {p: Buffer.from(picture), u: Buffer.from(username)},
+         ) as UpdateResult<WithId<AuthData>>;
+
+         if (result.modifiedCount === 0) throw new Error('Unknown user');
+
+         callback(null, build_AuthResponse(
+            this.tokenTools.generateToken({
+               authId: result.upsertedId.toString(),
+               address: '0x' + address,
+               username, picture,
+            })
+         ));
       } catch (e) {
          this.vlog.error({e, func: "login", msg: "Unknown error"})
          callback(e)
@@ -100,20 +113,23 @@ export default class AuthService {
       callback: sendUnaryData<I.UserResponse>
    ): Promise<void> {
       try {
-         const r = call.request;
-         const authId = r.hasAuthId() ? r.getAuthId()!.getValue() : null;
+         const r = call.request
+            , authId = r.hasAuthId() ? r.getAuthId()!.getValue() : null;
+
          if (!authId || !ObjectId.isValid(authId)) throw new Error('invalid Data')
 
-         this.collection.findOne(
+         const result = await this.collection.findOne(
             {_id: new ObjectId(authId)}
-         ).then((d: WithId<AuthData>) => {
-               callback(null, build_UserResponse(
-                  d._id.toString(),
-                  '0x' + d.a.buffer.toString('hex'),
-                  d.u.buffer.toString(),
-                  d.p.buffer.toString(),
-               ))
-         });
+         ) as WithId<AuthData> | null;
+
+         if (!result) throw new Error('User not found');
+
+         callback(null, build_UserResponse(
+            result._id.toString(),
+            '0x' + result.a.buffer.toString('hex'),
+            result.u.buffer.toString(),
+            result.p.buffer.toString(),
+         ));
       } catch (e) {
          this.vlog.error({e, func: "getUserById", msg: "Unknown error"})
          callback(e);
@@ -124,23 +140,28 @@ export default class AuthService {
       call: ServerWritableStream<I.Pagination, I.UserResponse>,
    ): Promise<void> {
       try {
-         const r = call.request;
-         const limit = r.hasLimit() ? r.getLimit()!.getValue() : 6;
-         const skip = r.hasSkip() ? r.getSkip()!.getValue() : 1;
+         const r = call.request
+            , limit = r.hasLimit() ? r.getLimit()!.getValue() : 6
+            , skip = r.hasSkip() ? r.getSkip()!.getValue() : 1;
 
-         this.collection
-            .find()
-            .skip((skip - 1) * limit)
-            .limit(limit)
-            .toArray()
-            .then(() => {
+         const result = await this.collection.find({
+            $skip: ((skip - 1) * limit),
+            $limit: (limit),
+         }).toArray() as Array<WithId<AuthData>>;
 
-            })
-
-         call.write()
+         for (let i = 0; i < result.length; i++) {
+            call.write(build_UserResponse(
+               result[i]._id.toString(),
+               '0x' + result[i].a.buffer.toString('hex'),
+               result[i].u.buffer.toString(),
+               result[i].p.buffer.toString(),
+            ));
+         }
       } catch (e) {
-         this.vlog.error({e, func: "getUserById", msg: "Unknown error"})
+         this.vlog.error({e, func: "getUserById", msg: "Unknown error"});
          call.emit(e);
+      } finally {
+         call.end();
       }
    }
 

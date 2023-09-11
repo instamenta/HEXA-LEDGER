@@ -1,44 +1,29 @@
-import {ServerUnaryCall, sendUnaryData, ServerWritableStream} from '@grpc/grpc-js';
-import {IVlog, VLogger} from "@instamenta/vlogger";
+import {sendUnaryData, ServerUnaryCall, ServerWritableStream, StatusBuilder} from '@grpc/grpc-js';
+import {Collection, Db, Document, InsertOneResult, ObjectId, UpdateResult, WithId,} from 'mongodb';
+import {build_AuthResponse, build_UserResponse} from "../protos/builder/builder";
+import {Status} from "@grpc/grpc-js/build/src/constants";
 import * as I from '../protos/generated/types/auth_pb';
-
-import {
-   build_AuthResponse,
-   build_UserResponse
-} from "../protos/builder/builder";
-
-import {
-   Db,
-   Binary,
-   Collection,
-   WithId,
-   ObjectId,
-   Document,
-   UpdateResult,
-   InsertOneResult,
-} from 'mongodb';
+import {IVlog, VLogger} from "@instamenta/vlogger";
 import TokenTools from "../utility/token-tools";
 
 export interface AuthData extends Document {
-   u: Buffer;
-   p: Buffer;
-   a: Buffer;
+   u: Buffer
+   p: Buffer
+   a: Buffer
 }
 
 export default class AuthService {
-   private readonly vlog: IVlog;
-   private readonly collection: Collection<AuthData>;
-   private readonly tokenTools: TokenTools;
+   private readonly vlog: IVlog
+   private readonly collection: Collection<AuthData>
+   private readonly tokenTools: TokenTools
 
    constructor(vlogger: VLogger, db: Db, tokenTools: TokenTools) {
-      this.vlog = vlogger.getVlog(this.constructor.name);
-      this.collection = db.collection('auth');
-      this.tokenTools = tokenTools;
+      this.vlog = vlogger.getVlog(this.constructor.name)
+      this.collection = db.collection('auth')
+      this.tokenTools = tokenTools
    }
 
-   public static getInstance(
-      {vlogger, db, tokenTools}:
-         { vlogger: VLogger, db: Db, tokenTools: TokenTools }
+   public static getInstance({vlogger, db, tokenTools}: { vlogger: VLogger, db: Db, tokenTools: TokenTools }
    ): AuthService {
       return new AuthService(vlogger, db, tokenTools);
    }
@@ -53,13 +38,21 @@ export default class AuthService {
             , picture = r.hasPicture() ? r.getPicture()!.getValue() : null
             , address = r.hasAddress() ? r.getAddress()!.getValue() : null
          ;
-         if (!username || !picture || !address) throw new Error('Invalid Data');
+         if (!username || !picture || !address) {
+            this.vlog.error({e: {username, picture, address}, msg: 'Invalid Data', func: 'auth'});
+            return callback(new StatusBuilder().withCode(Status.INVALID_ARGUMENT).withDetails('Invalid Data').build());
+         }
 
          const result = await this.collection.insertOne({
             a: Buffer.from(address.replace(/^0x/, ''), 'hex'),
             u: Buffer.from(username),
             p: Buffer.from(picture),
          }) as InsertOneResult<AuthData>;
+
+         if(!result.insertedId) {
+            this.vlog.error({e: {username, picture, address}, msg: 'Creation Failed', func: 'auth'});
+            return callback(new StatusBuilder().withCode(Status.CANCELLED).withDetails('Creation Failed').build());
+         }
 
          callback(null, build_AuthResponse(
             this.tokenTools.generateToken({
@@ -69,9 +62,9 @@ export default class AuthService {
             })
          ));
 
-      } catch (e) {
-         this.vlog.error({e, func: "login", msg: "Unknown error"})
-         callback(e)
+      } catch (e: any) {
+         this.vlog.error({e, func: "login", msg: "Unknown error"});
+         callback(new StatusBuilder().withCode(Status.UNKNOWN).withMetadata(e).build());
       }
    }
 
@@ -85,15 +78,20 @@ export default class AuthService {
             , picture = r.hasPicture() ? r.getPicture()!.getValue() : null
             , address = r.hasAddress() ? r.getAddress()!.getValue() : null
          ;
-
-         if (!address || !picture || !username) throw new Error('Invalid data');
+         if (!address || !picture || !username) {
+            this.vlog.error({e: {username, picture, address}, msg: 'Invalid Data', func: 'update'});
+            return callback(new StatusBuilder().withCode(Status.INVALID_ARGUMENT).withDetails('Invalid Data').build());
+         }
 
          const result = await this.collection.updateOne(
             {a: Buffer.from(address.replace(/^0x/, ''), 'hex')},
             {p: Buffer.from(picture), u: Buffer.from(username)},
          ) as UpdateResult<WithId<AuthData>>;
 
-         if (result.modifiedCount === 0) throw new Error('Unknown user');
+         if (result.modifiedCount === 0) {
+            this.vlog.error({e: {username, picture, address}, msg: 'Update Failed', func: 'update'});
+            return callback(new StatusBuilder().withCode(Status.CANCELLED).withDetails('Updating Failed').build());
+         }
 
          callback(null, build_AuthResponse(
             this.tokenTools.generateToken({
@@ -102,9 +100,9 @@ export default class AuthService {
                username, picture,
             })
          ));
-      } catch (e) {
+      } catch (e: any) {
          this.vlog.error({e, func: "login", msg: "Unknown error"})
-         callback(e)
+         callback(new StatusBuilder().withCode(Status.UNKNOWN).withMetadata(e).build())
       }
    }
 
@@ -116,13 +114,19 @@ export default class AuthService {
          const r = call.request
             , authId = r.hasAuthId() ? r.getAuthId()!.getValue() : null;
 
-         if (!authId || !ObjectId.isValid(authId)) throw new Error('invalid Data')
+         if (!authId || !ObjectId.isValid(authId)) {
+            this.vlog.error({e: {invalid_data: authId}, msg: 'Invalid Data', func: 'getUser'})
+            return callback(new StatusBuilder().withCode(Status.INVALID_ARGUMENT).withDetails('Invalid Data').build());
+         }
 
          const result = await this.collection.findOne(
             {_id: new ObjectId(authId)}
          ) as WithId<AuthData> | null;
 
-         if (!result) throw new Error('User not found');
+         if (!result) {
+            this.vlog.error({e: {not_found: authId}, msg: 'User not found', func: 'getUser'});
+            return callback(new StatusBuilder().withCode(Status.NOT_FOUND).withDetails('User not found').build());
+         }
 
          callback(null, build_UserResponse(
             result._id.toString(),
@@ -130,9 +134,9 @@ export default class AuthService {
             result.u.buffer.toString(),
             result.p.buffer.toString(),
          ));
-      } catch (e) {
-         this.vlog.error({e, func: "getUserById", msg: "Unknown error"})
-         callback(e);
+      } catch (e: any) {
+         this.vlog.error({e, func: "getUserById", msg: "Unknown error"});
+         callback(new StatusBuilder().withCode(Status.UNKNOWN).withMetadata(e).build());
       }
    }
 
@@ -157,13 +161,12 @@ export default class AuthService {
                result[i].p.buffer.toString(),
             ));
          }
-      } catch (e) {
+      } catch (e: any) {
          this.vlog.error({e, func: "getUserById", msg: "Unknown error"});
-         call.emit(e);
+         call.emit('error', new StatusBuilder().withCode(Status.UNKNOWN).withMetadata(e).build());
       } finally {
          call.end();
       }
    }
-
 
 }

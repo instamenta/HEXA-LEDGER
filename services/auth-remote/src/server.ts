@@ -18,7 +18,7 @@ export const dot = new DotConfig(process.env as Record<string, string>);
    const mongoClient = new MongoClient(process.env['MONGODB_URI'] || 'NO URI')
    const db = mongoClient.db(dot.GET('DB_NAME', 'hexa-ledger'), {retryWrites: true});
 
-   const authService = AuthService.getInstance({vlogger, db});
+   const authService = AuthService.getInstance({vlogger, db, tokenTools});
 
    grpc_server.addService(AuthServiceService, {
       auth: authService.auth.bind(authService),

@@ -78,7 +78,7 @@ export default function Navbar() {
                            <div>
                               <SignedIn>
                                  {/* Mount the UserButton component */}
-                                 <UserButton afterSignOutUrl />
+                                 <UserButton afterSignOutUrl="/" />
                               </SignedIn>
                               <SignedOut>
                                  {/* Signed out users get sign in button */}

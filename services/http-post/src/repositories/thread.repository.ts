@@ -1,24 +1,21 @@
-import {
-   Collection,
-   Db, Document,
-   Filter,
-   FindOneAndUpdateOptions, InsertOneResult,
-   MongoError,
-   ObjectId, ReturnDocument,
-   UpdateFilter, WithId,
-} from 'mongodb';
 import * as I from '../types/types';
 import ThreadModel from '../models/thread.model';
 import {HandleMongoError} from '../utilities/error.handlers';
-import {PUpdateData} from "../types/types";
-import {Readable as NodeRStream} from "node:stream";
+import {Readable as NodeRStream} from 'node:stream';
+import {config} from '../utilities/config';
+import {
+   Db, ObjectId, Collection, MongoError,
+   InsertOneResult, FindOneAndUpdateOptions,
+   Filter, WithId, UpdateFilter,
+   ReturnDocument,
+} from 'mongodb';
 
 export default class ThreadRepository {
 
    private collection: Collection<I.IThreadSchema>;
 
    constructor(db: Db) {
-      this.collection = db.collection('threads');
+      this.collection = db.collection(config.DB_THREADS_COLLECTION);
    }
 
    async create(d: I.PCreateData): Promise<ThreadModel | null> {
@@ -26,23 +23,27 @@ export default class ThreadRepository {
          n: Buffer.from(d.name),
          des: Buffer.from(d.description),
          c: Buffer.from(d.content),
-         o: new ObjectId(d.owner),
-         p: [{promoter: new ObjectId(d.owner), date: new Date(), amount: d.promoted}],
+         o: Buffer.from(d.owner, 'hex'),
+         p: [{
+            promoter: Buffer.from(d.owner, 'hex'),
+            date: Math.floor(new Date().getTime() / 1000),
+            amount: d.promoted
+         }],
          i: d.images.map((img) => Buffer.from(img)),
          t: d.tags.map((tag) => Buffer.from(tag)),
-         ca: new Date(), up: new Date(),
+         ca: Math.floor(new Date().getTime() / 1000),
+         up: Math.floor(new Date().getTime() / 1000),
          do: [], li: [], di: [],
          del: false,
       };
-      return this.collection.insertOne(
-         record
-      ).then((res: InsertOneResult<I.IThreadSchema>) => res.insertedId
-         ? new ThreadModel({...record, _id: res.insertedId})
-         : null
-      ).catch((e: MongoError) => {
-         HandleMongoError(e);
-         throw e;
-      });
+      return this.collection.insertOne(record)
+         .then((res: InsertOneResult<I.IThreadSchema>) => res.insertedId
+            ? new ThreadModel({...record, _id: res.insertedId})
+            : null)
+         .catch((e: MongoError) => {
+            HandleMongoError(e);
+            throw e;
+         });
    }
 
    async deleteById(postId: string): Promise<ThreadModel | null> {
@@ -50,20 +51,19 @@ export default class ThreadRepository {
          $match: {_id: new ObjectId(postId), del: true}
       };
       const update: UpdateFilter<I.IThreadSchema> = {
-         $set: {del: true, up: new Date()}
+         $set: {del: true, up: Math.floor(new Date().getTime() / 1000)}
       };
       const options: FindOneAndUpdateOptions = {
          returnDocument: 'after' as ReturnDocument
       };
-      return this.collection.findOneAndUpdate(
-         filter, update, options
-      ).then((res: WithId<I.IThreadSchema> | null) => res
-         ? new ThreadModel(res)
-         : null
-      ).catch((e: MongoError) => {
-         HandleMongoError(e);
-         throw e;
-      });
+      return this.collection.findOneAndUpdate(filter, update, options)
+         .then((res: WithId<I.IThreadSchema> | null) => res
+            ? new ThreadModel(res)
+            : null)
+         .catch((e: MongoError) => {
+            HandleMongoError(e);
+            throw e;
+         });
    }
 
    async update(postId: string, d: I.PUpdateData): Promise<ThreadModel | null> {
@@ -71,7 +71,7 @@ export default class ThreadRepository {
          $match: {_id: new ObjectId(postId), del: false}
       };
       const update = {
-         $set: {up: new Date()}
+         $set: {up: Math.floor(new Date().getTime() / 1000)}
       } satisfies UpdateFilter<I.IThreadSchema>;
       const options: FindOneAndUpdateOptions = {
          returnDocument: 'after' as ReturnDocument
@@ -85,30 +85,28 @@ export default class ThreadRepository {
       if (d.tags) Object.assign(update.$set, {
          t: (d.tags).map((tag) => Buffer.from(tag))
       });
-      return this.collection.findOneAndUpdate(
-         filter, update, options
-      ).then((res: WithId<I.IThreadSchema> | null) => res
-         ? new ThreadModel(res)
-         : null
-      ).catch((e: MongoError) => {
-         HandleMongoError(e);
-         throw e;
-      });
+      return this.collection.findOneAndUpdate(filter, update, options)
+         .then((res: WithId<I.IThreadSchema> | null) => res
+            ? new ThreadModel(res)
+            : null)
+         .catch((e: MongoError) => {
+            HandleMongoError(e);
+            throw e;
+         });
    }
 
    async getOneById(postId: string): Promise<ThreadModel | null> {
       const filter: Filter<I.IThreadSchema> = {
          _id: new ObjectId(postId), del: false
       };
-      return this.collection.findOne(
-         filter
-      ).then((res: WithId<I.IThreadSchema> | null) => res
-         ? new ThreadModel(res)
-         : null
-      ).catch((e: MongoError) => {
-         HandleMongoError(e);
-         throw e;
-      });
+      return this.collection.findOne(filter)
+         .then((res: WithId<I.IThreadSchema> | null) => res
+            ? new ThreadModel(res)
+            : null)
+         .catch((e: MongoError) => {
+            HandleMongoError(e);
+            throw e;
+         });
    }
 
    async getMany(skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
@@ -117,7 +115,8 @@ export default class ThreadRepository {
             .skip(skip)
             .limit(limit)
             .stream({
-               transform: (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
+               transform:
+                  (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
             });
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);

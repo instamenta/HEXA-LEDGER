@@ -8,20 +8,18 @@ const express_1 = __importDefault(require("express"));
 const thread_router_1 = __importDefault(require("./routes/thread.router"));
 const thread_controller_1 = __importDefault(require("./controllers/thread.controller"));
 const thread_repository_1 = __importDefault(require("./repositories/thread.repository"));
-const mongodb_1 = require("mongodb");
 const config_1 = require("./utilities/config");
 const error_middleware_1 = require("./middlewares/error.middleware");
 (function initializeService() {
     const _server = getServer();
-    const db = new mongodb_1.MongoClient(config_1.config.DB_URI, config_1.config.DB_OPTIONS)
-        .db(config_1.config.DB_NAME);
+    const db = (0, config_1.getDatabase)();
     const threadRepository = new thread_repository_1.default(db);
     const threadController = new thread_controller_1.default(threadRepository);
     const threadRouter = new thread_router_1.default(threadController).getRouter();
     _server.use('/thread', threadRouter);
     _server.use(error_middleware_1._404Handler);
     _server.use(error_middleware_1._errorHandler);
-    _server.listen(config_1.config.PORT, () => console.log(`[${config_1.config.SERVICE_NAME}] running on port: [${config_1.config.PORT}]`));
+    _server.listen(config_1.config.PORT, () => console.log(`[${config_1.config.SERVICE_NAME}] Running on port: [${config_1.config.PORT}]`));
     _server.on('error', e => console.log(`${config_1.config.SERVICE_NAME} ran into Error:`, e));
 })();
 function getServer() {

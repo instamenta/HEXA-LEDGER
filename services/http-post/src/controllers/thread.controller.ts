@@ -1,14 +1,13 @@
 import {Request as Req, Response as Res} from 'express';
 import StatusCode from '@instamenta/http-status-codes';
 import * as zod from '../validation/thread.zod';
-import {type ZodError} from 'zod';
 import ThreadRepository from '../repositories/thread.repository';
 import ThreadModel from '../models/thread.model';
-import {type MongoError} from 'mongodb';
 import {RespondGeneralPurpose} from '../utilities/error.handlers';
-import {pageQuery} from "../validation/thread.zod";
-import {Transform} from "stream";
-import {TransformCallback} from "node:stream";
+import {Transform} from 'stream';
+import {TransformCallback} from 'node:stream';
+import {type ZodError} from 'zod';
+import {type MongoError} from 'mongodb';
 
 export default class ThreadController {
 
@@ -37,7 +36,7 @@ export default class ThreadController {
 
    public async update(r: Req, w: Res): Promise<void> {
       try {
-         const {postId} = zod.postIdParam.parse(r.params)
+         const {postId} = zod.postIdParam.parse(r.params);
          const threadData = zod.updateBody.parse(r.body);
 
          this.threadRepository.update(
@@ -91,28 +90,27 @@ export default class ThreadController {
       try {
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
-         const _$_DB_ = await this.threadRepository.getMany(skip, limit);
-         const _$_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
+         const $_DB = await this.threadRepository.getMany(skip, limit);
+         const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
+         let co = 0;
 
-         _$_T_._transform = (
-            chunk: ThreadModel,
-            encoding: BufferEncoding,
-            callback: TransformCallback
-         ) => {
-            callback(null, chunk.get());
-         }
+         $_T_._transform = (d: ThreadModel, enc: BufferEncoding, call: TransformCallback) => {
+            call(null, d.get());
+            co++;
+         };
 
-         _$_T_.on('end', () => {
-            w.status(StatusCode.OK).end();
+         $_T_.on('end', () => {
+            co ? w.status(StatusCode.OK).end()
+               : w.status(StatusCode.NOT_FOUND).end();
          });
 
-         _$_DB_.on('error', (e: Error) => {
+         $_DB.on('error', (e: Error) => {
             w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
-         })
+         });
 
-         _$_DB_.pipe(_$_T_).pipe(w);
+         $_DB.pipe($_T_).pipe(w);
       } catch
-         (e: Error | ZodError | MongoError | unknown) {
+      (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
    }

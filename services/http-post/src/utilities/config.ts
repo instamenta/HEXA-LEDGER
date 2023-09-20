@@ -1,29 +1,31 @@
 import {z} from 'zod';
-import {MongoClientOptions} from 'mongodb';
+import {MongoClient, MongoClientOptions} from 'mongodb';
 
-const env = z.object({
+const envSchema = z.object({
    PORT: z.string().default('4002'),
    SERVICE_NAME: z.string().default('HTTP_POST'),
    DB_URI: z.string(),
    DB_NAME: z.string().default('main'),
+   DB_THREADS_COLLECTION: z.string().default('threads')
 });
 
-env.parse(process.env);
-
-declare global {
-   namespace NodeJS {
-      interface ProcessEnv extends z.infer<typeof env> {
-
-      }
-   }
-}
+const env = envSchema.parse(process.env);
 
 export const config = {
-   SERVICE_NAME: process.env.SERVICE_NAME,
-   PORT: process.env.PORT,
-   DB_URI: process.env.DB_URI,
-   DB_NAME: process.env.DB_NAME,
+   SERVICE_NAME: env.SERVICE_NAME,
+   PORT: env.PORT,
+   DB_URI: env.DB_URI,
+   DB_NAME: env.DB_NAME,
+   DB_THREADS_COLLECTION: env.DB_THREADS_COLLECTION || 'threads',
    DB_OPTIONS: {
-      appName: process.env.SERVICE_NAME,
+      appName: env.SERVICE_NAME,
    } as MongoClientOptions,
 };
+
+export function getDatabase() {
+   console.log('[Connecting to Mongo Client]');
+   const db_client = new MongoClient(config.DB_URI, config.DB_OPTIONS);
+
+   console.log(`[Connecting to Database "${config.DB_NAME}]`);
+   return db_client.db(config.DB_NAME);
+}

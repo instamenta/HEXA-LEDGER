@@ -6,21 +6,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongodb_1 = require("mongodb");
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const error_handlers_1 = require("../utilities/error.handlers");
+const config_1 = require("../utilities/config");
 class ThreadRepository {
     collection;
     constructor(db) {
-        this.collection = db.collection('threads');
+        this.collection = db.collection(config_1.config.DB_THREADS_COLLECTION);
     }
     async create(d) {
         const record = {
             n: Buffer.from(d.name),
             des: Buffer.from(d.description),
             c: Buffer.from(d.content),
-            o: new mongodb_1.ObjectId(d.owner),
-            p: [{ promoter: new mongodb_1.ObjectId(d.owner), date: new Date(), amount: d.promoted }],
+            o: Buffer.from(d.owner, 'hex'),
+            p: [{
+                    promoter: Buffer.from(d.owner, 'hex'),
+                    date: Math.floor(new Date().getTime() / 1000),
+                    amount: d.promoted
+                }],
             i: d.images.map((img) => Buffer.from(img)),
             t: d.tags.map((tag) => Buffer.from(tag)),
-            ca: new Date(), up: new Date(),
+            ca: Math.floor(new Date().getTime() / 1000),
+            up: Math.floor(new Date().getTime() / 1000),
             do: [], li: [], di: [],
             del: false,
         };
@@ -36,7 +42,7 @@ class ThreadRepository {
             $match: { _id: new mongodb_1.ObjectId(postId), del: true }
         };
         const update = {
-            $set: { del: true, up: new Date() }
+            $set: { del: true, up: Math.floor(new Date().getTime() / 1000) }
         };
         const options = {
             returnDocument: 'after'
@@ -53,7 +59,7 @@ class ThreadRepository {
             $match: { _id: new mongodb_1.ObjectId(postId), del: false }
         };
         const update = {
-            $set: { up: new Date() }
+            $set: { up: Math.floor(new Date().getTime() / 1000) }
         };
         const options = {
             returnDocument: 'after'

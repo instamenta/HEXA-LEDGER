@@ -1,5 +1,3 @@
-import {ObjectId} from 'mongodb';
-
 export type PCreateData = {
    name: string;
    description: string;
@@ -20,14 +18,14 @@ export type PUpdateData = {
 
 export type IPromotedObject = {
    amount: number,
-   promoter: ObjectId,
-   date: Date,
+   promoter: Buffer,
+   date: number,
 }
 
 export type IDonationObject = {
-   donator: ObjectId,
+   donator: Buffer,
    amount: number,
-   date: Date,
+   date: number,
 }
 
 export interface IThreadSchema {
@@ -35,14 +33,14 @@ export interface IThreadSchema {
    des: Buffer // description
    c: Buffer // content
    i: Buffer[] // images
-   ca: Date // created_at
-   up: Date // updated_at
-   o: ObjectId // owner
+   ca: number // created_at
+   up: number // updated_at
+   o: Buffer // owner
    del: boolean // deleted
    p: IPromotedObject[] // promoted
    do: IDonationObject[] // donations
-   li: ObjectId[] // likes
-   di: ObjectId[] // dislikes
+   li: Buffer[] // likes
+   di: Buffer[] // dislikes
    t: Buffer[] // tags
 }
 

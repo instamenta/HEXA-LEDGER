@@ -12,7 +12,7 @@ export const createBody = z.object({
 
 export const postIdParam = z.object({
    postId: z.string().length(24),
-})
+});
 
 export const pageQuery = z.object({
    limit: z.coerce.number().positive().lt(100),
@@ -25,4 +25,4 @@ export const updateBody = z.object({
    content: z.string().min(26).max(360).trim().default('No Content Provided!'),
    images: z.array(z.string()).default([]),
    tags: z.array(z.string()).default([]),
-})
+});

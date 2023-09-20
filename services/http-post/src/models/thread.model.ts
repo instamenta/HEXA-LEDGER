@@ -1,6 +1,7 @@
 import {WithId} from 'mongodb';
 import * as I from '../types/types';
 import BaseThreadModel from './base.thread.model';
+import {SOThreadsModel} from "../types/types";
 
 export default class ThreadModel extends BaseThreadModel {
 
@@ -76,7 +77,7 @@ export default class ThreadModel extends BaseThreadModel {
       return this.t.map(tag => tag.toString());
    }
 
-   get(): I.OThreadsModel {
+    public get(): Omit<I.OThreadsModel, 'deleted'> {
       return {
          id: this.id,
          name: this.name,
@@ -86,7 +87,6 @@ export default class ThreadModel extends BaseThreadModel {
          created_at: this.created_at,
          updated_at: this.updated_at,
          owner: this.owner,
-         deleted: this.deleted,
          promoted: this.promoted,
          donations: this.donations,
          likes: this.likes,
@@ -94,4 +94,20 @@ export default class ThreadModel extends BaseThreadModel {
          tags: this.tags,
       };
    }
+
+   public getStatic():SOThreadsModel {
+      return {
+         id: this.id,
+         name: this.name,
+         description: this.description,
+         content: this.content,
+         owner: this.owner,
+         image: this.images[0],
+         created_at: this.created_at.toISOString(),
+         updated_at: this.updated_at.toISOString(),
+         likes_count : this.likes.length,
+         dislikes_count: this.dislikes.length,
+      };
+   }
+
 }

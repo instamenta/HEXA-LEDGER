@@ -89,13 +89,15 @@ export default class ThreadController {
    public async getMany(r: Req, w: Res): Promise<void> {
       try {
          const {skip, limit} = zod.pageQuery.parse(r.query);
+         console.log('=================')
 
          const $_DB = await this.threadRepository.getMany(skip, limit);
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
          let co = 0;
 
          $_T_._transform = (d: ThreadModel, enc: BufferEncoding, call: TransformCallback) => {
-            call(null, d.get());
+            console.log(d.getStatic());
+            call(null, JSON.stringify(d.getStatic()));
             co++;
          };
 
@@ -105,12 +107,13 @@ export default class ThreadController {
          });
 
          $_DB.on('error', (e: Error) => {
+            console.log('=================ERROR')
             w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
          });
 
          $_DB.pipe($_T_).pipe(w);
       } catch
-      (e: Error | ZodError | MongoError | unknown) {
+         (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
    }

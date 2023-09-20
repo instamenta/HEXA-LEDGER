@@ -63,3 +63,16 @@ export interface OThreadsModel {
    dislikes: string[]
    tags: string[]
 }
+
+export interface SOThreadsModel {
+   id: string
+   name: string
+   description: string
+   content: string
+   image:  string
+   created_at: string
+   updated_at: string
+   owner: string
+   likes_count : number
+   dislikes_count: number
+}

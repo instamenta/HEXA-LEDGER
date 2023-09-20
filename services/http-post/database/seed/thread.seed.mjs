@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ObjectId, MongoClient, Collection, Db } from 'mongodb';
 import 'dotenv/config';
 
-(function seeding() {
+(async function seeding() {
 	/** @type {{c: Buffer, di: Buffer[], i: Buffer[], del: boolean, do: {date: number, amount: number, donator: Buffer}[], sample: boolean, n: Buffer, o: Buffer, p: {date: number, amount: number, promoter: Buffer}[], des: Buffer, t: Buffer[], up: number, li: Buffer[], ca: number}[]}*/
 	const users = [];
 	for ( let i = 0 ; i < faker.datatype.number({ min: 200, max: 300 }) ; i++ ) {
@@ -13,24 +13,23 @@ import 'dotenv/config';
 	/** @type {MongoClient} */
 	const mongoClient = new MongoClient(process.env.DB_URI);
 
-	console.log(`[Connecting to Database "${process.env.DB_NAME}:]`);
+	console.log(`[Connecting to Database "${ process.env.DB_NAME }:]`);
 	/** @type {Db} */
 	const mongoDB = mongoClient.db(process.env.DB_NAME);
 
-	console.log(`[Connecting to Collection "${process.env.DB_THREADS_COLLECTION}"] `);
+	console.log(`[Connecting to Collection "${ process.env.DB_THREADS_COLLECTION }"] `);
 	/** @type {Collection<IThreadSchema>} */
 	const threads_collection = mongoDB.collection(process.env.DB_THREADS_COLLECTION);
 
 	let flag = true
 	try {
-		threads_collection.insertMany(users)
+		await threads_collection.insertMany(users)
 			.then(res => console.log(`[Successfully seeded the database with -->] ${ res.insertedCount }`));
 	} catch ( e ) {
 		console.log('[Database seeded unsuccessfully]: ', e)
 		flag = false
 	} finally {
-		flag ? process.exit(0)
-			: process.exit(1);
+		flag ? process.exit(0) : process.exit(1);
 	}
 })()
 

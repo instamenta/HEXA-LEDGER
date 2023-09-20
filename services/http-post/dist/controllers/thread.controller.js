@@ -92,11 +92,13 @@ class ThreadController {
     async getMany(r, w) {
         try {
             const { skip, limit } = zod.pageQuery.parse(r.query);
+            console.log('=================');
             const $_DB = await this.threadRepository.getMany(skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
             let co = 0;
             $_T_._transform = (d, enc, call) => {
-                call(null, d.get());
+                console.log(d.getStatic());
+                call(null, JSON.stringify(d.getStatic()));
                 co++;
             };
             $_T_.on('end', () => {
@@ -104,6 +106,7 @@ class ThreadController {
                     : w.status(http_status_codes_1.default.NOT_FOUND).end();
             });
             $_DB.on('error', (e) => {
+                console.log('=================ERROR');
                 w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
             });
             $_DB.pipe($_T_).pipe(w);

@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongodb_1 = require("mongodb");
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const error_handlers_1 = require("../utilities/error.handlers");
 const config_1 = require("../utilities/config");
+const mongodb_1 = require("mongodb");
 class ThreadRepository {
     collection;
     constructor(db) {
@@ -30,9 +30,11 @@ class ThreadRepository {
             do: [], li: [], di: [],
             del: false,
         };
-        return this.collection.insertOne(record).then((res) => res.insertedId
+        return this.collection.insertOne(record)
+            .then((res) => res.insertedId
             ? new thread_model_1.default({ ...record, _id: res.insertedId })
-            : null).catch((e) => {
+            : null)
+            .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
@@ -47,9 +49,11 @@ class ThreadRepository {
         const options = {
             returnDocument: 'after'
         };
-        return this.collection.findOneAndUpdate(filter, update, options).then((res) => res
+        return this.collection.findOneAndUpdate(filter, update, options)
+            .then((res) => res
             ? new thread_model_1.default(res)
-            : null).catch((e) => {
+            : null)
+            .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
@@ -78,9 +82,11 @@ class ThreadRepository {
             Object.assign(update.$set, {
                 t: (d.tags).map((tag) => Buffer.from(tag))
             });
-        return this.collection.findOneAndUpdate(filter, update, options).then((res) => res
+        return this.collection.findOneAndUpdate(filter, update, options)
+            .then((res) => res
             ? new thread_model_1.default(res)
-            : null).catch((e) => {
+            : null)
+            .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
@@ -89,9 +95,11 @@ class ThreadRepository {
         const filter = {
             _id: new mongodb_1.ObjectId(postId), del: false
         };
-        return this.collection.findOne(filter).then((res) => res
+        return this.collection.findOne(filter)
+            .then((res) => res
             ? new thread_model_1.default(res)
-            : null).catch((e) => {
+            : null)
+            .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });

@@ -72,12 +72,25 @@ class ThreadModel extends base_thread_model_1.default {
             created_at: this.created_at,
             updated_at: this.updated_at,
             owner: this.owner,
-            deleted: this.deleted,
             promoted: this.promoted,
             donations: this.donations,
             likes: this.likes,
             dislikes: this.dislikes,
             tags: this.tags,
+        };
+    }
+    getStatic() {
+        return {
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            content: this.content,
+            owner: this.owner,
+            image: this.images[0],
+            created_at: this.created_at.toISOString(),
+            updated_at: this.updated_at.toISOString(),
+            likes_count: this.likes.length,
+            dislikes_count: this.dislikes.length,
         };
     }
 }

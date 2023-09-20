@@ -1,8 +1,22 @@
 import React from 'react'
+import {useQuery} from "@tanstack/react-query";
+import axios, {type AxiosResponse} from 'axios';
+import * as I from "~/types/threads.api";
 
 export default function Catalog() {
 
+   const getThreads = (skip: number, limit: number) => axios.get(`http://localhost:4002/thread?limit=${limit}&skip=${skip}`)
+      .then((res: AxiosResponse<I.SOThreadsModel>) => res ? res.data : null);
 
+   const skip = 0;
+   const limit = 10;
+
+   const {data} = useQuery({
+      queryKey: ['repoData', skip, limit],
+      queryFn: () => getThreads(skip, limit)
+   });
+console.log('==============')
+   console.log(data);
 
    return (
       <main className="flex flex-col w-screen min-h-screen p-10 bg-gray-100 text-gray-800">

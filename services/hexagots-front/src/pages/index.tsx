@@ -1,17 +1,7 @@
 import Head from "next/head";
 import Link from "next/link";
-import {useQuery} from "@tanstack/react-query";
-import axios from 'axios';
 
 export default function Home() {
-
-   const {data} = useQuery({
-      queryKey: ['repoData'],
-      queryFn: () => axios.get('localhost:4002/thread').then()
-   });
-
-   console.log(data);
-
    return (
       <>
          <Head>

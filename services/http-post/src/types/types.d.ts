@@ -10,6 +10,14 @@ export type PCreateData = {
    tags: string[];
 }
 
+export type PUpdateData = {
+   name: string;
+   description: string;
+   content: string;
+   images: string[];
+   tags: string[];
+}
+
 export type IPromotedObject = {
    amount: number,
    promoter: ObjectId,

@@ -22,17 +22,30 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const http_status_codes_1 = __importDefault(require("@instamenta/http-status-codes"));
 const zod = __importStar(require("../validation/thread.zod"));
-const zod_1 = require("zod");
+const thread_model_1 = __importDefault(require("../models/thread.model"));
+const error_handlers_1 = require("../utilities/error.handlers");
 class ThreadController {
+    threadRepository;
+    constructor(threadRepository) {
+        this.threadRepository = threadRepository;
+    }
     async create(r, w) {
         try {
-            const { body: { name, description, content, images, owner, promoted, tags } } = zod.create.parse(r);
+            const { body: threadData } = zod.create.parse(r);
+            this.threadRepository.create(threadData).then(model => model instanceof thread_model_1.default
+                ? w.status(http_status_codes_1.default.CREATED)
+                    .json(model.get()).end()
+                : w.status(http_status_codes_1.default.BAD_REQUEST)
+                    .json('Failed to create').end());
         }
         catch (e) {
-            if (e instanceof zod_1.ZodError)
-                w.end();
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
         }
     }
     async update(r, w) {

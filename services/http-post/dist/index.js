@@ -3,22 +3,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-const cookie_parser_1 = __importDefault(require("cookie-parser"));
 require("dotenv/config");
+const express_1 = __importDefault(require("express"));
 const thread_router_1 = __importDefault(require("./routes/thread.router"));
 const thread_controller_1 = __importDefault(require("./controllers/thread.controller"));
-const SERVICE_NAME = process.env.SERVICE_NAME;
-const PORT = process.env.PORT;
+const thread_repository_1 = __importDefault(require("./repositories/thread.repository"));
+const mongodb_1 = require("mongodb");
+const config_1 = require("./utilities/config");
+const error_middleware_1 = require("./middlewares/error.middleware");
 (function initializeService() {
-    const _server = (0, express_1.default)();
-    _server.use((0, cors_1.default)());
-    _server.use(express_1.default.json());
-    _server.use((0, cookie_parser_1.default)());
-    const threadController = new thread_controller_1.default();
+    const _server = getServer();
+    const db = new mongodb_1.MongoClient(config_1.config.DB_URI, config_1.config.DB_OPTIONS)
+        .db(config_1.config.DB_NAME);
+    const threadRepository = new thread_repository_1.default(db);
+    const threadController = new thread_controller_1.default(threadRepository);
     const threadRouter = new thread_router_1.default(threadController).getRouter();
     _server.use('/thread', threadRouter);
-    _server.listen(PORT, () => console.log(`[${SERVICE_NAME}] running on port: [${PORT}]`));
-    _server.on('error', (e) => console.log(`${SERVICE_NAME} ran into Error:`, e));
+    _server.use(error_middleware_1._404Handler);
+    _server.use(error_middleware_1._errorHandler);
+    _server.listen(config_1.config.PORT, () => console.log(`[${config_1.config.SERVICE_NAME}] running on port: [${config_1.config.PORT}]`));
+    _server.on('error', e => console.log(`${config_1.config.SERVICE_NAME} ran into Error:`, e));
 })();
+function getServer() {
+    const _server = (0, express_1.default)();
+    _server.use(require('cors')());
+    _server.use(express_1.default.json());
+    _server.use(require('cookie-parser')());
+    return _server;
+}

@@ -6,8 +6,9 @@ import ThreadModel from '../models/thread.model';
 import {RespondGeneralPurpose} from '../utilities/error.handlers';
 import {Transform} from 'stream';
 import {TransformCallback} from 'node:stream';
-import {type ZodError} from 'zod';
+import {type ZodError, z} from 'zod';
 import {type MongoError} from 'mongodb';
+import * as I from "../types/types";
 
 export default class ThreadController {
 
@@ -17,7 +18,10 @@ export default class ThreadController {
       this.threadRepository = threadRepository;
    }
 
-   public async create(r: Req, w: Res): Promise<void> {
+   public async create(
+      r: Req<{}, {}, z.infer<typeof zod.createBody>>,
+      w: Res<Omit<I.OThreadsModel, "deleted"> | string | Error>
+   ): Promise<void> {
       try {
          const threadData = zod.createBody.parse(r.body);
 
@@ -34,7 +38,10 @@ export default class ThreadController {
       }
    }
 
-   public async update(r: Req, w: Res): Promise<void> {
+   public async update(
+      r: Req<{ postId: string }, {}, z.infer<typeof zod.updateBody>>,
+      w: Res<Omit<I.OThreadsModel, "deleted"> | string | Error>
+   ): Promise<void> {
       try {
          const {postId} = zod.postIdParam.parse(r.params);
          const threadData = zod.updateBody.parse(r.body);
@@ -52,7 +59,10 @@ export default class ThreadController {
       }
    }
 
-   public async delete(r: Req, w: Res): Promise<void> {
+   public async delete(
+      r: Req<{ postId: string }>,
+      w: Res<Omit<I.OThreadsModel, "deleted"> | string | Error>
+   ): Promise<void> {
       try {
          const {postId} = zod.postIdParam.parse(r.params);
 
@@ -69,7 +79,10 @@ export default class ThreadController {
       }
    }
 
-   public async getOne(r: Req, w: Res): Promise<void> {
+   public async getOne(
+      r: Req<{ postId: string }>,
+      w: Res<string | Omit<I.OThreadsModel, "deleted"> | Error>
+   ): Promise<void> {
       try {
          const {postId} = zod.postIdParam.parse(r.params);
 
@@ -86,17 +99,20 @@ export default class ThreadController {
       }
    }
 
-   public async getMany(r: Req, w: Res): Promise<void> {
+   public async getMany(
+      r: Req<{}, { skip: number, limit: number }>,
+      w: Res<I.SOThreadsModel[] | Error>
+   ): Promise<void> {
+      console.log('here')
       try {
+         console.log(r.cookies);
          const {skip, limit} = zod.pageQuery.parse(r.query);
-         console.log('=================')
 
          const $_DB = await this.threadRepository.getMany(skip, limit);
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
          let co = 0;
 
-         $_T_._transform = (d: ThreadModel, enc: BufferEncoding, call: TransformCallback) => {
-            console.log(d.getStatic());
+         $_T_._transform = (d: ThreadModel, enc, call: TransformCallback) => {
             call(null, JSON.stringify(d.getStatic()));
             co++;
          };
@@ -107,7 +123,6 @@ export default class ThreadController {
          });
 
          $_DB.on('error', (e: Error) => {
-            console.log('=================ERROR')
             w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
          });
 
@@ -118,8 +133,41 @@ export default class ThreadController {
       }
    }
 
-   public async getByOwner(r: Req, w: Res): Promise<void> {
+   public async getByOwner(
+      r: Req<{}, { skip: number, limit: number }>,
+      w: Res
+   ): Promise<void> {
+      try {
+         const authId = r.cookies;
+         console.log(authId)
+
+         const {skip, limit} = zod.pageQuery.parse(r.query);
+
+         const $_DB = await this.threadRepository.getByOwner(authId, skip, limit);
+         const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
+         let co = 0;
+
+         $_T_._transform = (d: ThreadModel, encoding, call: TransformCallback) => {
+            call(null, JSON.stringify(d.getStatic()));
+            co++;
+         };
+
+         $_T_.on('end', () => {
+            co ? w.status(StatusCode.OK).end()
+               : w.status(StatusCode.NOT_FOUND).end();
+         });
+
+         $_DB.on('error', (e: Error) => {
+            w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
+         });
+
+         $_DB.pipe($_T_).pipe(w);
+      } catch
+         (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
    }
+
 
    public async like(r: Req, w: Res): Promise<void> {
    }

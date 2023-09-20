@@ -90,14 +90,14 @@ class ThreadController {
         }
     }
     async getMany(r, w) {
+        console.log('here');
         try {
+            console.log(r.cookies);
             const { skip, limit } = zod.pageQuery.parse(r.query);
-            console.log('=================');
             const $_DB = await this.threadRepository.getMany(skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
             let co = 0;
             $_T_._transform = (d, enc, call) => {
-                console.log(d.getStatic());
                 call(null, JSON.stringify(d.getStatic()));
                 co++;
             };
@@ -106,7 +106,6 @@ class ThreadController {
                     : w.status(http_status_codes_1.default.NOT_FOUND).end();
             });
             $_DB.on('error', (e) => {
-                console.log('=================ERROR');
                 w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
             });
             $_DB.pipe($_T_).pipe(w);
@@ -116,6 +115,29 @@ class ThreadController {
         }
     }
     async getByOwner(r, w) {
+        try {
+            const authId = r.cookies;
+            console.log(authId);
+            const { skip, limit } = zod.pageQuery.parse(r.query);
+            const $_DB = await this.threadRepository.getByOwner(authId, skip, limit);
+            const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
+            let co = 0;
+            $_T_._transform = (d, encoding, call) => {
+                call(null, JSON.stringify(d.getStatic()));
+                co++;
+            };
+            $_T_.on('end', () => {
+                co ? w.status(http_status_codes_1.default.OK).end()
+                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
+            });
+            $_DB.on('error', (e) => {
+                w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
+            });
+            $_DB.pipe($_T_).pipe(w);
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
     }
     async like(r, w) {
     }

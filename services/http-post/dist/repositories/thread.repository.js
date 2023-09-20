@@ -118,17 +118,113 @@ class ThreadRepository {
             throw e;
         }
     }
-    customOne() {
+    async getByOwner(ownerId, skip, limit) {
+        const filter = {
+            o: Buffer.from(ownerId, 'hex'), del: false
+        };
+        try {
+            return this.collection
+                .find(filter)
+                .skip(skip)
+                .limit(limit)
+                .stream({
+                transform: (doc) => new thread_model_1.default(doc)
+            });
+        }
+        catch (e) {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        }
     }
-    customMany() {
+    async promote(postId, authId, amount) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(postId), del: false
+        };
+        const update = {
+            $push: {
+                p: {
+                    promoter: Buffer.from(authId, 'hex'),
+                    date: new Date().getTime() / 1000,
+                    amount: +amount,
+                }
+            }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
     }
-    promote() {
+    async donate(postId, authId, amount) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(postId), del: false
+        };
+        const update = {
+            $push: {
+                do: {
+                    donator: Buffer.from(authId, 'hex'),
+                    date: new Date().getTime() / 1000,
+                    amount: +amount,
+                }
+            }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
     }
-    transferOwnership() {
+    async transferOwnership(postId, authId, newOwner) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(postId),
+            o: Buffer.from(authId, 'hex'),
+            del: false,
+        };
+        const update = {
+            $set: { o: Buffer.from(newOwner, 'hex') }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
     }
-    like() {
+    async like(postId, authId) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(postId),
+            $ne: { o: Buffer.from(authId, 'hex') },
+            del: false,
+        };
+        const update = {
+            $addToSet: { li: Buffer.from(authId, 'hex') },
+            $pull: { di: Buffer.from(authId, 'hex') }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
     }
-    dislike() {
+    async dislike(postId, authId) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(postId),
+            $ne: { o: Buffer.from(authId, 'hex') },
+            del: false,
+        };
+        const update = {
+            $addToSet: { di: Buffer.from(authId, 'hex') },
+            $pull: { li: Buffer.from(authId, 'hex') }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
     }
 }
 exports.default = ThreadRepository;

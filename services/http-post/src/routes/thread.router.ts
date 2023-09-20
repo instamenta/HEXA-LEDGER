@@ -13,20 +13,20 @@ export default class ThreadRouter {
 
     private initialize(c: ThreadController) {
         this.router.route('/')
-            .get(c.getMany)
-            .post(c.create);
+            .get(c.getMany.bind(c))
+            .post(c.create.bind(c));
 
         this.router.route('/:threadId')
-            .get(c.getOne)
-            .put(c.update)
-            .delete(c.delete);
+            .get(c.getOne.bind(c))
+            .put(c.update.bind(c))
+            .delete(c.delete.bind(c));
 
-        this.router.put('/:threadId/like', c.like);
-        this.router.put('/:threadId/dislike', c.dislike);
-        this.router.put('/:threadId/promote', c.dislike);
-        this.router.put('/:threadId/transfer', c.dislike);
-        this.router.put('/:threadId/donate', c.donate);
-        this.router.get('/owner/:ownerId', c.getByOwner);
+        this.router.put('/:threadId/like', c.like.bind(c));
+        this.router.put('/:threadId/dislike', c.dislike.bind(c));
+        this.router.put('/:threadId/promote', c.dislike.bind(c));
+        this.router.put('/:threadId/transfer', c.dislike.bind(c));
+        this.router.put('/:threadId/donate', c.donate.bind(c));
+        this.router.get('/owner/:ownerId', c.getByOwner.bind(c));
     }
 
     public getRouter(): Router {

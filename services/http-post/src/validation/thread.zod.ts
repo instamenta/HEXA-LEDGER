@@ -14,6 +14,11 @@ export const postIdParam = z.object({
    postId: z.string().length(24),
 })
 
+export const pageQuery = z.object({
+   limit: z.coerce.number().positive().lt(100),
+   skip: z.coerce.number().gte(0),
+});
+
 export const updateBody = z.object({
    name: z.string().min(1).max(48).trim(),
    description: z.string().min(3).max(120).trim().default('No Description!'),

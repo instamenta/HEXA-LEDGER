@@ -1,6 +1,6 @@
 import {
    Collection,
-   Db,
+   Db, Document,
    Filter,
    FindOneAndUpdateOptions, InsertOneResult,
    MongoError,
@@ -11,6 +11,7 @@ import * as I from '../types/types';
 import ThreadModel from '../models/thread.model';
 import {HandleMongoError} from '../utilities/error.handlers';
 import {PUpdateData} from "../types/types";
+import {Readable as NodeRStream} from "node:stream";
 
 export default class ThreadRepository {
 
@@ -95,12 +96,33 @@ export default class ThreadRepository {
       });
    }
 
-   getOne() {
-
+   async getOneById(postId: string): Promise<ThreadModel | null> {
+      const filter: Filter<I.IThreadSchema> = {
+         _id: new ObjectId(postId), del: false
+      };
+      return this.collection.findOne(
+         filter
+      ).then((res: WithId<I.IThreadSchema> | null) => res
+         ? new ThreadModel(res)
+         : null
+      ).catch((e: MongoError) => {
+         HandleMongoError(e);
+         throw e;
+      });
    }
 
-   getMany() {
-
+   async getMany(skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
+      try {
+         return this.collection.find()
+            .skip(skip)
+            .limit(limit)
+            .stream({
+               transform: (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
+            });
+      } catch (e: MongoError | unknown) {
+         HandleMongoError(e);
+         throw e;
+      }
    }
 
    customOne() {

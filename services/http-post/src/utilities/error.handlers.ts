@@ -52,6 +52,7 @@ export function RespondGeneralPurpose(
    error: Error | ZodError | MongoError | unknown,
    w: Response
 ): void {
+   console.log(error);
    if (error instanceof ZodError) {
       RespondToZodError(error, w);
    } else if (error instanceof MongoError) {

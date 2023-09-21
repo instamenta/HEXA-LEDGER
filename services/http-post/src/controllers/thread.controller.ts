@@ -8,7 +8,8 @@ import {Transform} from 'stream';
 import {TransformCallback} from 'node:stream';
 import {type ZodError, z} from 'zod';
 import {type MongoError} from 'mongodb';
-import * as I from "../types/types";
+import * as I from '../types/types';
+import '@clerk/clerk-sdk-node'
 
 export default class ThreadController {
 
@@ -20,7 +21,7 @@ export default class ThreadController {
 
    public async create(
       r: Req<{}, {}, z.infer<typeof zod.createBody>>,
-      w: Res<Omit<I.OThreadsModel, "deleted"> | string | Error>
+      w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
    ): Promise<void> {
       try {
          const threadData = zod.createBody.parse(r.body);
@@ -40,7 +41,7 @@ export default class ThreadController {
 
    public async update(
       r: Req<{ postId: string }, {}, z.infer<typeof zod.updateBody>>,
-      w: Res<Omit<I.OThreadsModel, "deleted"> | string | Error>
+      w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
    ): Promise<void> {
       try {
          const {postId} = zod.postIdParam.parse(r.params);
@@ -61,7 +62,7 @@ export default class ThreadController {
 
    public async delete(
       r: Req<{ postId: string }>,
-      w: Res<Omit<I.OThreadsModel, "deleted"> | string | Error>
+      w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
    ): Promise<void> {
       try {
          const {postId} = zod.postIdParam.parse(r.params);
@@ -81,7 +82,7 @@ export default class ThreadController {
 
    public async getOne(
       r: Req<{ postId: string }>,
-      w: Res<string | Omit<I.OThreadsModel, "deleted"> | Error>
+      w: Res<string | Omit<I.OThreadsModel, 'deleted'> | Error>
    ): Promise<void> {
       try {
          const {postId} = zod.postIdParam.parse(r.params);
@@ -103,22 +104,20 @@ export default class ThreadController {
       r: Req<{}, { skip: number, limit: number }>,
       w: Res<I.SOThreadsModel[] | Error>
    ): Promise<void> {
-      console.log('here')
       try {
-         console.log(r.cookies);
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
          const $_DB = await this.threadRepository.getMany(skip, limit);
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
-         let co = 0;
+         let counter = 0;
 
          $_T_._transform = (d: ThreadModel, enc, call: TransformCallback) => {
             call(null, JSON.stringify(d.getStatic()));
-            co++;
+            counter++;
          };
 
          $_T_.on('end', () => {
-            co ? w.status(StatusCode.OK).end()
+            counter ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end();
          });
 
@@ -128,7 +127,7 @@ export default class ThreadController {
 
          $_DB.pipe($_T_).pipe(w);
       } catch
-         (e: Error | ZodError | MongoError | unknown) {
+      (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
    }
@@ -139,21 +138,21 @@ export default class ThreadController {
    ): Promise<void> {
       try {
          const authId = r.cookies;
-         console.log(authId)
+         console.log(authId);
 
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
          const $_DB = await this.threadRepository.getByOwner(authId, skip, limit);
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
-         let co = 0;
+         let counter = 0;
 
-         $_T_._transform = (d: ThreadModel, encoding, call: TransformCallback) => {
+         $_T_._transform = (d: ThreadModel, enc, call: TransformCallback) => {
             call(null, JSON.stringify(d.getStatic()));
-            co++;
+            counter++;
          };
 
          $_T_.on('end', () => {
-            co ? w.status(StatusCode.OK).end()
+            counter ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end();
          });
 
@@ -163,7 +162,7 @@ export default class ThreadController {
 
          $_DB.pipe($_T_).pipe(w);
       } catch
-         (e: Error | ZodError | MongoError | unknown) {
+      (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
    }

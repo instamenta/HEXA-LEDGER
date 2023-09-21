@@ -1,7 +1,7 @@
 import {WithId} from 'mongodb';
 import * as I from '../types/types';
 import BaseThreadModel from './base.thread.model';
-import {SOThreadsModel} from "../types/types";
+import {SOThreadsModel} from '../types/types';
 
 export default class ThreadModel extends BaseThreadModel {
 
@@ -77,7 +77,7 @@ export default class ThreadModel extends BaseThreadModel {
       return this.t.map(tag => tag.toString());
    }
 
-    public get(): Omit<I.OThreadsModel, 'deleted'> {
+   public get(): Omit<I.OThreadsModel, 'deleted'> {
       return {
          id: this.id,
          name: this.name,

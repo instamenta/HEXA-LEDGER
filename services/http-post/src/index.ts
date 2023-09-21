@@ -1,9 +1,8 @@
 import 'dotenv/config';
-import express from 'express';
 import ThreadRouter from "./routes/thread.router";
 import ThreadController from "./controllers/thread.controller";
 import ThreadRepository from "./repositories/thread.repository";
-import {config, getDatabase} from './utilities/config'
+import {config, getDatabase, getServer} from './utilities/config'
 import {_404Handler, _errorHandler} from "./middlewares/error.middleware";
 
 (function initializeService(): void {
@@ -24,13 +23,3 @@ import {_404Handler, _errorHandler} from "./middlewares/error.middleware";
    _server.on('error', e => console.log(
       `${config.SERVICE_NAME} ran into Error:`, e));
 })();
-
-function getServer(): express.Express {
-   const _server = express();
-
-   _server.use(require('cors')());
-   _server.use(express.json());
-   _server.use(require('cookie-parser')());
-
-   return _server;
-}

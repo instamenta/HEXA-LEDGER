@@ -60,6 +60,7 @@ function RespondToError(error, w) {
 }
 exports.RespondToError = RespondToError;
 function RespondGeneralPurpose(error, w) {
+    console.log(error);
     if (error instanceof zod_1.ZodError) {
         RespondToZodError(error, w);
     }

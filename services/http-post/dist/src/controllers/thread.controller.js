@@ -31,6 +31,7 @@ const zod = __importStar(require("../validation/thread.zod"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const error_handlers_1 = require("../utilities/error.handlers");
 const stream_1 = require("stream");
+require("@clerk/clerk-sdk-node");
 class ThreadController {
     threadRepository;
     constructor(threadRepository) {
@@ -90,19 +91,18 @@ class ThreadController {
         }
     }
     async getMany(r, w) {
-        console.log('here');
         try {
-            console.log(r.cookies);
+            console.log(r.auth);
             const { skip, limit } = zod.pageQuery.parse(r.query);
             const $_DB = await this.threadRepository.getMany(skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
-            let co = 0;
+            let counter = 0;
             $_T_._transform = (d, enc, call) => {
                 call(null, JSON.stringify(d.getStatic()));
-                co++;
+                counter++;
             };
             $_T_.on('end', () => {
-                co ? w.status(http_status_codes_1.default.OK).end()
+                counter ? w.status(http_status_codes_1.default.OK).end()
                     : w.status(http_status_codes_1.default.NOT_FOUND).end();
             });
             $_DB.on('error', (e) => {
@@ -121,13 +121,13 @@ class ThreadController {
             const { skip, limit } = zod.pageQuery.parse(r.query);
             const $_DB = await this.threadRepository.getByOwner(authId, skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
-            let co = 0;
-            $_T_._transform = (d, encoding, call) => {
+            let counter = 0;
+            $_T_._transform = (d, enc, call) => {
                 call(null, JSON.stringify(d.getStatic()));
-                co++;
+                counter++;
             };
             $_T_.on('end', () => {
-                co ? w.status(http_status_codes_1.default.OK).end()
+                counter ? w.status(http_status_codes_1.default.OK).end()
                     : w.status(http_status_codes_1.default.NOT_FOUND).end();
             });
             $_DB.on('error', (e) => {

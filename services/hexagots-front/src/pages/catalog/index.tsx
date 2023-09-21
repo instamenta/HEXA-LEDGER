@@ -1,22 +1,22 @@
 import React from 'react'
 import {useQuery} from "@tanstack/react-query";
-import axios, {type AxiosResponse} from 'axios';
-import * as I from "~/types/threads.api";
+import {useClerk} from '@clerk/nextjs'
+import LoadingPage from "~/component/Loading.page";
+import ErrorPage from "~/component/Error.page";
+import {fetch_with_token} from "~/queries/queries.threads";
 
 export default function Catalog() {
+   const {session} = useClerk();
 
-   const getThreads = (skip: number, limit: number) => axios.get(`http://localhost:4002/thread?limit=${limit}&skip=${skip}`)
-      .then((res: AxiosResponse<I.SOThreadsModel>) => res ? res.data : null);
+   const {data, error, isLoading} = useQuery(
+      ['repoData'],
+      () => fetch_with_token('http://localhost:4002/thread?limit=10&skip=0', "GET", session),
+      {enabled: !!session}
+   );
 
-   const skip = 0;
-   const limit = 10;
+   if (isLoading) return (<LoadingPage/>)
 
-   const {data} = useQuery({
-      queryKey: ['repoData', skip, limit],
-      queryFn: () => getThreads(skip, limit)
-   });
-console.log('==============')
-   console.log(data);
+   if (error) return (<ErrorPage/>)
 
    return (
       <main className="flex flex-col w-screen min-h-screen p-10 bg-gray-100 text-gray-800">

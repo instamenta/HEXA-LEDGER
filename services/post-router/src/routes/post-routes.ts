@@ -7,7 +7,7 @@ import PostController from '../controller/post-controller';
 export default class PostRouter {
 
    private router: Router = Router();
-   private postController: PostController;
+   private readonly postController: PostController;
 
    constructor(postController: PostController) {
       this.postController = postController;

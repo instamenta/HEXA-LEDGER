@@ -49,7 +49,7 @@ export default class AuthService {
             p: Buffer.from(picture),
          }) as InsertOneResult<AuthData>;
 
-         if(!result.insertedId) {
+         if (!result.insertedId) {
             this.vlog.error({e: {username, picture, address}, msg: 'Creation Failed', func: 'auth'});
             return callback(new StatusBuilder().withCode(Status.CANCELLED).withDetails('Creation Failed').build());
          }
@@ -130,8 +130,7 @@ export default class AuthService {
 
          callback(null, build_UserResponse(
             result._id.toString(),
-            // @ts-ignore
-            '0x' + result.a.buffer.toString('hex'),
+            '0x' + (result.a.buffer as Buffer).toString('hex'),
             result.u.buffer.toString(),
             result.p.buffer.toString(),
          ));
@@ -157,8 +156,7 @@ export default class AuthService {
          for (let i = 0; i < result.length; i++) {
             call.write(build_UserResponse(
                result[i]._id.toString(),
-               //@ts-ignore
-               '0x' + result[i].a.buffer.toString('hex'),
+               '0x' + (result[i].a.buffer as Buffer).toString('hex'),
                result[i].u.buffer.toString(),
                result[i].p.buffer.toString(),
             ));

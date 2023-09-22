@@ -78,9 +78,7 @@ class AuthService {
                 this.vlog.error({ e: { not_found: authId }, msg: 'User not found', func: 'getUser' });
                 return callback(new grpc_js_1.StatusBuilder().withCode(constants_1.Status.NOT_FOUND).withDetails('User not found').build());
             }
-            callback(null, (0, builder_1.build_UserResponse)(result._id.toString(), 
-            // @ts-ignore
-            '0x' + result.a.buffer.toString('hex'), result.u.buffer.toString(), result.p.buffer.toString()));
+            callback(null, (0, builder_1.build_UserResponse)(result._id.toString(), '0x' + result.a.buffer.toString('hex'), result.u.buffer.toString(), result.p.buffer.toString()));
         }
         catch (e) {
             this.vlog.error({ e, func: "getUserById", msg: "Unknown error" });
@@ -95,9 +93,7 @@ class AuthService {
                 $limit: (limit),
             }).toArray();
             for (let i = 0; i < result.length; i++) {
-                call.write((0, builder_1.build_UserResponse)(result[i]._id.toString(), 
-                //@ts-ignore
-                '0x' + result[i].a.buffer.toString('hex'), result[i].u.buffer.toString(), result[i].p.buffer.toString()));
+                call.write((0, builder_1.build_UserResponse)(result[i]._id.toString(), '0x' + result[i].a.buffer.toString('hex'), result[i].u.buffer.toString(), result[i].p.buffer.toString()));
             }
         }
         catch (e) {

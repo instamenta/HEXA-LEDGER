@@ -3,20 +3,25 @@ import {useQuery} from "@tanstack/react-query";
 import {useClerk} from '@clerk/nextjs'
 import LoadingPage from "~/component/Loading.page";
 import ErrorPage from "~/component/Error.page";
-import {fetch_with_token} from "~/queries/queries.threads";
+import { fetch_with_token} from "~/queries/queries.threads";
+import type * as I from '../../types/threads.api'
+import Link from "next/link";
 
 export default function Catalog() {
    const {session} = useClerk();
 
-   const {data, error, isLoading} = useQuery(
+   const {data: threads, error, isLoading} = useQuery(
       ['repoData'],
-      () => fetch_with_token('http://localhost:4002/thread?limit=10&skip=0', "GET", session),
+      () => fetch_with_token<I.SOThreadsModel>(
+         'http://localhost:4002/thread?limit=20&skip=0', 'GET', session),
       {enabled: !!session}
    );
 
    if (isLoading) return (<LoadingPage/>)
 
-   if (error) return (<ErrorPage/>)
+   if (error || !threads) return (<ErrorPage/>)
+
+   console.log(threads)
 
    return (
       <main className="flex flex-col w-screen min-h-screen p-10 bg-gray-100 text-gray-800">
@@ -50,63 +55,30 @@ export default function Catalog() {
             className="grid 2xl:grid-cols-5 xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-6 gap-y-12 w-full mt-6"
          >
             {/*// <!-- Product Tile Start -->*/}
+            {threads.map((thread) => (
+                  <div key={thread.id}>
+                     <img className="block h-64 rounded-lg shadow-lg bg-white" alt="image"
+                          src={thread.image
+                             ? thread.image
+                             : 'https://www.bhaktiphotos.com/wp-content/uploads/2018/04/Mahadev-Bhagwan-Photo-for-Devotee.jpg'
+                          }>
+                     </img>
+                     <div className="flex items-center justify-between mt-3">
+                        <div>
+                           <Link href="#" className="font-medium">{thread.name}</Link>
+                           <Link className="flex items-center" href="#">
+                              <span className="text-xs font-medium text-gray-600">by</span>
+                              <span className="text-xs font-medium ml-1 text-indigo-500">{thread.owner}</span>
+                           </Link>
+                        </div>
+                        <span className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">
+                           $34
+                        </span>
+                     </div>
+                  </div>
+               ))
+            }
 
-            <div>
-               <a href="#" className="block h-64 rounded-lg shadow-lg bg-white"></a>
-               <div className="flex items-center justify-between mt-3">
-                  <div>
-                     <a href="#" className="font-medium">Product Name</a>
-                     <a className="flex items-center" href="#">
-                        <span className="text-xs font-medium text-gray-600">by</span>
-                        <span className="text-xs font-medium ml-1 text-indigo-500">Store Name</span>
-                     </a>
-                  </div>
-                  <span
-                     className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">$34</span>
-               </div>
-            </div>
-            <div>
-               <a href="#" className="block h-64 rounded-lg shadow-lg bg-white"></a>
-               <div className="flex items-center justify-between mt-3">
-                  <div>
-                     <a href="#" className="font-medium">Product Name</a>
-                     <a className="flex items-center" href="#">
-                        <span className="text-xs font-medium text-gray-600">by</span>
-                        <span className="text-xs font-medium ml-1 text-indigo-500">Store Name</span>
-                     </a>
-                  </div>
-                  <span
-                     className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">$34</span>
-               </div>
-            </div>
-            <div>
-               <a href="#" className="block h-64 rounded-lg shadow-lg bg-white"></a>
-               <div className="flex items-center justify-between mt-3">
-                  <div>
-                     <a href="#" className="font-medium">Product Name</a>
-                     <a className="flex items-center" href="#">
-                        <span className="text-xs font-medium text-gray-600">by</span>
-                        <span className="text-xs font-medium ml-1 text-indigo-500">Store Name</span>
-                     </a>
-                  </div>
-                  <span
-                     className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">$34</span>
-               </div>
-            </div>
-            <div>
-               <a href="#" className="block h-64 rounded-lg shadow-lg bg-white"></a>
-               <div className="flex items-center justify-between mt-3">
-                  <div>
-                     <a href="#" className="font-medium">Product Name</a>
-                     <a className="flex items-center" href="#">
-                        <span className="text-xs font-medium text-gray-600">by</span>
-                        <span className="text-xs font-medium ml-1 text-indigo-500">Store Name</span>
-                     </a>
-                  </div>
-                  <span
-                     className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">$34</span>
-               </div>
-            </div>
 
             {/*<!-- Product Tile End -->*/}
          </div>

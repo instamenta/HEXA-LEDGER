@@ -26,12 +26,12 @@ exports.config = {
     DB_OPTIONS: { appName: env.SERVICE_NAME, },
     CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
 };
+/* eslint-disable @typescript-eslint/no-var-requires */
 function getServer() {
     const _server = (0, express_1.default)();
     _server.use(require('cors')());
     _server.use(express_1.default.json());
     _server.use(require('cookie-parser')());
-    console.log(exports.config.CLERK_JWT_PUBLIC_KEY);
     _server.use((0, clerk_sdk_node_1.ClerkExpressWithAuth)({ jwtKey: exports.config.CLERK_JWT_PUBLIC_KEY }));
     return _server;
 }

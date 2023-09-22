@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBody = exports.pageQuery = exports.postIdParam = exports.createBody = void 0;
+exports.updateBody = exports.pageQuery = exports.walletParam = exports.walletAuthClaims = exports.threadIdParam = exports.amountBody = exports.createBody = void 0;
 const zod_1 = require("zod");
 exports.createBody = zod_1.z.object({
     name: zod_1.z.string().min(1).max(48).trim(),
@@ -11,8 +11,17 @@ exports.createBody = zod_1.z.object({
     promoted: zod_1.z.number().optional().default(0),
     tags: zod_1.z.array(zod_1.z.string()).default([]),
 });
-exports.postIdParam = zod_1.z.object({
-    postId: zod_1.z.string().length(24),
+exports.amountBody = zod_1.z.object({
+    amount: zod_1.z.coerce.number().positive()
+});
+exports.threadIdParam = zod_1.z.object({
+    threadId: zod_1.z.string().length(24),
+});
+exports.walletAuthClaims = zod_1.z.object({
+    wallet: zod_1.z.string().length(42)
+});
+exports.walletParam = zod_1.z.object({
+    wallet: zod_1.z.string().length(42)
 });
 exports.pageQuery = zod_1.z.object({
     limit: zod_1.z.coerce.number().positive().lt(100),

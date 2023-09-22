@@ -38,7 +38,7 @@ export default class ThreadModel extends BaseThreadModel {
    }
 
    get owner(): string {
-      return this.o.toString('hex');
+      return '0x' + this.o.toString('hex');
    }
 
    get deleted(): boolean {
@@ -48,7 +48,7 @@ export default class ThreadModel extends BaseThreadModel {
    get promoted(): I.OPromotedObject[] {
       return this.p.map(({promoter, date, amount}) => {
          return {
-            promoter: promoter.toString('hex'),
+            promoter: '0x' + promoter.toString('hex'),
             date: new Date(date * 1000),
             amount
          };
@@ -58,7 +58,7 @@ export default class ThreadModel extends BaseThreadModel {
    get donations(): I.ODonationObject[] {
       return this.do.map(({donator, amount, date}) => {
          return {
-            donator: donator.toString('hex'),
+            donator: '0x' + donator.toString('hex'),
             date: new Date(date * 1000),
             amount,
          };
@@ -66,11 +66,11 @@ export default class ThreadModel extends BaseThreadModel {
    }
 
    get likes(): string[] {
-      return this.li.map(like => like.toString('hex'));
+      return this.li.map(like => '0x' + like.toString('hex'));
    }
 
    get dislikes(): string[] {
-      return this.di.map(dislike => dislike.toString('hex'));
+      return this.di.map(dislike => '0x' + dislike.toString('hex'));
    }
 
    get tags(): string[] {

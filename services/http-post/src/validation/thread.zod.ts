@@ -10,8 +10,20 @@ export const createBody = z.object({
    tags: z.array(z.string()).default([]),
 });
 
-export const postIdParam = z.object({
-   postId: z.string().length(24),
+export const amountBody = z.object({
+   amount: z.coerce.number().positive()
+});
+
+export const threadIdParam = z.object({
+   threadId: z.string().length(24),
+});
+
+export const walletAuthClaims = z.object({
+   wallet: z.string().length(42)
+});
+
+export const walletParam = z.object({
+   wallet: z.string().length(42)
 });
 
 export const pageQuery = z.object({

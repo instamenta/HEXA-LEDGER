@@ -17,9 +17,9 @@ class ThreadRepository {
             n: Buffer.from(d.name),
             des: Buffer.from(d.description),
             c: Buffer.from(d.content),
-            o: Buffer.from(d.owner, 'hex'),
+            o: Buffer.from(d.owner.replace(/^0x/, ''), 'hex'),
             p: [{
-                    promoter: Buffer.from(d.owner, 'hex'),
+                    promoter: Buffer.from(d.owner.replace(/^0x/, ''), 'hex'),
                     date: Math.floor(new Date().getTime() / 1000),
                     amount: d.promoted
                 }],
@@ -39,9 +39,9 @@ class ThreadRepository {
             throw e;
         });
     }
-    async deleteById(postId) {
+    async deleteById(threadId) {
         const filter = {
-            $match: { _id: new mongodb_1.ObjectId(postId), del: true }
+            $match: { _id: new mongodb_1.ObjectId(threadId), del: true }
         };
         const update = {
             $set: { del: true, up: Math.floor(new Date().getTime() / 1000) }
@@ -58,9 +58,9 @@ class ThreadRepository {
             throw e;
         });
     }
-    async update(postId, d) {
+    async update(threadId, d) {
         const filter = {
-            $match: { _id: new mongodb_1.ObjectId(postId), del: false }
+            $match: { _id: new mongodb_1.ObjectId(threadId), del: false }
         };
         const update = {
             $set: { up: Math.floor(new Date().getTime() / 1000) }
@@ -91,9 +91,9 @@ class ThreadRepository {
             throw e;
         });
     }
-    async getOneById(postId) {
+    async getOneById(threadId) {
         const filter = {
-            _id: new mongodb_1.ObjectId(postId), del: false
+            _id: new mongodb_1.ObjectId(threadId), del: false
         };
         return this.collection.findOne(filter)
             .then((res) => res
@@ -106,9 +106,12 @@ class ThreadRepository {
     }
     async getMany(skip, limit) {
         try {
-            return this.collection.find()
-                .skip(skip)
-                .limit(limit)
+            const filter = { del: false };
+            const options = {
+                skip, limit,
+                projection: { do: 0, li: 0, di: 0, del: 0 }
+            };
+            return this.collection.find(filter, options)
                 .stream({
                 transform: (doc) => new thread_model_1.default(doc)
             });
@@ -118,9 +121,9 @@ class ThreadRepository {
             throw e;
         }
     }
-    async getByOwner(ownerId, skip, limit) {
+    async getByOwner(ownerAddr, skip, limit) {
         const filter = {
-            o: Buffer.from(ownerId, 'hex'), del: false
+            o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
         };
         try {
             return this.collection
@@ -136,14 +139,48 @@ class ThreadRepository {
             throw e;
         }
     }
-    async promote(postId, authId, amount) {
+    async like(threadId, wallet) {
         const filter = {
-            _id: new mongodb_1.ObjectId(postId), del: false
+            _id: new mongodb_1.ObjectId(threadId),
+            $ne: { o: Buffer.from(wallet.replace(/^0x/, ''), 'hex') },
+            del: false,
+        };
+        const update = {
+            $addToSet: { li: Buffer.from(wallet.replace(/^0x/, ''), 'hex') },
+            $pull: { di: Buffer.from(wallet.replace(/^0x/, ''), 'hex') }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
+    }
+    async dislike(threadId, wallet) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(threadId),
+            $ne: { o: Buffer.from(wallet.replace(/^0x/, ''), 'hex') },
+            del: false,
+        };
+        const update = {
+            $addToSet: { di: Buffer.from(wallet.replace(/^0x/, ''), 'hex') },
+            $pull: { li: Buffer.from(wallet.replace(/^0x/, ''), 'hex') }
+        };
+        return this.collection.updateOne(filter, update)
+            .then((res) => !!res.modifiedCount)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
+    }
+    async promote(threadId, wallet, amount) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(threadId), del: false
         };
         const update = {
             $push: {
                 p: {
-                    promoter: Buffer.from(authId, 'hex'),
+                    promoter: Buffer.from(wallet.replace(/^0x/, ''), 'hex'),
                     date: new Date().getTime() / 1000,
                     amount: +amount,
                 }
@@ -156,14 +193,14 @@ class ThreadRepository {
             throw e;
         });
     }
-    async donate(postId, authId, amount) {
+    async donate(threadId, wallet, amount) {
         const filter = {
-            _id: new mongodb_1.ObjectId(postId), del: false
+            _id: new mongodb_1.ObjectId(threadId), del: false
         };
         const update = {
             $push: {
                 do: {
-                    donator: Buffer.from(authId, 'hex'),
+                    donator: Buffer.from(wallet.replace(/^0x/, ''), 'hex'),
                     date: new Date().getTime() / 1000,
                     amount: +amount,
                 }
@@ -176,48 +213,14 @@ class ThreadRepository {
             throw e;
         });
     }
-    async transferOwnership(postId, authId, newOwner) {
+    async transferOwnership(threadId, wallet, newOwner) {
         const filter = {
-            _id: new mongodb_1.ObjectId(postId),
-            o: Buffer.from(authId, 'hex'),
+            _id: new mongodb_1.ObjectId(threadId),
+            o: Buffer.from(wallet, 'hex'),
             del: false,
         };
         const update = {
             $set: { o: Buffer.from(newOwner, 'hex') }
-        };
-        return this.collection.updateOne(filter, update)
-            .then((res) => !!res.modifiedCount)
-            .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
-            throw e;
-        });
-    }
-    async like(postId, authId) {
-        const filter = {
-            _id: new mongodb_1.ObjectId(postId),
-            $ne: { o: Buffer.from(authId, 'hex') },
-            del: false,
-        };
-        const update = {
-            $addToSet: { li: Buffer.from(authId, 'hex') },
-            $pull: { di: Buffer.from(authId, 'hex') }
-        };
-        return this.collection.updateOne(filter, update)
-            .then((res) => !!res.modifiedCount)
-            .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
-            throw e;
-        });
-    }
-    async dislike(postId, authId) {
-        const filter = {
-            _id: new mongodb_1.ObjectId(postId),
-            $ne: { o: Buffer.from(authId, 'hex') },
-            del: false,
-        };
-        const update = {
-            $addToSet: { di: Buffer.from(authId, 'hex') },
-            $pull: { li: Buffer.from(authId, 'hex') }
         };
         return this.collection.updateOne(filter, update)
             .then((res) => !!res.modifiedCount)

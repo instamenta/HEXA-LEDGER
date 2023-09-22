@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {MongoClient, MongoClientOptions} from 'mongodb';
 import {ClerkExpressWithAuth, LooseAuthProp} from '@clerk/clerk-sdk-node';
-import express from "express";
+import express from 'express';
 
 const envSchema = z.object({
    PORT: z.string().default('4002'),
@@ -24,15 +24,15 @@ export const config = {
    CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
 };
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 export function getServer(): express.Express {
    const _server = express();
 
    _server.use(require('cors')());
    _server.use(express.json());
    _server.use(require('cookie-parser')());
-   console.log(config.CLERK_JWT_PUBLIC_KEY);
-   _server.use(ClerkExpressWithAuth({jwtKey: config.CLERK_JWT_PUBLIC_KEY }
-   ));
+   _server.use(ClerkExpressWithAuth({jwtKey: config.CLERK_JWT_PUBLIC_KEY }));
+
    return _server;
 }
 

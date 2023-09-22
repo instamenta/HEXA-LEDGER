@@ -30,7 +30,7 @@ class ThreadModel extends base_thread_model_1.default {
         return new Date(this.up * 1000);
     }
     get owner() {
-        return this.o.toString('hex');
+        return '0x' + this.o.toString('hex');
     }
     get deleted() {
         return this.del;
@@ -38,7 +38,7 @@ class ThreadModel extends base_thread_model_1.default {
     get promoted() {
         return this.p.map(({ promoter, date, amount }) => {
             return {
-                promoter: promoter.toString('hex'),
+                promoter: '0x' + promoter.toString('hex'),
                 date: new Date(date * 1000),
                 amount
             };
@@ -47,17 +47,17 @@ class ThreadModel extends base_thread_model_1.default {
     get donations() {
         return this.do.map(({ donator, amount, date }) => {
             return {
-                donator: donator.toString('hex'),
+                donator: '0x' + donator.toString('hex'),
                 date: new Date(date * 1000),
                 amount,
             };
         });
     }
     get likes() {
-        return this.li.map(like => like.toString('hex'));
+        return this.li.map(like => '0x' + like.toString('hex'));
     }
     get dislikes() {
-        return this.di.map(dislike => dislike.toString('hex'));
+        return this.di.map(dislike => '0x' + dislike.toString('hex'));
     }
     get tags() {
         return this.t.map(tag => tag.toString());

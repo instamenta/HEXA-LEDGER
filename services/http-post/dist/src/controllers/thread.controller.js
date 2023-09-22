@@ -31,7 +31,6 @@ const zod = __importStar(require("../validation/thread.zod"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
 const error_handlers_1 = require("../utilities/error.handlers");
 const stream_1 = require("stream");
-require("@clerk/clerk-sdk-node");
 class ThreadController {
     threadRepository;
     constructor(threadRepository) {
@@ -40,7 +39,8 @@ class ThreadController {
     async create(r, w) {
         try {
             const threadData = zod.createBody.parse(r.body);
-            this.threadRepository.create(threadData).then(model => model instanceof thread_model_1.default
+            this.threadRepository.create(threadData)
+                .then(model => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.CREATED)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.BAD_REQUEST)
@@ -52,9 +52,10 @@ class ThreadController {
     }
     async update(r, w) {
         try {
-            const { postId } = zod.postIdParam.parse(r.params);
+            const { threadId } = zod.threadIdParam.parse(r.params);
             const threadData = zod.updateBody.parse(r.body);
-            this.threadRepository.update(postId, threadData).then(model => model instanceof thread_model_1.default
+            this.threadRepository.update(threadId, threadData)
+                .then(model => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.CREATED)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND)
@@ -66,8 +67,9 @@ class ThreadController {
     }
     async delete(r, w) {
         try {
-            const { postId } = zod.postIdParam.parse(r.params);
-            this.threadRepository.deleteById(postId).then(model => model instanceof thread_model_1.default
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.deleteById(threadId)
+                .then(model => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.OK)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND)
@@ -79,8 +81,9 @@ class ThreadController {
     }
     async getOne(r, w) {
         try {
-            const { postId } = zod.postIdParam.parse(r.params);
-            this.threadRepository.getOneById(postId).then(model => model instanceof thread_model_1.default
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.getOneById(threadId)
+                .then(model => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.OK)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND)
@@ -92,12 +95,11 @@ class ThreadController {
     }
     async getMany(r, w) {
         try {
-            console.log(r.auth);
             const { skip, limit } = zod.pageQuery.parse(r.query);
             const $_DB = await this.threadRepository.getMany(skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
             let counter = 0;
-            $_T_._transform = (d, enc, call) => {
+            $_T_._transform = (d, encryption, call) => {
                 call(null, JSON.stringify(d.getStatic()));
                 counter++;
             };
@@ -116,13 +118,12 @@ class ThreadController {
     }
     async getByOwner(r, w) {
         try {
-            const authId = r.cookies;
-            console.log(authId);
+            const { wallet: ownerAddr } = zod.walletParam.parse(r.params);
             const { skip, limit } = zod.pageQuery.parse(r.query);
-            const $_DB = await this.threadRepository.getByOwner(authId, skip, limit);
+            const $_DB = await this.threadRepository.getByOwner(ownerAddr, skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
             let counter = 0;
-            $_T_._transform = (d, enc, call) => {
+            $_T_._transform = (d, encryption, call) => {
                 call(null, JSON.stringify(d.getStatic()));
                 counter++;
             };
@@ -140,14 +141,72 @@ class ThreadController {
         }
     }
     async like(r, w) {
+        try {
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.like(threadId, wallet)
+                .then(res => res
+                ? w.status(http_status_codes_1.default.OK).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
     }
     async dislike(r, w) {
+        try {
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.dislike(threadId, wallet)
+                .then(res => res
+                ? w.status(http_status_codes_1.default.OK).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
     }
     async promote(r, w) {
+        try {
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            const { amount } = zod.amountBody.parse(r.body);
+            this.threadRepository.promote(threadId, wallet, amount)
+                .then(res => res
+                ? w.status(http_status_codes_1.default.OK).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
     }
     async donate(r, w) {
+        try {
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            const { amount } = zod.amountBody.parse(r.body);
+            this.threadRepository.donate(threadId, wallet, amount)
+                .then(res => res
+                ? w.status(http_status_codes_1.default.OK).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
     }
     async transferOwnership(r, w) {
+        try {
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            const { wallet: newOwner } = zod.walletParam.parse(r.params);
+            this.threadRepository.transferOwnership(threadId, wallet, newOwner)
+                .then(res => res
+                ? w.status(http_status_codes_1.default.OK).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
     }
 }
 exports.default = ThreadController;

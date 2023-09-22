@@ -7,7 +7,7 @@ import {
    Db, ObjectId, Collection, MongoError,
    InsertOneResult, FindOneAndUpdateOptions,
    Filter, WithId, UpdateFilter,
-   ReturnDocument, UpdateResult,
+   ReturnDocument, UpdateResult, FindOptions, CursorStreamOptions,
 } from 'mongodb';
 
 export default class ThreadRepository {
@@ -23,9 +23,9 @@ export default class ThreadRepository {
          n: Buffer.from(d.name),
          des: Buffer.from(d.description),
          c: Buffer.from(d.content),
-         o: Buffer.from(d.owner, 'hex'),
+         o: Buffer.from(d.owner.replace(/^0x/, ''), 'hex'),
          p: [{
-            promoter: Buffer.from(d.owner, 'hex'),
+            promoter: Buffer.from(d.owner.replace(/^0x/, ''), 'hex'),
             date: Math.floor(new Date().getTime() / 1000),
             amount: d.promoted
          }],
@@ -46,9 +46,9 @@ export default class ThreadRepository {
          });
    }
 
-   public async deleteById(postId: string): Promise<ThreadModel | null> {
+   public async deleteById(threadId: string): Promise<ThreadModel | null> {
       const filter: Filter<I.IThreadSchema> = {
-         $match: {_id: new ObjectId(postId), del: true}
+         $match: {_id: new ObjectId(threadId), del: true}
       };
       const update: UpdateFilter<I.IThreadSchema> = {
          $set: {del: true, up: Math.floor(new Date().getTime() / 1000)}
@@ -66,9 +66,9 @@ export default class ThreadRepository {
          });
    }
 
-   public async update(postId: string, d: I.PUpdateData): Promise<ThreadModel | null> {
+   public async update(threadId: string, d: I.PUpdateData): Promise<ThreadModel | null> {
       const filter: Filter<I.IThreadSchema> = {
-         $match: {_id: new ObjectId(postId), del: false}
+         $match: {_id: new ObjectId(threadId), del: false}
       };
       const update = {
          $set: {up: Math.floor(new Date().getTime() / 1000)}
@@ -95,9 +95,9 @@ export default class ThreadRepository {
          });
    }
 
-   public async getOneById(postId: string): Promise<ThreadModel | null> {
+   public async getOneById(threadId: string): Promise<ThreadModel | null> {
       const filter: Filter<I.IThreadSchema> = {
-         _id: new ObjectId(postId), del: false
+         _id: new ObjectId(threadId), del: false
       };
       return this.collection.findOne(filter)
          .then((res: WithId<I.IThreadSchema> | null) => res
@@ -111,22 +111,26 @@ export default class ThreadRepository {
 
    public async getMany(skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
       try {
-         return this.collection.find()
-            .skip(skip)
-            .limit(limit)
+         const filter = {del: false} as Filter<I.IThreadSchema>;
+         const options = {
+            skip, limit,
+            projection: {do: 0, li: 0, di: 0, del: 0}
+         } as FindOptions<I.IThreadSchema>;
+
+         return this.collection.find(filter, options)
             .stream({
                transform:
                   (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
-            });
+            } as CursorStreamOptions);
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;
       }
    }
 
-   public async getByOwner(ownerId: string, skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
+   public async getByOwner(ownerAddr: string, skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
       const filter: Filter<I.IThreadSchema> = {
-         o: Buffer.from(ownerId, 'hex'), del: false
+         o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
       };
       try {
          return this.collection
@@ -143,14 +147,50 @@ export default class ThreadRepository {
       }
    }
 
-   public async promote(postId: string, authId: string, amount: number): Promise<boolean> {
+   public async like(threadId: string, wallet: string): Promise<boolean> {
       const filter: Filter<I.IThreadSchema> = {
-         _id: new ObjectId(postId), del: false
+         _id: new ObjectId(threadId),
+         $ne: {o: Buffer.from(wallet.replace(/^0x/, ''), 'hex')},
+         del: false,
+      };
+      const update: UpdateFilter<I.IThreadSchema> = {
+         $addToSet: {li: Buffer.from(wallet.replace(/^0x/, ''), 'hex')},
+         $pull: {di: Buffer.from(wallet.replace(/^0x/, ''), 'hex')}
+      };
+      return this.collection.updateOne(filter, update)
+         .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
+         .catch((e: MongoError) => {
+            HandleMongoError(e);
+            throw e;
+         });
+   }
+
+   public async dislike(threadId: string, wallet: string): Promise<boolean> {
+      const filter: Filter<I.IThreadSchema> = {
+         _id: new ObjectId(threadId),
+         $ne: {o: Buffer.from(wallet.replace(/^0x/, ''), 'hex')},
+         del: false,
+      };
+      const update: UpdateFilter<I.IThreadSchema> = {
+         $addToSet: {di: Buffer.from(wallet.replace(/^0x/, ''), 'hex')},
+         $pull: {li: Buffer.from(wallet.replace(/^0x/, ''), 'hex')}
+      };
+      return this.collection.updateOne(filter, update)
+         .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
+         .catch((e: MongoError) => {
+            HandleMongoError(e);
+            throw e;
+         });
+   }
+
+   public async promote(threadId: string, wallet: string, amount: number): Promise<boolean> {
+      const filter: Filter<I.IThreadSchema> = {
+         _id: new ObjectId(threadId), del: false
       };
       const update: UpdateFilter<I.IThreadSchema> = {
          $push: {
             p: {
-               promoter: Buffer.from(authId, 'hex'),
+               promoter: Buffer.from(wallet.replace(/^0x/, ''), 'hex'),
                date: new Date().getTime() / 1000,
                amount: +amount,
             }
@@ -164,14 +204,14 @@ export default class ThreadRepository {
          });
    }
 
-   public async donate(postId: string, authId: string, amount: number): Promise<boolean> {
+   public async donate(threadId: string, wallet: string, amount: number): Promise<boolean> {
       const filter: Filter<I.IThreadSchema> = {
-         _id: new ObjectId(postId), del: false
+         _id: new ObjectId(threadId), del: false
       };
       const update: UpdateFilter<I.IThreadSchema> = {
          $push: {
             do: {
-               donator: Buffer.from(authId, 'hex'),
+               donator: Buffer.from(wallet.replace(/^0x/, ''), 'hex'),
                date: new Date().getTime() / 1000,
                amount: +amount,
             }
@@ -185,50 +225,14 @@ export default class ThreadRepository {
          });
    }
 
-   public async transferOwnership(postId: string, authId: string, newOwner: string): Promise<boolean> {
+   public async transferOwnership(threadId: string, wallet: string, newOwner: string): Promise<boolean> {
       const filter: Filter<I.IThreadSchema> = {
-         _id: new ObjectId(postId),
-         o: Buffer.from(authId, 'hex'),
+         _id: new ObjectId(threadId),
+         o: Buffer.from(wallet, 'hex'),
          del: false,
       };
       const update: UpdateFilter<I.IThreadSchema> = {
          $set: {o: Buffer.from(newOwner, 'hex')}
-      };
-      return this.collection.updateOne(filter, update)
-         .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
-         .catch((e: MongoError) => {
-            HandleMongoError(e);
-            throw e;
-         });
-   }
-
-   public async like(postId: string, authId: string): Promise<boolean> {
-      const filter: Filter<I.IThreadSchema> = {
-         _id: new ObjectId(postId),
-         $ne: {o: Buffer.from(authId, 'hex')},
-         del: false,
-      };
-      const update: UpdateFilter<I.IThreadSchema> = {
-         $addToSet: {li: Buffer.from(authId, 'hex')},
-         $pull: {di: Buffer.from(authId, 'hex')}
-      };
-      return this.collection.updateOne(filter, update)
-         .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
-         .catch((e: MongoError) => {
-            HandleMongoError(e);
-            throw e;
-         });
-   }
-
-   public async dislike(postId: string, authId: string): Promise<boolean> {
-      const filter: Filter<I.IThreadSchema> = {
-         _id: new ObjectId(postId),
-         $ne: {o: Buffer.from(authId, 'hex')},
-         del: false,
-      };
-      const update: UpdateFilter<I.IThreadSchema> = {
-         $addToSet: {di: Buffer.from(authId, 'hex')},
-         $pull: {li: Buffer.from(authId, 'hex')}
       };
       return this.collection.updateOne(filter, update)
          .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)

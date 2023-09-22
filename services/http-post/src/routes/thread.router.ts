@@ -16,6 +16,8 @@ export default class ThreadRouter {
          .get(c.getMany.bind(c))
          .post(c.create.bind(c));
 
+      this.router.get('/stream', c.getMany_$.bind(c));
+
       this.router.route('/:threadId')
          .get(c.getOne.bind(c))
          .put(c.update.bind(c))

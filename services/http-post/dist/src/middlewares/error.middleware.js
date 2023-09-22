@@ -9,14 +9,12 @@ const http_status_codes_1 = __importDefault(require("@instamenta/http-status-cod
 function _errorHandler(e, r, w, n) {
     console.error('Error:', e);
     w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR)
-        .json({ error: 'Internal Server Error!' })
-        .end();
+        .json({ error: 'Internal Server Error!' }).end();
 }
 exports._errorHandler = _errorHandler;
 function _404Handler(r, w, n) {
     console.log(r.url);
     w.status(http_status_codes_1.default.NOT_FOUND)
-        .json({ error: 'Not Found' })
-        .end();
+        .json({ error: 'Not Found' }).end();
 }
 exports._404Handler = _404Handler;

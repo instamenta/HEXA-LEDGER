@@ -96,21 +96,12 @@ class ThreadController {
     async getMany(r, w) {
         try {
             const { skip, limit } = zod.pageQuery.parse(r.query);
-            const $_DB = await this.threadRepository.getMany(skip, limit);
-            const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
-            let counter = 0;
-            $_T_._transform = (d, encryption, call) => {
-                call(null, JSON.stringify(d.getStatic()));
-                counter++;
-            };
-            $_T_.on('end', () => {
-                counter ? w.status(http_status_codes_1.default.OK).end()
-                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
-            });
-            $_DB.on('error', (e) => {
-                w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
-            });
-            $_DB.pipe($_T_).pipe(w);
+            const models = await this.threadRepository.getMany(skip, limit);
+            const data = models.map((model) => model.getStatic());
+            data.length
+                ? w.status(http_status_codes_1.default.OK)
+                    .json(data).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end();
         }
         catch (e) {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);
@@ -123,6 +114,7 @@ class ThreadController {
             const $_DB = await this.threadRepository.getByOwner(ownerAddr, skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
             let counter = 0;
+            w.setHeader('Content-Type', 'application/json');
             $_T_._transform = (d, encryption, call) => {
                 call(null, JSON.stringify(d.getStatic()));
                 counter++;
@@ -203,6 +195,26 @@ class ThreadController {
                 .then(res => res
                 ? w.status(http_status_codes_1.default.OK).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
+    }
+    async getMany_$(r, w) {
+        try {
+            const { skip, limit } = zod.pageQuery.parse(r.query);
+            const $_DB = await this.threadRepository.getMany_$(skip, limit);
+            let counter = 0;
+            $_DB.on('data', (model) => {
+                w.write(JSON.stringify(model.getStatic()) + '--------------');
+            });
+            $_DB.on('end', () => {
+                counter ? w.status(http_status_codes_1.default.OK).end()
+                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
+            });
+            $_DB.on('error', (e) => {
+                w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
+            });
         }
         catch (e) {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);

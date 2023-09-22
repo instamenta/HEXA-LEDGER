@@ -52,8 +52,7 @@ class ThreadRepository {
         return this.collection.findOneAndUpdate(filter, update, options)
             .then((res) => res
             ? new thread_model_1.default(res)
-            : null)
-            .catch((e) => {
+            : null).catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
@@ -85,8 +84,7 @@ class ThreadRepository {
         return this.collection.findOneAndUpdate(filter, update, options)
             .then((res) => res
             ? new thread_model_1.default(res)
-            : null)
-            .catch((e) => {
+            : null).catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
@@ -98,23 +96,23 @@ class ThreadRepository {
         return this.collection.findOne(filter)
             .then((res) => res
             ? new thread_model_1.default(res)
-            : null)
-            .catch((e) => {
+            : null).catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
     }
     async getMany(skip, limit) {
         try {
-            const filter = { del: false };
+            const filter = {
+                del: false
+            };
             const options = {
                 skip, limit,
-                projection: { do: 0, li: 0, di: 0, del: 0 }
+                // projection: {do: 0, li: 0, di: 0, del: 0}
             };
             return this.collection.find(filter, options)
-                .stream({
-                transform: (doc) => new thread_model_1.default(doc)
-            });
+                .toArray()
+                .then((models) => models.map((data) => new thread_model_1.default(data)));
         }
         catch (e) {
             (0, error_handlers_1.HandleMongoError)(e);
@@ -228,6 +226,25 @@ class ThreadRepository {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
+    }
+    async getMany_$(skip, limit) {
+        try {
+            const filter = {
+                del: false
+            };
+            const options = {
+                skip, limit,
+                // projection: {do: 0, li: 0, di: 0, del: 0}
+            };
+            return this.collection.find(filter, options)
+                .stream({
+                transform: (doc) => new thread_model_1.default(doc)
+            });
+        }
+        catch (e) {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        }
     }
 }
 exports.default = ThreadRepository;

@@ -102,30 +102,17 @@ export default class ThreadController {
 
    public async getMany(
       r: Req<object, { skip: number, limit: number }>,
-      w: Res<I.SOThreadsModel[] | Error>
+      w: Res<Omit<I.SOThreadsModel, "deleted">[] | Error>
    ): Promise<void> {
       try {
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
-         const $_DB = await this.threadRepository.getMany(skip, limit);
-         const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
-         let counter = 0;
-
-         $_T_._transform = (d: ThreadModel, encryption, call) => {
-            call(null, JSON.stringify(d.getStatic()));
-            counter++;
-         };
-
-         $_T_.on('end', () => {
-            counter ? w.status(StatusCode.OK).end()
-               : w.status(StatusCode.NOT_FOUND).end();
-         });
-
-         $_DB.on('error', (e: Error) => {
-            w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
-         });
-
-         $_DB.pipe($_T_).pipe(w);
+         const models = await this.threadRepository.getMany(skip, limit)
+         const data = models.map((model) => model.getStatic())
+         data.length
+            ? w.status(StatusCode.OK)
+               .json(data).end()
+            : w.status(StatusCode.NOT_FOUND).end()
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
@@ -145,6 +132,7 @@ export default class ThreadController {
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
          let counter = 0;
 
+         w.setHeader('Content-Type', 'application/json')
          $_T_._transform = (d: ThreadModel, encryption, call) => {
             call(null, JSON.stringify(d.getStatic()));
             counter++;
@@ -255,6 +243,34 @@ export default class ThreadController {
                ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
+   }
+
+   public async getMany_$(
+      r: Req,
+      w: Res<string | Error>
+   ): Promise<void> {
+      try {
+         const {skip, limit} = zod.pageQuery.parse(r.query);
+
+         const $_DB = await this.threadRepository.getMany_$(skip, limit);
+         let counter = 0;
+
+         $_DB.on('data', (model: ThreadModel) => {
+            w.write(JSON.stringify(model.getStatic()) + '--------------');
+         });
+
+         $_DB.on('end', () => {
+            counter ? w.status(StatusCode.OK).end()
+               : w.status(StatusCode.NOT_FOUND).end();
+         });
+
+         $_DB.on('error', (e: Error) => {
+            w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
+         });
+
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }

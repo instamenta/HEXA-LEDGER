@@ -9,7 +9,7 @@ import {
 
 const navigation = [
    {name: 'Main', href: '/', current: true},
-   {name: '', href: '#', current: false},
+   {name: 'Catalog', href: '/catalog', current: false},
 ]
 
 function classNames(...classes: string[]) {

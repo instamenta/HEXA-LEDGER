@@ -296,7 +296,7 @@ export default class ThreadRepository {
          });
    }
 
-   public async getStatisticsCount(threadId: string): Promise<I.StatisticsCount | null> {
+   public async getStatistics(threadId: string): Promise<I.StatisticsCount | null> {
       try {
          const filter: Filter<I.IThreadSchema> = {
             _id: new ObjectId(threadId), del: false

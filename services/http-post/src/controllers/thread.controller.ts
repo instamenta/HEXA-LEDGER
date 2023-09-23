@@ -27,8 +27,7 @@ export default class ThreadController {
          const threadData = zod.createBody.parse(r.body);
 
          this.threadRepository.create(threadData)
-
-            .then(model => model instanceof ThreadModel
+            .then((model: ThreadModel | null) => model instanceof ThreadModel
                ? w.status(StatusCode.CREATED)
                   .json(model.get()).end()
                : w.status(StatusCode.BAD_REQUEST)
@@ -48,8 +47,7 @@ export default class ThreadController {
          const threadData = zod.updateBody.parse(r.body);
 
          this.threadRepository.update(threadId, threadData)
-
-            .then(model => model instanceof ThreadModel
+            .then((model: ThreadModel | null) => model instanceof ThreadModel
                ? w.status(StatusCode.CREATED)
                   .json(model.get()).end()
                : w.status(StatusCode.NOT_FOUND)
@@ -68,8 +66,7 @@ export default class ThreadController {
          const {threadId} = zod.threadIdParam.parse(r.params);
 
          this.threadRepository.deleteById(threadId)
-
-            .then(model => model instanceof ThreadModel
+            .then((model: ThreadModel | null) => model instanceof ThreadModel
                ? w.status(StatusCode.OK)
                   .json(model.get()).end()
                : w.status(StatusCode.NOT_FOUND)
@@ -88,8 +85,7 @@ export default class ThreadController {
          const {threadId} = zod.threadIdParam.parse(r.params);
 
          this.threadRepository.getOneById(threadId)
-
-            .then(model => model instanceof ThreadModel
+            .then((model: ThreadModel | null) => model instanceof ThreadModel
                ? w.status(StatusCode.OK)
                   .json(model.get()).end()
                : w.status(StatusCode.NOT_FOUND)
@@ -107,12 +103,12 @@ export default class ThreadController {
       try {
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
-         const models = await this.threadRepository.getMany(skip, limit)
-         const data = models.map((model) => model.getStatic())
-         data.length
-            ? w.status(StatusCode.OK)
-               .json(data).end()
-            : w.status(StatusCode.NOT_FOUND).end()
+         this.threadRepository.getMany(skip, limit)
+            .then((models: ThreadModel[]) => models.length
+               ? w.status(StatusCode.OK)
+                  .json(models.map((model) => model.getStatic())).end()
+               : w.status(StatusCode.NOT_FOUND).end()
+            );
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
@@ -123,48 +119,28 @@ export default class ThreadController {
       w: Res
    ): Promise<void> {
       try {
-         const {wallet: ownerAddr} = zod.walletParam.parse(r.params);
-         const {skip, limit} = zod.pageQuery.parse(r.query);
+         const {wallet: ownerAddr} = zod.walletParam.parse(r.params)
+            , {skip, limit} = zod.pageQuery.parse(r.query);
 
          const $_DB = await this.threadRepository.getByOwner(
             ownerAddr, skip, limit
          );
-         const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
-         let counter = 0;
 
-         w.setHeader('Content-Type', 'application/json')
-         $_T_._transform = (d: ThreadModel, encryption, call) => {
-            call(null, JSON.stringify(d.getStatic()));
-            counter++;
-         };
-
-         $_T_.on('end', () => {
-            counter ? w.status(StatusCode.OK).end()
-               : w.status(StatusCode.NOT_FOUND).end();
-         });
-
-         $_DB.on('error', (e: Error) => {
-            w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
-         });
-
-         $_DB.pipe($_T_).pipe(w);
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
    }
-
 
    public async like(
       r: Req<{ threadId: string }>,
       w: Res
    ): Promise<void> {
       try {
-         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims);
-         const {threadId} = zod.threadIdParam.parse(r.params);
+         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
+            , {threadId} = zod.threadIdParam.parse(r.params);
 
          this.threadRepository.like(threadId, wallet)
-
-            .then(res => res
+            .then((res: boolean) => res
                ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
@@ -178,11 +154,11 @@ export default class ThreadController {
       w: Res
    ): Promise<void> {
       try {
-         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims);
-         const {threadId} = zod.threadIdParam.parse(r.params);
+         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
+            , {threadId} = zod.threadIdParam.parse(r.params);
 
          this.threadRepository.dislike(threadId, wallet)
-            .then(res => res
+            .then((res: boolean) => res
                ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
@@ -196,12 +172,12 @@ export default class ThreadController {
       w: Res
    ): Promise<void> {
       try {
-         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims);
-         const {threadId} = zod.threadIdParam.parse(r.params);
-         const {amount} = zod.amountBody.parse(r.body);
+         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
+            , {threadId} = zod.threadIdParam.parse(r.params)
+            , {amount} = zod.amountBody.parse(r.body);
 
          this.threadRepository.promote(threadId, wallet, amount)
-            .then(res => res
+            .then((res: boolean) => res
                ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
@@ -215,12 +191,12 @@ export default class ThreadController {
       w: Res
    ): Promise<void> {
       try {
-         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims);
-         const {threadId} = zod.threadIdParam.parse(r.params);
-         const {amount} = zod.amountBody.parse(r.body);
+         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
+            , {threadId} = zod.threadIdParam.parse(r.params)
+            , {amount} = zod.amountBody.parse(r.body);
 
          this.threadRepository.donate(threadId, wallet, amount)
-            .then(res => res
+            .then((res: boolean) => res
                ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
@@ -230,16 +206,16 @@ export default class ThreadController {
    }
 
    public async transferOwnership(
-      r: Req<{ threadId: string, }>,
+      r: Req<{ threadId: string, wallet: string }>,
       w: Res
    ): Promise<void> {
       try {
-         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims);
-         const {threadId} = zod.threadIdParam.parse(r.params);
-         const {wallet: newOwner} = zod.walletParam.parse(r.params);
+         const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
+            , {threadId} = zod.threadIdParam.parse(r.params)
+            , {wallet: newOwner} = zod.walletParam.parse(r.params);
 
          this.threadRepository.transferOwnership(threadId, wallet, newOwner)
-            .then(res => res
+            .then((res: boolean) => res
                ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
@@ -248,8 +224,59 @@ export default class ThreadController {
       }
    }
 
-   public async getMany_$(
-      r: Req,
+   public async getLikes(
+      r: Req<{ threadId: string, }>,
+      w: Res<string[]>
+   ): Promise<void> {
+      try {
+         const {threadId} = zod.threadIdParam.parse(r.params);
+
+         this.threadRepository.getLikes(threadId)
+            .then((res: string[] | null) => res
+               ? w.status(StatusCode.OK).end()
+               : w.status(StatusCode.NOT_FOUND).end()
+            );
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
+   }
+
+   public async getDislikes(
+      r: Req<{ threadId: string, }>,
+      w: Res<string[]>
+   ): Promise<void> {
+      try {
+         const {threadId} = zod.threadIdParam.parse(r.params);
+
+         this.threadRepository.getDislikes(threadId)
+            .then((res: string[] | null) => res
+               ? w.status(StatusCode.OK).json(res).end()
+               : w.status(StatusCode.NOT_FOUND).end()
+            );
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
+   }
+
+   public async getStatistics(
+      r: Req<{ threadId: string, }>,
+      w: Res<I.StatisticsCount>
+   ): Promise<void> {
+      try {
+         const {threadId} = zod.threadIdParam.parse(r.params);
+
+         this.threadRepository.getStatistics(threadId)
+            .then((res: I.StatisticsCount | null) => res
+               ? w.status(StatusCode.OK).json(res).end()
+               : w.status(StatusCode.NOT_FOUND).end()
+            );
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
+   }
+
+   public async getMany_$( // deprecated
+      r: Req<{ threadId: string }>,
       w: Res<string | Error>
    ): Promise<void> {
       try {
@@ -276,4 +303,38 @@ export default class ThreadController {
       }
    }
 
+   public async getByOwner_$( // deprecated
+      r: Req<object, { skip: number, limit: number }>,
+      w: Res
+   ): Promise<void> {
+      try {
+         const {wallet: ownerAddr} = zod.walletParam.parse(r.params);
+         const {skip, limit} = zod.pageQuery.parse(r.query);
+
+         const $_DB = await this.threadRepository.getByOwner(
+            ownerAddr, skip, limit
+         );
+         const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
+         let c = 0;
+
+         w.setHeader('Content-Type', 'application/json')
+         $_T_._transform = (d: ThreadModel, encryption, call) => {
+            call(null, JSON.stringify(d.getStatic()));
+            c++;
+         };
+
+         $_T_.on('end', () => {
+            c ? w.status(StatusCode.OK).end()
+               : w.status(StatusCode.NOT_FOUND).end();
+         });
+
+         $_DB.on('error', (e: Error) => {
+            w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
+         });
+
+         $_DB.pipe($_T_).pipe(w);
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
+   }
 }

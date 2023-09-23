@@ -16,6 +16,7 @@ export default class ThreadRouter {
          .get(c.getMany.bind(c))
          .post(c.create.bind(c));
 
+      this.router.get('/count', c.getTotalCount.bind(c));
       this.router.get('/stream', c.getMany_$.bind(c));
       this.router.get('/stream/owner/:owner', c.getByOwner_$.bind(c));
       this.router.get('/statistics', c.getStatistics.bind(c));

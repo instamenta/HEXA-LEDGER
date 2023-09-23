@@ -47,6 +47,17 @@ export default class ThreadRepository {
          });
    }
 
+   public async getTotalCount(): Promise<number> {
+      const filter: Filter<I.IThreadSchema> = {
+         del: false
+      };
+      return this.collection.countDocuments(filter)
+         .catch((e: MongoError | unknown) => {
+            HandleMongoError(e);
+            throw e;
+         });
+   }
+
    public async deleteById(threadId: string): Promise<ThreadModel | null> {
       const filter: Filter<I.IThreadSchema> = {
          $match: {_id: new ObjectId(threadId), del: true}

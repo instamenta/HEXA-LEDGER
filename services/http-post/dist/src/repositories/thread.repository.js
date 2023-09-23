@@ -40,6 +40,16 @@ class ThreadRepository {
             throw e;
         });
     }
+    async getTotalCount() {
+        const filter = {
+            del: false
+        };
+        return this.collection.countDocuments(filter)
+            .catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
+    }
     async deleteById(threadId) {
         const filter = {
             $match: { _id: new mongodb_1.ObjectId(threadId), del: true }

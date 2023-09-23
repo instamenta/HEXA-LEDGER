@@ -6,6 +6,7 @@ import ThreadRepository from '../repositories/thread.repository';
 import ThreadModel from '../models/thread.model';
 import {RespondGeneralPurpose} from '../utilities/error.handlers';
 import {Transform} from 'stream';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {type ZodError, z} from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -128,6 +129,20 @@ export default class ThreadController {
                   .json(models.map((model) => model.getStatic())).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         RespondGeneralPurpose(e, w);
+      }
+   }
+
+   public async getTotalCount(
+      r: Req,
+      w: Res
+   ): Promise<void> {
+      try {
+         this.threadRepository.getTotalCount()
+            .then((res: number) => res
+               ? w.status(StatusCode.OK).json(res).end()
+               : w.status(StatusCode.NOT_FOUND).end());
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }

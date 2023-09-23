@@ -119,6 +119,17 @@ class ThreadController {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);
         }
     }
+    async getTotalCount(r, w) {
+        try {
+            this.threadRepository.getTotalCount()
+                .then((res) => res
+                ? w.status(http_status_codes_1.default.OK).json(res).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
+    }
     async like(r, w) {
         try {
             const { wallet } = zod.walletAuthClaims.parse(r.auth.claims), { threadId } = zod.threadIdParam.parse(r.params);

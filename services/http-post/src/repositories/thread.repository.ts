@@ -7,8 +7,9 @@ import {
    Db, ObjectId, Collection, MongoError,
    InsertOneResult, FindOneAndUpdateOptions,
    Filter, WithId, UpdateFilter,
-   ReturnDocument, UpdateResult, FindOptions, CursorStreamOptions,
+   ReturnDocument, UpdateResult, FindOptions, CursorStreamOptions, AggregationCursor,
 } from 'mongodb';
+import {StatisticsCount} from "../types/types";
 
 export default class ThreadRepository {
 
@@ -255,6 +256,72 @@ export default class ThreadRepository {
                transform:
                   (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
             } as CursorStreamOptions);
+      } catch (e: MongoError | unknown) {
+         HandleMongoError(e);
+         throw e;
+      }
+   }
+
+   public async getLikes(threadId: string): Promise<string[] | null> {
+      const filter: Filter<I.IThreadSchema> = {
+         _id: new ObjectId(threadId), del: false
+      };
+      const options: FindOptions<I.IThreadSchema> = {
+         projection: {li: 1}
+      };
+      return await this.collection.findOne(filter, options)
+         .then((thread: Pick<WithId<I.IThreadSchema>, 'li'> | null) => thread
+            ? thread.li.map((likes: Buffer) => '0x' + likes.toString('hex'))
+            : null
+         ).catch((e: MongoError | unknown) => {
+            HandleMongoError(e);
+            throw e;
+         });
+   }
+
+   public async getDislikes(threadId: string): Promise<string[] | null> {
+      const filter: Filter<I.IThreadSchema> = {
+         _id: new ObjectId(threadId), del: false
+      };
+      const options: FindOptions<I.IThreadSchema> = {
+         projection: {di: 1}
+      };
+      return await this.collection.findOne(filter, options)
+         .then((thread: Pick<WithId<I.IThreadSchema>, 'di'> | null) => thread
+            ? thread.di.map((dislikes: Buffer) => '0x' + dislikes.toString('hex'))
+            : null
+         ).catch((e: MongoError | unknown) => {
+            HandleMongoError(e);
+            throw e;
+         });
+   }
+
+   public async getStatisticsCount(threadId: string): Promise<I.StatisticsCount | null> {
+      try {
+         const filter: Filter<I.IThreadSchema> = {
+            _id: new ObjectId(threadId), del: false
+         };
+         const options: FindOptions<I.IThreadSchema> = {
+            projection: {
+               li: 1, do: 1, p: 1, di: 1
+            },
+         };
+         const thread = await this.collection.findOne(filter, options) as Pick<
+            WithId<I.IThreadSchema>, 'di' | 'li' | 'do' | 'p' | '_id'
+         > | null;
+         if (!thread) return null;
+         return {
+            likes: thread.li.length,
+            dislikes: thread.di.length,
+            donations: {
+               count: thread.do.length,
+               amount: thread.do.reduce((total, d) => total + d.amount, 0)
+            },
+            promotions: {
+               count: thread.p.length,
+               amount: thread.p.reduce((total, p) => total + p.amount, 0)
+            },
+         } as I.StatisticsCount;
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;

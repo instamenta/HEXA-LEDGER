@@ -259,7 +259,7 @@ export default class ThreadController {
          let counter = 0;
 
          $_DB.on('data', (model: ThreadModel) => {
-            w.write(JSON.stringify(model.getStatic()) + '--------------');
+            w.write(JSON.stringify(model.getStatic()));
          });
 
          $_DB.on('end', () => {

@@ -52,14 +52,14 @@ export interface OThreadsModel {
    name: string
    description: string
    content: string
-   images:  string[]
+   images: string[]
    created_at: Date
    updated_at: Date
    owner: string
    deleted: boolean
    promoted: OPromotedObject[]
    donations: ODonationObject[]
-   likes : string[]
+   likes: string[]
    dislikes: string[]
    tags: string[]
 }
@@ -69,10 +69,37 @@ export interface SOThreadsModel {
    name: string
    description: string
    content: string
-   image:  string
+   image: string
    created_at: string
    updated_at: string
    owner: string
-   likes_count : number
+   likes_count: number
    dislikes_count: number
+}
+
+export interface PThreadsModel {
+   id: ?string
+   name: ?string
+   description: ?string
+   content: ?string
+   images: string[]
+   created_at: ?string
+   updated_at: ?string
+   owner: ?string
+   deleted: ?boolean
+   promoted: SPromotedObject[]
+   donations: SDonationObject[]
+   likes: string[]
+   dislikes: string[]
+   tags: string[]
+}
+
+type SPromotedObject = { promoter: string, date: string, amount: number };
+type SDonationObject = { donator: string, date: string, amount: number };
+
+export type StatisticsCount = {
+   likes: number,
+   dislikes: number,
+   donations: { count: number, amount: number },
+   promotions: { count: number, amount: number }
 }

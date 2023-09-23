@@ -3,25 +3,61 @@ import {useQuery} from "@tanstack/react-query";
 import {useClerk} from '@clerk/nextjs'
 import LoadingPage from "~/component/Loading.page";
 import ErrorPage from "~/component/Error.page";
-import { fetch_with_token} from "~/queries/queries.threads";
+import {fetch_with_token} from "~/queries/queries.threads";
 import type * as I from '../../types/threads.api'
 import Link from "next/link";
+import {useRouter} from 'next/router';
+import axios, {type AxiosResponse} from "axios";
 
 export default function Catalog() {
    const {session} = useClerk();
+   const router = useRouter();
+
+   const [limit, setLimit] = React.useState(Number(router.query.limit) || 0);
+   const [skip, setSkip] = React.useState(Number(router.query.skip) || 0);
+
+   const [total, setTotal] = React.useState(0);
+
+   React.useEffect(() => {
+      axios.get('http://localhost:4002/thread/count')
+         .then((res: AxiosResponse<number>) => setTotal(Math.ceil(res.data / limit)))
+         .catch(console.error);
+   }, [limit]);
+
+   React.useEffect(() => {
+      router.push({
+         pathname: '/catalog',
+         query: {limit, skip},
+      })
+         .then()
+         .catch(console.error);
+   }, [limit, router, skip]);
 
    const {data: threads, error, isLoading} = useQuery(
       ['repoData'],
       () => fetch_with_token<I.SOThreadsModel>(
-         'http://localhost:4002/thread?limit=20&skip=0', 'GET', session),
+         `http://localhost:4002/thread?limit=${limit}&skip=${skip}`
+         , 'GET', session),
       {enabled: !!session}
    );
 
    if (isLoading) return (<LoadingPage/>)
-
    if (error || !threads) return (<ErrorPage/>)
 
-   console.log(threads)
+   console.log(threads);
+
+   const handlePrevPage = () => {
+      if (skip > 0) {
+         setSkip(skip - limit);
+      }
+   };
+
+   const handleNextPage = () => {
+      if (skip + limit < total * limit) {
+         setSkip(skip + limit);
+      }
+   };
+
 
    return (
       <main className="flex flex-col w-screen min-h-screen p-10 bg-gray-100 text-gray-800">
@@ -56,27 +92,27 @@ export default function Catalog() {
          >
             {/*// <!-- Product Tile Start -->*/}
             {threads.map((thread) => (
-                  <div key={thread.id}>
-                     <img className="block h-64 rounded-lg shadow-lg bg-white" alt="image"
-                          src={thread.image
-                             ? thread.image
-                             : 'https://www.bhaktiphotos.com/wp-content/uploads/2018/04/Mahadev-Bhagwan-Photo-for-Devotee.jpg'
-                          }>
-                     </img>
-                     <div className="flex items-center justify-between mt-3">
-                        <div>
-                           <Link href="#" className="font-medium">{thread.name}</Link>
-                           <Link className="flex items-center" href="#">
-                              <span className="text-xs font-medium text-gray-600">by</span>
-                              <span className="text-xs font-medium ml-1 text-indigo-500">{thread.owner}</span>
-                           </Link>
-                        </div>
-                        <span className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">
+               <div key={thread.id}>
+                  <img className="block h-64 rounded-lg shadow-lg bg-white" alt="image"
+                       src={thread.image
+                          ? thread.image
+                          : 'https://www.bhaktiphotos.com/wp-content/uploads/2018/04/Mahadev-Bhagwan-Photo-for-Devotee.jpg'
+                       }>
+                  </img>
+                  <div className="flex items-center justify-between mt-3">
+                     <div>
+                        <Link href="#" className="font-medium">{thread.name}</Link>
+                        <Link className="flex items-center" href="#">
+                           <span className="text-xs font-medium text-gray-600">by</span>
+                           <span className="text-xs font-medium ml-1 text-indigo-500">{thread.owner}</span>
+                        </Link>
+                     </div>
+                     <span className="flex items-center h-8 bg-indigo-200 text-indigo-600 text-sm px-2 rounded">
                            $34
                         </span>
-                     </div>
                   </div>
-               ))
+               </div>
+            ))
             }
 
 
@@ -91,6 +127,7 @@ export default function Catalog() {
                </svg>
             </button>
             <button className="flex items-center justify-center h-8 px-2 rounded text-sm font-medium text-gray-400"
+                    onClick={handlePrevPage}
                     disabled>
                Prev
             </button>
@@ -112,6 +149,7 @@ export default function Catalog() {
                Next
             </button>
             <button
+               onClick={handleNextPage}
                className="flex items-center justify-center h-8 w-8 rounded hover:bg-indigo-200 text-gray-600 hover:text-indigo-600">
                <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd"

@@ -30,7 +30,8 @@ class ThreadRepository {
             do: [], li: [], di: [],
             del: false,
         };
-        return this.collection.insertOne(record)
+        return this.collection
+            .insertOne(record)
             .then((res) => res.insertedId
             ? new thread_model_1.default({ ...record, _id: res.insertedId })
             : null)
@@ -49,7 +50,8 @@ class ThreadRepository {
         const options = {
             returnDocument: 'after'
         };
-        return this.collection.findOneAndUpdate(filter, update, options)
+        return this.collection
+            .findOneAndUpdate(filter, update, options)
             .then((res) => res
             ? new thread_model_1.default(res)
             : null).catch((e) => {
@@ -81,7 +83,8 @@ class ThreadRepository {
             Object.assign(update.$set, {
                 t: (d.tags).map((tag) => Buffer.from(tag))
             });
-        return this.collection.findOneAndUpdate(filter, update, options)
+        return this.collection
+            .findOneAndUpdate(filter, update, options)
             .then((res) => res
             ? new thread_model_1.default(res)
             : null).catch((e) => {
@@ -93,7 +96,8 @@ class ThreadRepository {
         const filter = {
             _id: new mongodb_1.ObjectId(threadId), del: false
         };
-        return this.collection.findOne(filter)
+        return this.collection
+            .findOne(filter)
             .then((res) => res
             ? new thread_model_1.default(res)
             : null).catch((e) => {
@@ -107,10 +111,10 @@ class ThreadRepository {
                 del: false
             };
             const options = {
-                skip, limit,
-                // projection: {do: 0, li: 0, di: 0, del: 0}
+                skip, limit
             };
-            return this.collection.find(filter, options)
+            return this.collection
+                .find(filter, options)
                 .toArray()
                 .then((models) => models.map((data) => new thread_model_1.default(data)));
         }
@@ -123,19 +127,17 @@ class ThreadRepository {
         const filter = {
             o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
         };
-        try {
-            return this.collection
-                .find(filter)
-                .skip(skip)
-                .limit(limit)
-                .stream({
-                transform: (doc) => new thread_model_1.default(doc)
-            });
-        }
-        catch (e) {
+        const options = {
+            skip, limit,
+        };
+        return this.collection
+            .find(filter, options)
+            .toArray()
+            .then((models) => models.map((data) => new thread_model_1.default(data)))
+            .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
-        }
+        });
     }
     async like(threadId, wallet) {
         const filter = {
@@ -147,7 +149,8 @@ class ThreadRepository {
             $addToSet: { li: Buffer.from(wallet.replace(/^0x/, ''), 'hex') },
             $pull: { di: Buffer.from(wallet.replace(/^0x/, ''), 'hex') }
         };
-        return this.collection.updateOne(filter, update)
+        return this.collection
+            .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
@@ -164,7 +167,8 @@ class ThreadRepository {
             $addToSet: { di: Buffer.from(wallet.replace(/^0x/, ''), 'hex') },
             $pull: { li: Buffer.from(wallet.replace(/^0x/, ''), 'hex') }
         };
-        return this.collection.updateOne(filter, update)
+        return this.collection
+            .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
@@ -184,7 +188,8 @@ class ThreadRepository {
                 }
             }
         };
-        return this.collection.updateOne(filter, update)
+        return this.collection
+            .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
@@ -204,7 +209,8 @@ class ThreadRepository {
                 }
             }
         };
-        return this.collection.updateOne(filter, update)
+        return this.collection
+            .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
@@ -220,12 +226,79 @@ class ThreadRepository {
         const update = {
             $set: { o: Buffer.from(newOwner, 'hex') }
         };
-        return this.collection.updateOne(filter, update)
+        return this.collection
+            .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
             (0, error_handlers_1.HandleMongoError)(e);
             throw e;
         });
+    }
+    async getLikes(threadId) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(threadId), del: false
+        };
+        const options = {
+            projection: { li: 1 }
+        };
+        return await this.collection
+            .findOne(filter, options)
+            .then((thread) => thread
+            ? thread.li.map((likes) => '0x' + likes.toString('hex'))
+            : null).catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
+    }
+    async getDislikes(threadId) {
+        const filter = {
+            _id: new mongodb_1.ObjectId(threadId), del: false
+        };
+        const options = {
+            projection: { di: 1 }
+        };
+        return await this.collection
+            .findOne(filter, options)
+            .then((thread) => thread
+            ? thread.di.map((dislikes) => '0x' + dislikes.toString('hex'))
+            : null).catch((e) => {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        });
+    }
+    async getStatistics(threadId) {
+        try {
+            const filter = {
+                _id: new mongodb_1.ObjectId(threadId), del: false
+            };
+            const options = {
+                projection: {
+                    li: 1, do: 1, p: 1, di: 1
+                },
+            };
+            return await this.collection
+                .findOne(filter, options)
+                .then((thread) => {
+                if (!thread)
+                    return null;
+                return {
+                    likes: thread.li.length,
+                    dislikes: thread.di.length,
+                    donations: {
+                        count: thread.do.length,
+                        amount: thread.do.reduce((total, d) => total + d.amount, 0)
+                    },
+                    promotions: {
+                        count: thread.p.length,
+                        amount: thread.p.reduce((total, p) => total + p.amount, 0)
+                    },
+                };
+            });
+        }
+        catch (e) {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        }
     }
     async getMany_$(skip, limit) {
         try {
@@ -233,10 +306,28 @@ class ThreadRepository {
                 del: false
             };
             const options = {
-                skip, limit,
-                // projection: {do: 0, li: 0, di: 0, del: 0}
+                skip, limit, // projection: {do: 0, li: 0, di: 0, del: 0}
             };
-            return this.collection.find(filter, options)
+            return this.collection
+                .find(filter, options)
+                .stream({
+                transform: (doc) => new thread_model_1.default(doc)
+            });
+        }
+        catch (e) {
+            (0, error_handlers_1.HandleMongoError)(e);
+            throw e;
+        }
+    }
+    async getByOwner_$(ownerAddr, skip, limit) {
+        const filter = {
+            o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
+        };
+        try {
+            return this.collection
+                .find(filter)
+                .skip(skip)
+                .limit(limit)
                 .stream({
                 transform: (doc) => new thread_model_1.default(doc)
             });

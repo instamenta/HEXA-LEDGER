@@ -98,7 +98,7 @@ export default class ThreadController {
 
    public async getMany(
       r: Req<object, { skip: number, limit: number }>,
-      w: Res<Omit<I.SOThreadsModel, "deleted">[] | Error>
+      w: Res<Omit<I.SOThreadsModel, 'deleted'>[] | Error>
    ): Promise<void> {
       try {
          const {skip, limit} = zod.pageQuery.parse(r.query);
@@ -285,7 +285,7 @@ export default class ThreadController {
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
          const $_DB = await this.threadRepository.getMany_$(skip, limit);
-         let counter = 0;
+         const counter = 0;
 
          $_DB.on('data', (model: ThreadModel) => {
             w.write(JSON.stringify(model.getStatic()));
@@ -319,7 +319,7 @@ export default class ThreadController {
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
          let c = 0;
 
-         w.setHeader('Content-Type', 'application/json')
+         w.setHeader('Content-Type', 'application/json');
          $_T_._transform = (d: ThreadModel, encryption, call) => {
             call(null, JSON.stringify(d.getStatic()));
             c++;

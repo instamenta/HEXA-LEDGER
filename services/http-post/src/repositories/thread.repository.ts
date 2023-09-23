@@ -124,7 +124,7 @@ export default class ThreadRepository {
          return this.collection
             .find(filter, options)
             .toArray()
-            .then((models) => models.map((data) => new ThreadModel(data)))
+            .then((models) => models.map((data) => new ThreadModel(data)));
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;
@@ -310,7 +310,7 @@ export default class ThreadRepository {
                      amount: thread.p.reduce((total, p) => total + p.amount, 0)
                   },
                } as I.StatisticsCount;
-            })
+            });
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;

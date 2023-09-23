@@ -40,7 +40,7 @@ class ThreadController {
         try {
             const threadData = zod.createBody.parse(r.body);
             this.threadRepository.create(threadData)
-                .then(model => model instanceof thread_model_1.default
+                .then((model) => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.CREATED)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.BAD_REQUEST)
@@ -55,7 +55,7 @@ class ThreadController {
             const { threadId } = zod.threadIdParam.parse(r.params);
             const threadData = zod.updateBody.parse(r.body);
             this.threadRepository.update(threadId, threadData)
-                .then(model => model instanceof thread_model_1.default
+                .then((model) => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.CREATED)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND)
@@ -69,7 +69,7 @@ class ThreadController {
         try {
             const { threadId } = zod.threadIdParam.parse(r.params);
             this.threadRepository.deleteById(threadId)
-                .then(model => model instanceof thread_model_1.default
+                .then((model) => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.OK)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND)
@@ -83,7 +83,7 @@ class ThreadController {
         try {
             const { threadId } = zod.threadIdParam.parse(r.params);
             this.threadRepository.getOneById(threadId)
-                .then(model => model instanceof thread_model_1.default
+                .then((model) => model instanceof thread_model_1.default
                 ? w.status(http_status_codes_1.default.OK)
                     .json(model.get()).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND)
@@ -96,12 +96,11 @@ class ThreadController {
     async getMany(r, w) {
         try {
             const { skip, limit } = zod.pageQuery.parse(r.query);
-            const models = await this.threadRepository.getMany(skip, limit);
-            const data = models.map((model) => model.getStatic());
-            data.length
+            this.threadRepository.getMany(skip, limit)
+                .then((models) => models.length
                 ? w.status(http_status_codes_1.default.OK)
-                    .json(data).end()
-                : w.status(http_status_codes_1.default.NOT_FOUND).end();
+                    .json(models.map((model) => model.getStatic())).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);
@@ -109,24 +108,12 @@ class ThreadController {
     }
     async getByOwner(r, w) {
         try {
-            const { wallet: ownerAddr } = zod.walletParam.parse(r.params);
-            const { skip, limit } = zod.pageQuery.parse(r.query);
-            const $_DB = await this.threadRepository.getByOwner(ownerAddr, skip, limit);
-            const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
-            let counter = 0;
-            w.setHeader('Content-Type', 'application/json');
-            $_T_._transform = (d, encryption, call) => {
-                call(null, JSON.stringify(d.getStatic()));
-                counter++;
-            };
-            $_T_.on('end', () => {
-                counter ? w.status(http_status_codes_1.default.OK).end()
-                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
-            });
-            $_DB.on('error', (e) => {
-                w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
-            });
-            $_DB.pipe($_T_).pipe(w);
+            const { wallet: ownerAddr } = zod.walletParam.parse(r.params), { skip, limit } = zod.pageQuery.parse(r.query);
+            this.threadRepository.getByOwner(ownerAddr, skip, limit)
+                .then((models) => models.length
+                ? w.status(http_status_codes_1.default.OK)
+                    .json(models.map((model) => model.getStatic())).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);
@@ -134,10 +121,9 @@ class ThreadController {
     }
     async like(r, w) {
         try {
-            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
-            const { threadId } = zod.threadIdParam.parse(r.params);
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims), { threadId } = zod.threadIdParam.parse(r.params);
             this.threadRepository.like(threadId, wallet)
-                .then(res => res
+                .then((res) => res
                 ? w.status(http_status_codes_1.default.OK).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
@@ -147,10 +133,9 @@ class ThreadController {
     }
     async dislike(r, w) {
         try {
-            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
-            const { threadId } = zod.threadIdParam.parse(r.params);
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims), { threadId } = zod.threadIdParam.parse(r.params);
             this.threadRepository.dislike(threadId, wallet)
-                .then(res => res
+                .then((res) => res
                 ? w.status(http_status_codes_1.default.OK).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
@@ -160,11 +145,9 @@ class ThreadController {
     }
     async promote(r, w) {
         try {
-            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
-            const { threadId } = zod.threadIdParam.parse(r.params);
-            const { amount } = zod.amountBody.parse(r.body);
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims), { threadId } = zod.threadIdParam.parse(r.params), { amount } = zod.amountBody.parse(r.body);
             this.threadRepository.promote(threadId, wallet, amount)
-                .then(res => res
+                .then((res) => res
                 ? w.status(http_status_codes_1.default.OK).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
@@ -174,11 +157,9 @@ class ThreadController {
     }
     async donate(r, w) {
         try {
-            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
-            const { threadId } = zod.threadIdParam.parse(r.params);
-            const { amount } = zod.amountBody.parse(r.body);
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims), { threadId } = zod.threadIdParam.parse(r.params), { amount } = zod.amountBody.parse(r.body);
             this.threadRepository.donate(threadId, wallet, amount)
-                .then(res => res
+                .then((res) => res
                 ? w.status(http_status_codes_1.default.OK).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
@@ -188,11 +169,9 @@ class ThreadController {
     }
     async transferOwnership(r, w) {
         try {
-            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims);
-            const { threadId } = zod.threadIdParam.parse(r.params);
-            const { wallet: newOwner } = zod.walletParam.parse(r.params);
+            const { wallet } = zod.walletAuthClaims.parse(r.auth.claims), { threadId } = zod.threadIdParam.parse(r.params), { wallet: newOwner } = zod.walletParam.parse(r.params);
             this.threadRepository.transferOwnership(threadId, wallet, newOwner)
-                .then(res => res
+                .then((res) => res
                 ? w.status(http_status_codes_1.default.OK).end()
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
@@ -200,13 +179,50 @@ class ThreadController {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);
         }
     }
-    async getMany_$(r, w) {
+    async getLikes(r, w) {
+        try {
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.getLikes(threadId)
+                .then((res) => res
+                ? w.status(http_status_codes_1.default.OK).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
+    }
+    async getDislikes(r, w) {
+        try {
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.getDislikes(threadId)
+                .then((res) => res
+                ? w.status(http_status_codes_1.default.OK).json(res).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
+    }
+    async getStatistics(r, w) {
+        try {
+            const { threadId } = zod.threadIdParam.parse(r.params);
+            this.threadRepository.getStatistics(threadId)
+                .then((res) => res
+                ? w.status(http_status_codes_1.default.OK).json(res).end()
+                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
+    }
+    async getMany_$(// deprecated
+    r, w) {
         try {
             const { skip, limit } = zod.pageQuery.parse(r.query);
             const $_DB = await this.threadRepository.getMany_$(skip, limit);
-            let counter = 0;
+            const counter = 0;
             $_DB.on('data', (model) => {
-                w.write(JSON.stringify(model.getStatic()) + '--------------');
+                w.write(JSON.stringify(model.getStatic()));
             });
             $_DB.on('end', () => {
                 counter ? w.status(http_status_codes_1.default.OK).end()
@@ -215,6 +231,32 @@ class ThreadController {
             $_DB.on('error', (e) => {
                 w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
             });
+        }
+        catch (e) {
+            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+        }
+    }
+    async getByOwner_$(// deprecated
+    r, w) {
+        try {
+            const { wallet: ownerAddr } = zod.walletParam.parse(r.params);
+            const { skip, limit } = zod.pageQuery.parse(r.query);
+            const $_DB = await this.threadRepository.getByOwner_$(ownerAddr, skip, limit);
+            const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
+            let c = 0;
+            w.setHeader('Content-Type', 'application/json');
+            $_T_._transform = (d, encryption, call) => {
+                call(null, JSON.stringify(d.getStatic()));
+                c++;
+            };
+            $_T_.on('end', () => {
+                c ? w.status(http_status_codes_1.default.OK).end()
+                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
+            });
+            $_DB.on('error', (e) => {
+                w.status(http_status_codes_1.default.INTERNAL_SERVER_ERROR).json(e).end();
+            });
+            $_DB.pipe($_T_).pipe(w);
         }
         catch (e) {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);

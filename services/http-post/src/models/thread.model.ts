@@ -124,10 +124,10 @@ export default class ThreadModel extends BaseThreadModel {
       this.dislikes ? model.dislikes = this.dislikes : [];
       this.tags ? model.tags = this.tags : [];
       if (this.promoted) model.promoted = this.promoted.map(p => {
-         return {promoter: p.promoter, date: p.date.toISOString(), amount: p.amount}
+         return {promoter: p.promoter, date: p.date.toISOString(), amount: p.amount};
       });
       if (this.donations) model.donations = this.donations.map(d => {
-         return {donator: d.donator, date: d.date.toISOString(), amount: d.amount}
+         return {donator: d.donator, date: d.date.toISOString(), amount: d.amount};
       });
       return model;
    }

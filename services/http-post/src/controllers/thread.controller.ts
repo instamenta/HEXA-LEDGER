@@ -122,10 +122,12 @@ export default class ThreadController {
          const {wallet: ownerAddr} = zod.walletParam.parse(r.params)
             , {skip, limit} = zod.pageQuery.parse(r.query);
 
-         const $_DB = await this.threadRepository.getByOwner(
-            ownerAddr, skip, limit
-         );
-
+         this.threadRepository.getByOwner(ownerAddr, skip, limit)
+            .then((models: ThreadModel[]) => models.length
+               ? w.status(StatusCode.OK)
+                  .json(models.map((model) => model.getStatic())).end()
+               : w.status(StatusCode.NOT_FOUND).end()
+            );
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
@@ -311,7 +313,7 @@ export default class ThreadController {
          const {wallet: ownerAddr} = zod.walletParam.parse(r.params);
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
-         const $_DB = await this.threadRepository.getByOwner(
+         const $_DB = await this.threadRepository.getByOwner_$(
             ownerAddr, skip, limit
          );
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});

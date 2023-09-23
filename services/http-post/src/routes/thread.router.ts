@@ -17,7 +17,9 @@ export default class ThreadRouter {
          .post(c.create.bind(c));
 
       this.router.get('/stream', c.getMany_$.bind(c));
+      this.router.get('/stream/owner/:owner', c.getByOwner_$.bind(c));
       this.router.get('/statistics', c.getStatistics.bind(c));
+      this.router.get('/owner/:owner', c.getByOwner.bind(c));
 
       this.router.route('/:threadId')
          .get(c.getOne.bind(c))
@@ -35,7 +37,6 @@ export default class ThreadRouter {
       this.router.put('/:threadId/promote', c.dislike.bind(c));
       this.router.put('/:threadId/transfer', c.dislike.bind(c));
       this.router.put('/:threadId/donate', c.donate.bind(c));
-      this.router.get('/owner/:ownerId', c.getByOwner.bind(c));
    }
 
    public getRouter(): Router {

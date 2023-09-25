@@ -1,3 +1,6 @@
+import {WithId} from 'mongodb';
+
+
 export type PCreateData = {
    name: string;
    description: string;
@@ -16,18 +19,7 @@ export type PUpdateData = {
    tags: string[];
 }
 
-export type IPromotedObject = {
-   amount: number,
-   promoter: Buffer,
-   date: number,
-}
-
-export type IDonationObject = {
-   donator: Buffer,
-   amount: number,
-   date: number,
-}
-
+//! Internal Thread
 export interface IThreadSchema {
    n: Buffer // name
    des: Buffer // description
@@ -44,9 +36,10 @@ export interface IThreadSchema {
    t: Buffer[] // tags
 }
 
-type OPromotedObject = { promoter: string, date: Date, amount: number };
-type ODonationObject = { donator: string, date: Date, amount: number };
+export type IPromotedObject = { amount: number, promoter: Buffer, date: number }
+export type IDonationObject = { donator: Buffer, amount: number, date: number }
 
+//! Object Thread
 export interface OThreadsModel {
    id: string
    name: string
@@ -64,6 +57,11 @@ export interface OThreadsModel {
    tags: string[]
 }
 
+type OPromotedObject = { promoter: string, date: Date, amount: number };
+type ODonationObject = { donator: string, date: Date, amount: number };
+
+
+//! Static Thread
 export interface SOThreadsModel {
    id: string
    name: string
@@ -77,6 +75,7 @@ export interface SOThreadsModel {
    dislikes_count: number
 }
 
+//! Projected Thread
 export interface PThreadsModel {
    id: ?string
    name: ?string
@@ -97,9 +96,15 @@ export interface PThreadsModel {
 type SPromotedObject = { promoter: string, date: string, amount: number };
 type SDonationObject = { donator: string, date: string, amount: number };
 
-export type StatisticsCount = {
+//! Statistics Internal
+export type IStatsModel = Pick<WithId<IThreadSchema>, 'di' | 'li' | 'do' | 'p' | '_id' | 'n'>;
+
+//! Statistics Object
+export type OStatsModel = {
+   id: string,
+   name: string,
+   promoted: { count: number, amount: number },
+   donations: { count: number, amount: number },
    likes: number,
    dislikes: number,
-   donations: { count: number, amount: number },
-   promotions: { count: number, amount: number }
-}
+};

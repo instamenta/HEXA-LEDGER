@@ -18,6 +18,10 @@ export const threadIdParam = z.object({
    threadId: z.string().length(24),
 });
 
+export const threadIdParamOptional = z.object({
+   threadId: z.string().length(24).optional(),
+});
+
 export const walletAuthClaims = z.object({
    wallet: z.string().length(42)
 });

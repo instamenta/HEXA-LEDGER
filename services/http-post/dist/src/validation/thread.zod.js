@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateBody = exports.pageQuery = exports.walletParam = exports.walletAuthClaims = exports.threadIdParam = exports.amountBody = exports.createBody = void 0;
+exports.updateBody = exports.pageQuery = exports.walletParam = exports.walletAuthClaims = exports.threadIdParamOptional = exports.threadIdParam = exports.amountBody = exports.createBody = void 0;
 const zod_1 = require("zod");
 exports.createBody = zod_1.z.object({
     name: zod_1.z.string().min(1).max(48).trim(),
@@ -16,6 +16,9 @@ exports.amountBody = zod_1.z.object({
 });
 exports.threadIdParam = zod_1.z.object({
     threadId: zod_1.z.string().length(24),
+});
+exports.threadIdParamOptional = zod_1.z.object({
+    threadId: zod_1.z.string().length(24).optional(),
 });
 exports.walletAuthClaims = zod_1.z.object({
     wallet: zod_1.z.string().length(42)

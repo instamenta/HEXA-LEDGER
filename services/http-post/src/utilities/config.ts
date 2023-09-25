@@ -1,7 +1,5 @@
+import {type MongoClientOptions} from 'mongodb';
 import {z} from 'zod';
-import {MongoClient, MongoClientOptions} from 'mongodb';
-import {ClerkExpressWithAuth, LooseAuthProp} from '@clerk/clerk-sdk-node';
-import express from 'express';
 
 const envSchema = z.object({
    PORT: z.string().default('4002'),
@@ -23,30 +21,3 @@ export const config = {
    DB_OPTIONS: {appName: env.SERVICE_NAME,} as MongoClientOptions,
    CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
 };
-
-/* eslint-disable @typescript-eslint/no-var-requires */
-export function getServer(): express.Express {
-   const _server = express();
-
-   _server.use(require('cors')());
-   _server.use(express.json());
-   _server.use(require('cookie-parser')());
-   _server.use(ClerkExpressWithAuth({jwtKey: config.CLERK_JWT_PUBLIC_KEY }));
-
-   return _server;
-}
-
-export function getDatabase() {
-   console.log('[Connecting to Mongo Client]');
-   const db_client = new MongoClient(config.DB_URI, config.DB_OPTIONS);
-
-   console.log(`[Connecting to Database "${config.DB_NAME}]`);
-   return db_client.db(config.DB_NAME);
-}
-
-declare global {
-   namespace Express {
-      interface Request extends LooseAuthProp {
-      }
-   }
-}

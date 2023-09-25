@@ -1,7 +1,7 @@
 import {ObjectId, WithId} from 'mongodb';
 import * as I from '../types/types';
 
-export default class BaseThreadModel {
+export default class BaseThread {
    _id: ObjectId; // id
    n: Buffer; // name
    des: Buffer; // description

@@ -86,11 +86,12 @@ export default class ThreadController {
          const {threadId} = zod.threadIdParam.parse(r.params);
 
          this.threadRepository.getOneById(threadId)
-            .then((model: ThreadModel | null) => model instanceof ThreadModel
-               ? w.status(StatusCode.OK)
-                  .json(model.get()).end()
-               : w.status(StatusCode.NOT_FOUND)
-                  .json('Failed to create').end()
+            .then((model: ThreadModel | null) =>
+               model instanceof ThreadModel
+                  ? w.status(StatusCode.OK)
+                     .json(model.get()).end()
+                  : w.status(StatusCode.NOT_FOUND)
+                     .json('Failed to create').end()
             );
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
@@ -105,10 +106,11 @@ export default class ThreadController {
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
          this.threadRepository.getMany(skip, limit)
-            .then((models: ThreadModel[]) => models.length
-               ? w.status(StatusCode.OK)
-                  .json(models.map((model) => model.getStatic())).end()
-               : w.status(StatusCode.NOT_FOUND).end()
+            .then((models: ThreadModel[]) =>
+               models.length
+                  ? w.status(StatusCode.OK)
+                     .json(models.map((model) => model.getStatic())).end()
+                  : w.status(StatusCode.NOT_FOUND).end()
             );
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
@@ -124,10 +126,11 @@ export default class ThreadController {
             , {skip, limit} = zod.pageQuery.parse(r.query);
 
          this.threadRepository.getByOwner(ownerAddr, skip, limit)
-            .then((models: ThreadModel[]) => models.length
-               ? w.status(StatusCode.OK)
-                  .json(models.map((model) => model.getStatic())).end()
-               : w.status(StatusCode.NOT_FOUND).end()
+            .then((models: ThreadModel[]) =>
+               models.length
+                  ? w.status(StatusCode.OK)
+                     .json(models.map((model) => model.getStatic())).end()
+                  : w.status(StatusCode.NOT_FOUND).end()
             );
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
@@ -277,16 +280,21 @@ export default class ThreadController {
 
    public async getStatistics(
       r: Req<{ threadId: string, }>,
-      w: Res<I.StatisticsCount>
+      w: Res<I.OStatsModel | I.OStatsModel[] | null>
    ): Promise<void> {
       try {
-         const {threadId} = zod.threadIdParam.parse(r.params);
+         const {threadId} = zod.threadIdParamOptional.parse(r.params);
 
-         this.threadRepository.getStatistics(threadId)
-            .then((res: I.StatisticsCount | null) => res
-               ? w.status(StatusCode.OK).json(res).end()
-               : w.status(StatusCode.NOT_FOUND).end()
-            );
+         const stats = await this.threadRepository.getStatistics(threadId ?? null);
+         if (Array.isArray(stats)) {
+            stats.length
+               ? w.status(StatusCode.OK).json(stats.map(d => d.get())).end()
+               : w.status(StatusCode.NOT_FOUND).end();
+         } else {
+            stats
+               ? w.status(StatusCode.OK).json(stats.get()).end()
+               : w.status(StatusCode.NOT_FOUND).end();
+         }
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }
@@ -300,14 +308,16 @@ export default class ThreadController {
          const {skip, limit} = zod.pageQuery.parse(r.query);
 
          const $_DB = await this.threadRepository.getMany_$(skip, limit);
-         const counter = 0;
+         let c = 0;
 
+         w.write('[');
          $_DB.on('data', (model: ThreadModel) => {
-            w.write(JSON.stringify(model.getStatic()));
+            w.write(JSON.stringify(model.getStatic()) + ',');
+            c++;
          });
 
          $_DB.on('end', () => {
-            counter ? w.status(StatusCode.OK).end()
+            c ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end();
          });
 
@@ -332,15 +342,17 @@ export default class ThreadController {
             ownerAddr, skip, limit
          );
          const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
+         w.setHeader('Content-Type', 'application/json');
          let c = 0;
 
-         w.setHeader('Content-Type', 'application/json');
+         w.write('[');
          $_T_._transform = (d: ThreadModel, encryption, call) => {
-            call(null, JSON.stringify(d.getStatic()));
+            call(null, JSON.stringify(d.getStatic()) + ',');
             c++;
          };
 
          $_T_.on('end', () => {
+            w.write(']');
             c ? w.status(StatusCode.OK).end()
                : w.status(StatusCode.NOT_FOUND).end();
          });

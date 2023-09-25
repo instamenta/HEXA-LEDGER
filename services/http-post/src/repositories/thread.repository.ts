@@ -9,6 +9,7 @@ import {
    Filter, WithId, UpdateFilter,
    ReturnDocument, UpdateResult, FindOptions, CursorStreamOptions,
 } from 'mongodb';
+import StatsModel from '../models/base/statistics.model';
 
 export default class ThreadRepository {
 
@@ -266,7 +267,7 @@ export default class ThreadRepository {
       const options: FindOptions<I.IThreadSchema> = {
          projection: {li: 1}
       };
-      return await this.collection
+      return this.collection
          .findOne(filter, options)
          .then((thread: Pick<WithId<I.IThreadSchema>, 'li'> | null) => thread
             ? thread.li.map((likes: Buffer) => '0x' + likes.toString('hex'))
@@ -284,7 +285,7 @@ export default class ThreadRepository {
       const options: FindOptions<I.IThreadSchema> = {
          projection: {di: 1}
       };
-      return await this.collection
+      return this.collection
          .findOne(filter, options)
          .then((thread: Pick<WithId<I.IThreadSchema>, 'di'> | null) => thread
             ? thread.di.map((dislikes: Buffer) => '0x' + dislikes.toString('hex'))
@@ -295,33 +296,29 @@ export default class ThreadRepository {
          });
    }
 
-   public async getStatistics(threadId: string): Promise<I.StatisticsCount | null> {
+   public async getStatistics(threadId: string | null): Promise<StatsModel | StatsModel[] | null> {
       try {
          const filter: Filter<I.IThreadSchema> = {
-            _id: new ObjectId(threadId), del: false
+            del: false
          };
          const options: FindOptions<I.IThreadSchema> = {
-            projection: {
-               li: 1, do: 1, p: 1, di: 1
-            },
+            projection: {li: 1, do: 1, p: 1, di: 1, n: 1}
          };
-         return await this.collection
-            .findOne(filter, options)
-            .then((thread: Pick<WithId<I.IThreadSchema>, 'di' | 'li' | 'do' | 'p' | '_id'> | null) => {
-               if (!thread) return null;
-               return {
-                  likes: thread.li.length,
-                  dislikes: thread.di.length,
-                  donations: {
-                     count: thread.do.length,
-                     amount: thread.do.reduce((total, d) => total + d.amount, 0)
-                  },
-                  promotions: {
-                     count: thread.p.length,
-                     amount: thread.p.reduce((total, p) => total + p.amount, 0)
-                  },
-               } as I.StatisticsCount;
-            });
+         if (threadId) {
+            filter._id = new ObjectId(threadId);
+            return this.collection
+               .findOne(filter, options)
+               .then((thread: I.IStatsModel | null) => thread
+                  ? new StatsModel(thread)
+                  : null
+               );
+         } else {
+            return this.collection
+               .find(filter, options)
+               .toArray()
+               .then((threads: I.IStatsModel[]) =>
+                  threads.map((t) => new StatsModel(t)));
+         }
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;

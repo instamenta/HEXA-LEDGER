@@ -7,6 +7,7 @@ const thread_model_1 = __importDefault(require("../models/thread.model"));
 const error_handlers_1 = require("../utilities/error.handlers");
 const config_1 = require("../utilities/config");
 const mongodb_1 = require("mongodb");
+const statistics_model_1 = __importDefault(require("../models/base/statistics.model"));
 class ThreadRepository {
     collection;
     constructor(db) {
@@ -251,7 +252,7 @@ class ThreadRepository {
         const options = {
             projection: { li: 1 }
         };
-        return await this.collection
+        return this.collection
             .findOne(filter, options)
             .then((thread) => thread
             ? thread.li.map((likes) => '0x' + likes.toString('hex'))
@@ -267,7 +268,7 @@ class ThreadRepository {
         const options = {
             projection: { di: 1 }
         };
-        return await this.collection
+        return this.collection
             .findOne(filter, options)
             .then((thread) => thread
             ? thread.di.map((dislikes) => '0x' + dislikes.toString('hex'))
@@ -279,31 +280,25 @@ class ThreadRepository {
     async getStatistics(threadId) {
         try {
             const filter = {
-                _id: new mongodb_1.ObjectId(threadId), del: false
+                del: false
             };
             const options = {
-                projection: {
-                    li: 1, do: 1, p: 1, di: 1
-                },
+                projection: { li: 1, do: 1, p: 1, di: 1, n: 1 }
             };
-            return await this.collection
-                .findOne(filter, options)
-                .then((thread) => {
-                if (!thread)
-                    return null;
-                return {
-                    likes: thread.li.length,
-                    dislikes: thread.di.length,
-                    donations: {
-                        count: thread.do.length,
-                        amount: thread.do.reduce((total, d) => total + d.amount, 0)
-                    },
-                    promotions: {
-                        count: thread.p.length,
-                        amount: thread.p.reduce((total, p) => total + p.amount, 0)
-                    },
-                };
-            });
+            if (threadId) {
+                filter._id = new mongodb_1.ObjectId(threadId);
+                return this.collection
+                    .findOne(filter, options)
+                    .then((thread) => thread
+                    ? new statistics_model_1.default(thread)
+                    : null);
+            }
+            else {
+                return this.collection
+                    .find(filter, options)
+                    .toArray()
+                    .then((threads) => threads.map((t) => new statistics_model_1.default(t)));
+            }
         }
         catch (e) {
             (0, error_handlers_1.HandleMongoError)(e);

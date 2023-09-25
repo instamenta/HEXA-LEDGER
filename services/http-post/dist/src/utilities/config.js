@@ -1,13 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDatabase = exports.getServer = exports.config = void 0;
+exports.config = void 0;
 const zod_1 = require("zod");
-const mongodb_1 = require("mongodb");
-const clerk_sdk_node_1 = require("@clerk/clerk-sdk-node");
-const express_1 = __importDefault(require("express"));
 const envSchema = zod_1.z.object({
     PORT: zod_1.z.string().default('4002'),
     SERVICE_NAME: zod_1.z.string().default('HTTP_POST'),
@@ -26,20 +20,3 @@ exports.config = {
     DB_OPTIONS: { appName: env.SERVICE_NAME, },
     CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
 };
-/* eslint-disable @typescript-eslint/no-var-requires */
-function getServer() {
-    const _server = (0, express_1.default)();
-    _server.use(require('cors')());
-    _server.use(express_1.default.json());
-    _server.use(require('cookie-parser')());
-    _server.use((0, clerk_sdk_node_1.ClerkExpressWithAuth)({ jwtKey: exports.config.CLERK_JWT_PUBLIC_KEY }));
-    return _server;
-}
-exports.getServer = getServer;
-function getDatabase() {
-    console.log('[Connecting to Mongo Client]');
-    const db_client = new mongodb_1.MongoClient(exports.config.DB_URI, exports.config.DB_OPTIONS);
-    console.log(`[Connecting to Database "${exports.config.DB_NAME}]`);
-    return db_client.db(exports.config.DB_NAME);
-}
-exports.getDatabase = getDatabase;

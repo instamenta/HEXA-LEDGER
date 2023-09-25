@@ -39,7 +39,7 @@ function RespondMongoToError(error, w) {
     }
     else if (error.code === 9) {
         w.json({ 'Failed to parse ObjectId': error })
-            .status(http_status_codes_1.default.BAD_REQUEST).end();
+            .status(http_status_codes_1.default.I_AM_A_TEAPOT).end();
     }
     else {
         w.json({ 'Unknown Mongo Error': error })
@@ -50,7 +50,7 @@ exports.RespondMongoToError = RespondMongoToError;
 function RespondToZodError(error, w) {
     console.log({ 'Invalid Data': error });
     w.json({ 'Invalid Data': error })
-        .status(http_status_codes_1.default.BAD_REQUEST).end();
+        .status(http_status_codes_1.default.I_AM_A_TEAPOT).end();
 }
 exports.RespondToZodError = RespondToZodError;
 function RespondToError(error, w) {

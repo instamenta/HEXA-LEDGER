@@ -216,11 +216,18 @@ class ThreadController {
     }
     async getStatistics(r, w) {
         try {
-            const { threadId } = zod.threadIdParam.parse(r.params);
-            this.threadRepository.getStatistics(threadId)
-                .then((res) => res
-                ? w.status(http_status_codes_1.default.OK).json(res).end()
-                : w.status(http_status_codes_1.default.NOT_FOUND).end());
+            const { threadId } = zod.threadIdParamOptional.parse(r.params);
+            const stats = await this.threadRepository.getStatistics(threadId ?? null);
+            if (Array.isArray(stats)) {
+                stats.length
+                    ? w.status(http_status_codes_1.default.OK).json(stats.map(d => d.get())).end()
+                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
+            }
+            else {
+                stats
+                    ? w.status(http_status_codes_1.default.OK).json(stats.get()).end()
+                    : w.status(http_status_codes_1.default.NOT_FOUND).end();
+            }
         }
         catch (e) {
             (0, error_handlers_1.RespondGeneralPurpose)(e, w);
@@ -231,12 +238,14 @@ class ThreadController {
         try {
             const { skip, limit } = zod.pageQuery.parse(r.query);
             const $_DB = await this.threadRepository.getMany_$(skip, limit);
-            const counter = 0;
+            let c = 0;
+            w.write('[');
             $_DB.on('data', (model) => {
-                w.write(JSON.stringify(model.getStatic()));
+                w.write(JSON.stringify(model.getStatic()) + ',');
+                c++;
             });
             $_DB.on('end', () => {
-                counter ? w.status(http_status_codes_1.default.OK).end()
+                c ? w.status(http_status_codes_1.default.OK).end()
                     : w.status(http_status_codes_1.default.NOT_FOUND).end();
             });
             $_DB.on('error', (e) => {
@@ -254,13 +263,15 @@ class ThreadController {
             const { skip, limit } = zod.pageQuery.parse(r.query);
             const $_DB = await this.threadRepository.getByOwner_$(ownerAddr, skip, limit);
             const $_T_ = new stream_1.Transform({ readableObjectMode: true, writableObjectMode: true });
-            let c = 0;
             w.setHeader('Content-Type', 'application/json');
+            let c = 0;
+            w.write('[');
             $_T_._transform = (d, encryption, call) => {
-                call(null, JSON.stringify(d.getStatic()));
+                call(null, JSON.stringify(d.getStatic()) + ',');
                 c++;
             };
             $_T_.on('end', () => {
+                w.write(']');
                 c ? w.status(http_status_codes_1.default.OK).end()
                     : w.status(http_status_codes_1.default.NOT_FOUND).end();
             });

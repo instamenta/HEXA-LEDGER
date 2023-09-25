@@ -1,9 +1,9 @@
 import {WithId} from 'mongodb';
 import * as I from '../types/types';
-import BaseThreadModel from './base.thread.model';
+import BaseThread from './base.thread';
 import {SOThreadsModel} from '../types/types';
 
-export default class ThreadModel extends BaseThreadModel {
+export default class ThreadModel extends BaseThread {
 
    constructor(props: WithId<I.IThreadSchema>) {
       super(props);

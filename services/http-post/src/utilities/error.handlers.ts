@@ -29,7 +29,7 @@ export function RespondMongoToError(error: MongoError, w: Response): void {
          .status(StatusCode.SERVICE_UNAVAILABLE).end();
    } else if (error.code === 9) {
       w.json({'Failed to parse ObjectId': error})
-         .status(StatusCode.BAD_REQUEST).end();
+         .status(StatusCode.I_AM_A_TEAPOT).end();
    } else {
       w.json({'Unknown Mongo Error': error})
          .status(StatusCode.INTERNAL_SERVER_ERROR).end();
@@ -39,7 +39,7 @@ export function RespondMongoToError(error: MongoError, w: Response): void {
 export function RespondToZodError(error: ZodError, w: Response): void {
    console.log({'Invalid Data': error});
    w.json({'Invalid Data': error})
-      .status(StatusCode.BAD_REQUEST).end();
+      .status(StatusCode.I_AM_A_TEAPOT).end();
 }
 
 export function RespondToError(error: unknown, w: Response): void {

@@ -9,7 +9,7 @@ import {
    Filter, WithId, UpdateFilter,
    ReturnDocument, UpdateResult, FindOptions, CursorStreamOptions,
 } from 'mongodb';
-import StatsModel from '../models/base/statistics.model';
+import StatsModel from '../models/statistics.model';
 
 export default class ThreadRepository {
 

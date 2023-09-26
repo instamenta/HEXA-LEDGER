@@ -12,9 +12,9 @@ export function initialize_server(): express.Express {
    _server.use(require('cors')());
    _server.use(require('helmet')());
    _server.use(require('compression')());
-   _server.use(express.json());
    _server.use(require('cookie-parser')());
    _server.use(require('morgan')('combined'));
+   _server.use(express.json());
 
    //* Prometheus
    _server.use(_metrics_middleware);

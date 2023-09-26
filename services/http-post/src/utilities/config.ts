@@ -8,6 +8,7 @@ const envSchema = z.object({
    DB_NAME: z.string().default('main'),
    DB_THREADS_COLLECTION: z.string().default('threads'),
    CLERK_JWT_PUBLIC_KEY: z.string(),
+   GRPC_PORT: z.string().default('50054')
 });
 
 const env = envSchema.parse(process.env);
@@ -20,4 +21,5 @@ export const config = {
    DB_THREADS_COLLECTION: env.DB_THREADS_COLLECTION || 'threads',
    DB_OPTIONS: {appName: env.SERVICE_NAME,} as MongoClientOptions,
    CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
+   GRPC_PORT: env.GRPC_PORT
 };

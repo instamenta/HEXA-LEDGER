@@ -35,8 +35,8 @@ export default class ThreadRouter {
          .put(c.dislike.bind(c))
          .get(c.getDislikes.bind(c));
 
-      this.router.put('/:threadId/promote', c.dislike.bind(c));
-      this.router.put('/:threadId/transfer', c.dislike.bind(c));
+      this.router.put('/:threadId/transfer', c.transferOwnership.bind(c));
+      this.router.put('/:threadId/promote', c.promote.bind(c));
       this.router.put('/:threadId/donate', c.donate.bind(c));
    }
 

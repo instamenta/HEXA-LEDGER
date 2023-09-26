@@ -4,9 +4,8 @@ import * as zod from '../validation/thread.zod';
 import * as I from '../types/types';
 import ThreadRepository from '../repositories/thread.repository';
 import ThreadModel from '../models/thread.model';
-import {RespondGeneralPurpose} from '../utilities/error.handlers';
+import {RespondGeneralPurpose} from '../utilities/errors/error.handler';
 import {Transform} from 'stream';
-
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {type ZodError, z} from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

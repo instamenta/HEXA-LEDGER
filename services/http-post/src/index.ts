@@ -5,6 +5,7 @@ import ThreadController from "./controllers/thread.controller";
 import ThreadRepository from "./repositories/thread.repository";
 import {_404Handler, _errorHandler} from "./middlewares/error.middleware";
 import {initialize_server, initialize_database, Graceful_Shutdown} from './utilities/initialize';
+import {start_grpc_server} from "./server";
 
 (function initializeService(): void {
    const _server = initialize_server();
@@ -25,6 +26,8 @@ import {initialize_server, initialize_database, Graceful_Shutdown} from './utili
       `[${config.SERVICE_NAME}] Running on port: [${config.PORT}]`));
    _server.on('error', e => console.log(
       `${config.SERVICE_NAME} ran into Error:`, e));
+
+   start_grpc_server(threadRepository);
 })();
 
 Graceful_Shutdown.process_on(['unhandledRejection', 'uncaughtException']);

@@ -18,7 +18,6 @@ export default class BaseStatistics {
       this.di = props.di;
    }
 
-
    get id(): string {
       return this._id?.toString();
    }

@@ -1,15 +1,15 @@
 import * as I from '../types/types';
-import ThreadModel from '../models/thread.model';
-import {HandleMongoError} from '../utilities/error.handlers';
-import {Readable as NodeRStream} from 'node:stream';
 import {config} from '../utilities/config';
+import ThreadModel from '../models/thread.model';
+import {HandleMongoError} from '../utilities/errors/error.handler';
+import {Readable as NodeRStream} from 'node:stream';
+import StatsModel from '../models/statistics.model';
 import {
    Db, ObjectId, Collection, MongoError,
-   InsertOneResult, FindOneAndUpdateOptions,
-   Filter, WithId, UpdateFilter,
-   ReturnDocument, UpdateResult, FindOptions, CursorStreamOptions,
+   Filter, UpdateFilter, FindOptions, FindOneAndUpdateOptions,
+   InsertOneResult, ReturnDocument, UpdateResult,
+   WithId, CursorStreamOptions,
 } from 'mongodb';
-import StatsModel from '../models/statistics.model';
 
 export default class ThreadRepository {
 
@@ -331,33 +331,34 @@ export default class ThreadRepository {
             del: false
          };
          const options: FindOptions<I.IThreadSchema> = {
-            skip, limit, // projection: {do: 0, li: 0, di: 0, del: 0}
+            skip, limit,
+         };
+         const streamOptions: CursorStreamOptions = {
+            transform: (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
          };
          return this.collection
             .find(filter, options)
-            .stream({
-               transform:
-                  (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
-            } as CursorStreamOptions);
+            .stream(streamOptions);
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;
       }
    }
 
+
    public async getByOwner_$(ownerAddr: string, skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
       const filter: Filter<I.IThreadSchema> = {
          o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
+      };
+      const streamOptions: CursorStreamOptions = {
+         transform: (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
       };
       try {
          return this.collection
             .find(filter)
             .skip(skip)
             .limit(limit)
-            .stream({
-               transform:
-                  (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
-            });
+            .stream(streamOptions);
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;
@@ -365,5 +366,3 @@ export default class ThreadRepository {
    }
 
 }
-
-

@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package threads;
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+service Threads {
+  // CUD
+  rpc Create(CreateRequest) returns (ThreadModel);
+  rpc Update(ThreadModel) returns (ThreadModel);
+  rpc Delete(IdRequest) returns (ThreadModel);
+
+  // GETTERS
+  rpc GetMany(Pagination) returns (stream ThreadModel);
+  rpc GetTotalCount(google.protobuf.Empty) returns (google.protobuf.Int32Value);
+  rpc GetByOwner(IdRequest) returns (stream ThreadModel);
+  rpc GetOne(IdRequest) returns (ThreadModel);
+  rpc GetStatistics(Pagination) returns (stream StatsModel);
+
+  rpc GetLikes(IdRequest) returns (google.protobuf.Int32Value);
+  rpc GetDislikes(IdRequest) returns (google.protobuf.Int32Value);
+  // INTERACTIONS
+  rpc Like(WalletWithAuthRequest) returns (google.protobuf.Empty);
+  rpc Dislike(WalletWithAuthRequest) returns (google.protobuf.Empty);
+  rpc Donate(AmountWithAuthRequest) returns (google.protobuf.Empty);
+  rpc Promote(AmountWithAuthRequest) returns (google.protobuf.Empty);
+}
+
+message ThreadModel {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue name = 2;
+  google.protobuf.StringValue description = 3;
+  google.protobuf.StringValue content = 4;
+  repeated google.protobuf.StringValue images = 5;
+  google.protobuf.StringValue created_at = 6;
+  google.protobuf.StringValue updated_at = 7;
+  google.protobuf.StringValue owner = 8;
+  google.protobuf.BoolValue deleted = 9;
+  repeated PromotedObject promoted = 10;
+  repeated DonationObject  donations = 11;
+  repeated google.protobuf.StringValue likes = 12;
+  repeated google.protobuf.StringValue dislikes = 13;
+  repeated google.protobuf.StringValue tags = 14;
+  google.protobuf.Int64Value likes_count = 15;
+  google.protobuf.Int64Value dislikes_count = 16;
+}
+
+message PromotedObject {
+  google.protobuf.StringValue promoter = 1;
+  google.protobuf.StringValue date = 2;
+  google.protobuf.Int64Value amount = 3;
+}
+
+message DonationObject  {
+  google.protobuf.StringValue donator = 1;
+  google.protobuf.StringValue date = 2;
+  google.protobuf.Int64Value amount = 3;
+}
+
+message CreateRequest {
+  google.protobuf.StringValue name = 1;
+  google.protobuf.StringValue description = 2;
+  google.protobuf.StringValue content = 3;
+  google.protobuf.StringValue owner = 4;
+  repeated google.protobuf.StringValue images = 5;
+  repeated google.protobuf.StringValue tags = 6;
+  google.protobuf.BoolValue isPromoted = 7;
+
+  google.protobuf.StringValue auth = 15;
+}
+
+message AmountWithAuthRequest {
+  google.protobuf.StringValue auth = 1;
+  google.protobuf.Int64Value amount = 2;
+}
+
+message Pagination {
+  google.protobuf.UInt32Value page = 1;
+  google.protobuf.UInt32Value limit = 2;
+}
+
+message WalletWithAuthRequest {
+  google.protobuf.StringValue wallet = 1;
+  google.protobuf.StringValue  id = 2;
+}
+
+message IdRequest {
+  google.protobuf.StringValue id = 1;
+}
+
+message StatsModel {
+  google.protobuf.StringValue id = 1;
+  google.protobuf.StringValue name = 2;
+  repeated PromotedStats promoted = 10;
+  repeated DonationsStats  donations = 11;
+  google.protobuf.Int64Value likes_count = 15;
+  google.protobuf.Int64Value dislikes_count = 16;
+}
+
+message PromotedStats {
+  google.protobuf.Int32Value count = 1;
+  google.protobuf.Int64Value amount = 2;
+
+}
+
+message DonationsStats {
+  google.protobuf.Int32Value count = 1;
+  google.protobuf.Int64Value amount = 2;
+}

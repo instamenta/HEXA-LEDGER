@@ -29,7 +29,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_status_codes_1 = __importDefault(require("@instamenta/http-status-codes"));
 const zod = __importStar(require("../validation/thread.zod"));
 const thread_model_1 = __importDefault(require("../models/thread.model"));
-const error_handlers_1 = require("../utilities/error.handlers");
+const error_handler_1 = require("../utilities/errors/error.handler");
 const stream_1 = require("stream");
 class ThreadController {
     threadRepository;
@@ -47,7 +47,7 @@ class ThreadController {
                     .json('Failed to create').end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async update(r, w) {
@@ -62,7 +62,7 @@ class ThreadController {
                     .json('Failed to create').end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async delete(r, w) {
@@ -76,7 +76,7 @@ class ThreadController {
                     .json('Failed to create').end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getOne(r, w) {
@@ -90,7 +90,7 @@ class ThreadController {
                     .json('Failed to create').end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getMany(r, w) {
@@ -103,7 +103,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getByOwner(r, w) {
@@ -116,7 +116,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getTotalCount(r, w) {
@@ -127,7 +127,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async like(r, w) {
@@ -139,7 +139,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async dislike(r, w) {
@@ -151,7 +151,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async promote(r, w) {
@@ -163,7 +163,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async donate(r, w) {
@@ -175,7 +175,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async transferOwnership(r, w) {
@@ -187,7 +187,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getLikes(r, w) {
@@ -199,7 +199,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getDislikes(r, w) {
@@ -211,7 +211,7 @@ class ThreadController {
                 : w.status(http_status_codes_1.default.NOT_FOUND).end());
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getStatistics(r, w) {
@@ -230,7 +230,7 @@ class ThreadController {
             }
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getMany_$(// deprecated
@@ -253,7 +253,7 @@ class ThreadController {
             });
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
     async getByOwner_$(// deprecated
@@ -281,7 +281,7 @@ class ThreadController {
             $_DB.pipe($_T_).pipe(w);
         }
         catch (e) {
-            (0, error_handlers_1.RespondGeneralPurpose)(e, w);
+            (0, error_handler_1.RespondGeneralPurpose)(e, w);
         }
     }
 }

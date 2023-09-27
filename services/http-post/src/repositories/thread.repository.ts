@@ -10,6 +10,7 @@ import {
    InsertOneResult, ReturnDocument, UpdateResult,
    WithId, CursorStreamOptions,
 } from 'mongodb';
+import ThreadMessageModel from '../models/grpc-models/thread.message.model';
 
 export default class ThreadRepository {
 
@@ -325,7 +326,7 @@ export default class ThreadRepository {
       }
    }
 
-   public async getMany_$(skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
+   public async getMany_$(skip: number, limit: number,): Promise<NodeRStream & AsyncIterable<ThreadMessageModel>> {
       try {
          const filter: Filter<I.IThreadSchema> = {
             del: false
@@ -334,7 +335,7 @@ export default class ThreadRepository {
             skip, limit,
          };
          const streamOptions: CursorStreamOptions = {
-            transform: (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
+            transform: (doc: WithId<I.IThreadSchema>): ThreadMessageModel => new ThreadMessageModel(doc)
          };
          return this.collection
             .find(filter, options)

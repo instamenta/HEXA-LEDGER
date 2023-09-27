@@ -1,11 +1,14 @@
 // GENERATED CODE -- DO NOT EDIT!
-
+// @ts-nocheck
 'use strict';
 var grpc = require('@grpc/grpc-js');
 var threads_pb = require('./threads_pb.js');
 var google_protobuf_wrappers_pb = require('google-protobuf/google/protobuf/wrappers_pb.js');
 var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js');
 
+/**
+ * @param {{ serializeBinary: () => WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>; }} arg
+ */
 function serialize_google_protobuf_Empty(arg) {
   if (!(arg instanceof google_protobuf_empty_pb.Empty)) {
     throw new Error('Expected argument of type google.protobuf.Empty');
@@ -13,10 +16,16 @@ function serialize_google_protobuf_Empty(arg) {
   return Buffer.from(arg.serializeBinary());
 }
 
+/**
+ * @param {Iterable<number>} buffer_arg
+ */
 function deserialize_google_protobuf_Empty(buffer_arg) {
   return google_protobuf_empty_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+/**
+ * @param {{ serializeBinary: () => WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>; }} arg
+ */
 function serialize_google_protobuf_Int32Value(arg) {
   if (!(arg instanceof google_protobuf_wrappers_pb.Int32Value)) {
     throw new Error('Expected argument of type google.protobuf.Int32Value');

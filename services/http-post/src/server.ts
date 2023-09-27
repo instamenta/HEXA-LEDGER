@@ -25,7 +25,7 @@ export function start_grpc_server(threadRepository: ThreadRepository) {
       getDislikes: threadService.getDislikes.bind(threadService),
       promote: threadService.promote.bind(threadService),
       donate: threadService.donate.bind(threadService),
-      transferOwnership: threadService.transferOwnership.bind(threadService),
+      // transferOwnership: threadService.transferOwnership.bind(threadService),
    });
    _grpc_server.bindAsync(
       `0.0.0.0:${config.GRPC_PORT}`,

@@ -3,11 +3,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const thread_model_1 = __importDefault(require("../models/thread.model"));
-const error_handlers_1 = require("../utilities/error.handlers");
 const config_1 = require("../utilities/config");
+const thread_model_1 = __importDefault(require("../models/thread.model"));
+const error_handler_1 = require("../utilities/errors/error.handler");
+const statistics_model_1 = __importDefault(require("../models/statistics.model"));
 const mongodb_1 = require("mongodb");
-const statistics_model_1 = __importDefault(require("../models/base/statistics.model"));
+const thread_message_model_1 = __importDefault(require("../models/grpc-models/thread.message.model"));
 class ThreadRepository {
     collection;
     constructor(db) {
@@ -37,7 +38,7 @@ class ThreadRepository {
             ? new thread_model_1.default({ ...record, _id: res.insertedId })
             : null)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -47,7 +48,7 @@ class ThreadRepository {
         };
         return this.collection.countDocuments(filter)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -66,7 +67,7 @@ class ThreadRepository {
             .then((res) => res
             ? new thread_model_1.default(res)
             : null).catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -99,7 +100,7 @@ class ThreadRepository {
             .then((res) => res
             ? new thread_model_1.default(res)
             : null).catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -112,7 +113,7 @@ class ThreadRepository {
             .then((res) => res
             ? new thread_model_1.default(res)
             : null).catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -130,7 +131,7 @@ class ThreadRepository {
                 .then((models) => models.map((data) => new thread_model_1.default(data)));
         }
         catch (e) {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         }
     }
@@ -146,7 +147,7 @@ class ThreadRepository {
             .toArray()
             .then((models) => models.map((data) => new thread_model_1.default(data)))
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -164,7 +165,7 @@ class ThreadRepository {
             .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -182,7 +183,7 @@ class ThreadRepository {
             .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -203,7 +204,7 @@ class ThreadRepository {
             .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -224,7 +225,7 @@ class ThreadRepository {
             .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -241,7 +242,7 @@ class ThreadRepository {
             .updateOne(filter, update)
             .then((res) => !!res.modifiedCount)
             .catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -257,7 +258,7 @@ class ThreadRepository {
             .then((thread) => thread
             ? thread.li.map((likes) => '0x' + likes.toString('hex'))
             : null).catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -273,7 +274,7 @@ class ThreadRepository {
             .then((thread) => thread
             ? thread.di.map((dislikes) => '0x' + dislikes.toString('hex'))
             : null).catch((e) => {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
@@ -301,7 +302,7 @@ class ThreadRepository {
             }
         }
         catch (e) {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         }
     }
@@ -311,16 +312,17 @@ class ThreadRepository {
                 del: false
             };
             const options = {
-                skip, limit, // projection: {do: 0, li: 0, di: 0, del: 0}
+                skip, limit,
+            };
+            const streamOptions = {
+                transform: (doc) => new thread_message_model_1.default(doc)
             };
             return this.collection
                 .find(filter, options)
-                .stream({
-                transform: (doc) => new thread_model_1.default(doc)
-            });
+                .stream(streamOptions);
         }
         catch (e) {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         }
     }
@@ -328,17 +330,18 @@ class ThreadRepository {
         const filter = {
             o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
         };
+        const streamOptions = {
+            transform: (doc) => new thread_model_1.default(doc)
+        };
         try {
             return this.collection
                 .find(filter)
                 .skip(skip)
                 .limit(limit)
-                .stream({
-                transform: (doc) => new thread_model_1.default(doc)
-            });
+                .stream(streamOptions);
         }
         catch (e) {
-            (0, error_handlers_1.HandleMongoError)(e);
+            (0, error_handler_1.HandleMongoError)(e);
             throw e;
         }
     }

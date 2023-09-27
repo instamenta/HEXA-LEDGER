@@ -10,6 +10,7 @@ const thread_controller_1 = __importDefault(require("./controllers/thread.contro
 const thread_repository_1 = __importDefault(require("./repositories/thread.repository"));
 const error_middleware_1 = require("./middlewares/error.middleware");
 const initialize_1 = require("./utilities/initialize");
+const server_1 = require("./server");
 (function initializeService() {
     const _server = (0, initialize_1.initialize_server)();
     const db = (0, initialize_1.initialize_database)();
@@ -24,6 +25,7 @@ const initialize_1 = require("./utilities/initialize");
     //! Start Web APi
     _server.listen(config_1.config.PORT, () => console.log(`[${config_1.config.SERVICE_NAME}] Running on port: [${config_1.config.PORT}]`));
     _server.on('error', e => console.log(`${config_1.config.SERVICE_NAME} ran into Error:`, e));
+    (0, server_1.start_grpc_server)(threadRepository);
 })();
 initialize_1.Graceful_Shutdown.process_on(['unhandledRejection', 'uncaughtException']);
 initialize_1.Graceful_Shutdown.process_once(['SIGTERM', 'SIGINT', 'SIGUSR2']);

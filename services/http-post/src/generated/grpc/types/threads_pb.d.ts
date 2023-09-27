@@ -76,13 +76,13 @@ export class ThreadModel extends jspb.Message {
 
     hasLikesCount(): boolean;
     clearLikesCount(): void;
-    getLikesCount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setLikesCount(value?: google_protobuf_wrappers_pb.Int64Value): ThreadModel;
+    getLikesCount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setLikesCount(value?: google_protobuf_wrappers_pb.UInt64Value): ThreadModel;
 
     hasDislikesCount(): boolean;
     clearDislikesCount(): void;
-    getDislikesCount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setDislikesCount(value?: google_protobuf_wrappers_pb.Int64Value): ThreadModel;
+    getDislikesCount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setDislikesCount(value?: google_protobuf_wrappers_pb.UInt64Value): ThreadModel;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): ThreadModel.AsObject;
@@ -110,8 +110,8 @@ export namespace ThreadModel {
         likesList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         dislikesList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
         tagsList: Array<google_protobuf_wrappers_pb.StringValue.AsObject>,
-        likesCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
-        dislikesCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        likesCount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
+        dislikesCount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }
 
@@ -129,8 +129,8 @@ export class PromotedObject extends jspb.Message {
 
     hasAmount(): boolean;
     clearAmount(): void;
-    getAmount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setAmount(value?: google_protobuf_wrappers_pb.Int64Value): PromotedObject;
+    getAmount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setAmount(value?: google_protobuf_wrappers_pb.UInt64Value): PromotedObject;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PromotedObject.AsObject;
@@ -146,7 +146,7 @@ export namespace PromotedObject {
     export type AsObject = {
         promoter?: google_protobuf_wrappers_pb.StringValue.AsObject,
         date?: google_protobuf_wrappers_pb.StringValue.AsObject,
-        amount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        amount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }
 
@@ -164,8 +164,8 @@ export class DonationObject extends jspb.Message {
 
     hasAmount(): boolean;
     clearAmount(): void;
-    getAmount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setAmount(value?: google_protobuf_wrappers_pb.Int64Value): DonationObject;
+    getAmount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setAmount(value?: google_protobuf_wrappers_pb.UInt64Value): DonationObject;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): DonationObject.AsObject;
@@ -181,7 +181,7 @@ export namespace DonationObject {
     export type AsObject = {
         donator?: google_protobuf_wrappers_pb.StringValue.AsObject,
         date?: google_protobuf_wrappers_pb.StringValue.AsObject,
-        amount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        amount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }
 
@@ -257,8 +257,8 @@ export class AmountWithAuthRequest extends jspb.Message {
 
     hasAmount(): boolean;
     clearAmount(): void;
-    getAmount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setAmount(value?: google_protobuf_wrappers_pb.Int64Value): AmountWithAuthRequest;
+    getAmount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setAmount(value?: google_protobuf_wrappers_pb.UInt64Value): AmountWithAuthRequest;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AmountWithAuthRequest.AsObject;
@@ -273,7 +273,7 @@ export class AmountWithAuthRequest extends jspb.Message {
 export namespace AmountWithAuthRequest {
     export type AsObject = {
         auth?: google_protobuf_wrappers_pb.StringValue.AsObject,
-        amount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        amount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }
 
@@ -281,13 +281,13 @@ export class Pagination extends jspb.Message {
 
     hasPage(): boolean;
     clearPage(): void;
-    getPage(): google_protobuf_wrappers_pb.UInt32Value | undefined;
-    setPage(value?: google_protobuf_wrappers_pb.UInt32Value): Pagination;
+    getPage(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setPage(value?: google_protobuf_wrappers_pb.UInt64Value): Pagination;
 
     hasLimit(): boolean;
     clearLimit(): void;
-    getLimit(): google_protobuf_wrappers_pb.UInt32Value | undefined;
-    setLimit(value?: google_protobuf_wrappers_pb.UInt32Value): Pagination;
+    getLimit(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setLimit(value?: google_protobuf_wrappers_pb.UInt64Value): Pagination;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): Pagination.AsObject;
@@ -301,8 +301,8 @@ export class Pagination extends jspb.Message {
 
 export namespace Pagination {
     export type AsObject = {
-        page?: google_protobuf_wrappers_pb.UInt32Value.AsObject,
-        limit?: google_protobuf_wrappers_pb.UInt32Value.AsObject,
+        page?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
+        limit?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }
 
@@ -413,13 +413,13 @@ export class PromotedStats extends jspb.Message {
 
     hasCount(): boolean;
     clearCount(): void;
-    getCount(): google_protobuf_wrappers_pb.Int32Value | undefined;
-    setCount(value?: google_protobuf_wrappers_pb.Int32Value): PromotedStats;
+    getCount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setCount(value?: google_protobuf_wrappers_pb.UInt64Value): PromotedStats;
 
     hasAmount(): boolean;
     clearAmount(): void;
-    getAmount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setAmount(value?: google_protobuf_wrappers_pb.Int64Value): PromotedStats;
+    getAmount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setAmount(value?: google_protobuf_wrappers_pb.UInt64Value): PromotedStats;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): PromotedStats.AsObject;
@@ -433,8 +433,8 @@ export class PromotedStats extends jspb.Message {
 
 export namespace PromotedStats {
     export type AsObject = {
-        count?: google_protobuf_wrappers_pb.Int32Value.AsObject,
-        amount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        count?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
+        amount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }
 
@@ -442,13 +442,13 @@ export class DonationsStats extends jspb.Message {
 
     hasCount(): boolean;
     clearCount(): void;
-    getCount(): google_protobuf_wrappers_pb.Int32Value | undefined;
-    setCount(value?: google_protobuf_wrappers_pb.Int32Value): DonationsStats;
+    getCount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setCount(value?: google_protobuf_wrappers_pb.UInt64Value): DonationsStats;
 
     hasAmount(): boolean;
     clearAmount(): void;
-    getAmount(): google_protobuf_wrappers_pb.Int64Value | undefined;
-    setAmount(value?: google_protobuf_wrappers_pb.Int64Value): DonationsStats;
+    getAmount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
+    setAmount(value?: google_protobuf_wrappers_pb.UInt64Value): DonationsStats;
 
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): DonationsStats.AsObject;
@@ -462,7 +462,7 @@ export class DonationsStats extends jspb.Message {
 
 export namespace DonationsStats {
     export type AsObject = {
-        count?: google_protobuf_wrappers_pb.Int32Value.AsObject,
-        amount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
+        count?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
+        amount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
     }
 }

@@ -42,20 +42,20 @@ message ThreadModel {
   repeated google.protobuf.StringValue likes = 12;
   repeated google.protobuf.StringValue dislikes = 13;
   repeated google.protobuf.StringValue tags = 14;
-  google.protobuf.Int64Value likes_count = 15;
-  google.protobuf.Int64Value dislikes_count = 16;
+  google.protobuf.UInt64Value likes_count = 15;
+  google.protobuf.UInt64Value dislikes_count = 16;
 }
 
 message PromotedObject {
   google.protobuf.StringValue promoter = 1;
   google.protobuf.StringValue date = 2;
-  google.protobuf.Int64Value amount = 3;
+  google.protobuf.UInt64Value amount = 3;
 }
 
 message DonationObject  {
   google.protobuf.StringValue donator = 1;
   google.protobuf.StringValue date = 2;
-  google.protobuf.Int64Value amount = 3;
+  google.protobuf.UInt64Value amount = 3;
 }
 
 message CreateRequest {
@@ -72,12 +72,12 @@ message CreateRequest {
 
 message AmountWithAuthRequest {
   google.protobuf.StringValue auth = 1;
-  google.protobuf.Int64Value amount = 2;
+  google.protobuf.UInt64Value amount = 2;
 }
 
 message Pagination {
-  google.protobuf.UInt32Value page = 1;
-  google.protobuf.UInt32Value limit = 2;
+  google.protobuf.UInt64Value page = 1;
+  google.protobuf.UInt64Value limit = 2;
 }
 
 message WalletWithAuthRequest {
@@ -99,12 +99,12 @@ message StatsModel {
 }
 
 message PromotedStats {
-  google.protobuf.Int32Value count = 1;
-  google.protobuf.Int64Value amount = 2;
+  google.protobuf.UInt64Value count = 1;
+  google.protobuf.UInt64Value amount = 2;
 
 }
 
 message DonationsStats {
-  google.protobuf.Int32Value count = 1;
-  google.protobuf.Int64Value amount = 2;
+  google.protobuf.UInt64Value count = 1;
+  google.protobuf.UInt64Value amount = 2;
 }

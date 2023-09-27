@@ -326,8 +326,8 @@ proto.threads.ThreadModel.toObject = function(includeInstance, msg) {
     google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
     tagsList: jspb.Message.toObjectList(msg.getTagsList(),
     google_protobuf_wrappers_pb.StringValue.toObject, includeInstance),
-    likesCount: (f = msg.getLikesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f),
-    dislikesCount: (f = msg.getDislikesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    likesCount: (f = msg.getLikesCount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f),
+    dislikesCount: (f = msg.getDislikesCount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -435,13 +435,13 @@ proto.threads.ThreadModel.deserializeBinaryFromReader = function(msg, reader) {
       msg.addTags(value);
       break;
     case 15:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setLikesCount(value);
       break;
     case 16:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setDislikesCount(value);
       break;
     default:
@@ -590,7 +590,7 @@ proto.threads.ThreadModel.serializeBinaryToWriter = function(message, writer) {
     writer.writeMessage(
       15,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
   f = message.getDislikesCount();
@@ -598,7 +598,7 @@ proto.threads.ThreadModel.serializeBinaryToWriter = function(message, writer) {
     writer.writeMessage(
       16,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
@@ -1129,17 +1129,17 @@ proto.threads.ThreadModel.prototype.clearTagsList = function() {
 
 
 /**
- * optional google.protobuf.Int64Value likes_count = 15;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value likes_count = 15;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.ThreadModel.prototype.getLikesCount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 15));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 15));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.ThreadModel} returns this
 */
 proto.threads.ThreadModel.prototype.setLikesCount = function(value) {
@@ -1166,17 +1166,17 @@ proto.threads.ThreadModel.prototype.hasLikesCount = function() {
 
 
 /**
- * optional google.protobuf.Int64Value dislikes_count = 16;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value dislikes_count = 16;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.ThreadModel.prototype.getDislikesCount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 16));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 16));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.ThreadModel} returns this
 */
 proto.threads.ThreadModel.prototype.setDislikesCount = function(value) {
@@ -1236,7 +1236,7 @@ proto.threads.PromotedObject.toObject = function(includeInstance, msg) {
   var f, obj = {
     promoter: (f = msg.getPromoter()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
     date: (f = msg.getDate()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
-    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1284,8 +1284,8 @@ proto.threads.PromotedObject.deserializeBinaryFromReader = function(msg, reader)
       msg.setDate(value);
       break;
     case 3:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -1338,7 +1338,7 @@ proto.threads.PromotedObject.serializeBinaryToWriter = function(message, writer)
     writer.writeMessage(
       3,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
@@ -1419,17 +1419,17 @@ proto.threads.PromotedObject.prototype.hasDate = function() {
 
 
 /**
- * optional google.protobuf.Int64Value amount = 3;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value amount = 3;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.PromotedObject.prototype.getAmount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 3));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 3));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.PromotedObject} returns this
 */
 proto.threads.PromotedObject.prototype.setAmount = function(value) {
@@ -1489,7 +1489,7 @@ proto.threads.DonationObject.toObject = function(includeInstance, msg) {
   var f, obj = {
     donator: (f = msg.getDonator()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
     date: (f = msg.getDate()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
-    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -1537,8 +1537,8 @@ proto.threads.DonationObject.deserializeBinaryFromReader = function(msg, reader)
       msg.setDate(value);
       break;
     case 3:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -1591,7 +1591,7 @@ proto.threads.DonationObject.serializeBinaryToWriter = function(message, writer)
     writer.writeMessage(
       3,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
@@ -1672,17 +1672,17 @@ proto.threads.DonationObject.prototype.hasDate = function() {
 
 
 /**
- * optional google.protobuf.Int64Value amount = 3;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value amount = 3;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.DonationObject.prototype.getAmount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 3));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 3));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.DonationObject} returns this
 */
 proto.threads.DonationObject.prototype.setAmount = function(value) {
@@ -2260,7 +2260,7 @@ proto.threads.AmountWithAuthRequest.prototype.toObject = function(opt_includeIns
 proto.threads.AmountWithAuthRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     auth: (f = msg.getAuth()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
-    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2303,8 +2303,8 @@ proto.threads.AmountWithAuthRequest.deserializeBinaryFromReader = function(msg, 
       msg.setAuth(value);
       break;
     case 2:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -2349,7 +2349,7 @@ proto.threads.AmountWithAuthRequest.serializeBinaryToWriter = function(message, 
     writer.writeMessage(
       2,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
@@ -2393,17 +2393,17 @@ proto.threads.AmountWithAuthRequest.prototype.hasAuth = function() {
 
 
 /**
- * optional google.protobuf.Int64Value amount = 2;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value amount = 2;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.AmountWithAuthRequest.prototype.getAmount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 2));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 2));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.AmountWithAuthRequest} returns this
 */
 proto.threads.AmountWithAuthRequest.prototype.setAmount = function(value) {
@@ -2461,8 +2461,8 @@ proto.threads.Pagination.prototype.toObject = function(opt_includeInstance) {
  */
 proto.threads.Pagination.toObject = function(includeInstance, msg) {
   var f, obj = {
-    page: (f = msg.getPage()) && google_protobuf_wrappers_pb.UInt32Value.toObject(includeInstance, f),
-    limit: (f = msg.getLimit()) && google_protobuf_wrappers_pb.UInt32Value.toObject(includeInstance, f)
+    page: (f = msg.getPage()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f),
+    limit: (f = msg.getLimit()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2500,13 +2500,13 @@ proto.threads.Pagination.deserializeBinaryFromReader = function(msg, reader) {
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new google_protobuf_wrappers_pb.UInt32Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.UInt32Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setPage(value);
       break;
     case 2:
-      var value = new google_protobuf_wrappers_pb.UInt32Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.UInt32Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setLimit(value);
       break;
     default:
@@ -2543,7 +2543,7 @@ proto.threads.Pagination.serializeBinaryToWriter = function(message, writer) {
     writer.writeMessage(
       1,
       f,
-      google_protobuf_wrappers_pb.UInt32Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
   f = message.getLimit();
@@ -2551,24 +2551,24 @@ proto.threads.Pagination.serializeBinaryToWriter = function(message, writer) {
     writer.writeMessage(
       2,
       f,
-      google_protobuf_wrappers_pb.UInt32Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * optional google.protobuf.UInt32Value page = 1;
- * @return {?proto.google.protobuf.UInt32Value}
+ * optional google.protobuf.UInt64Value page = 1;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.Pagination.prototype.getPage = function() {
-  return /** @type{?proto.google.protobuf.UInt32Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt32Value, 1));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 1));
 };
 
 
 /**
- * @param {?proto.google.protobuf.UInt32Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.Pagination} returns this
 */
 proto.threads.Pagination.prototype.setPage = function(value) {
@@ -2595,17 +2595,17 @@ proto.threads.Pagination.prototype.hasPage = function() {
 
 
 /**
- * optional google.protobuf.UInt32Value limit = 2;
- * @return {?proto.google.protobuf.UInt32Value}
+ * optional google.protobuf.UInt64Value limit = 2;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.Pagination.prototype.getLimit = function() {
-  return /** @type{?proto.google.protobuf.UInt32Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt32Value, 2));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 2));
 };
 
 
 /**
- * @param {?proto.google.protobuf.UInt32Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.Pagination} returns this
 */
 proto.threads.Pagination.prototype.setLimit = function(value) {
@@ -3433,8 +3433,8 @@ proto.threads.PromotedStats.prototype.toObject = function(opt_includeInstance) {
  */
 proto.threads.PromotedStats.toObject = function(includeInstance, msg) {
   var f, obj = {
-    count: (f = msg.getCount()) && google_protobuf_wrappers_pb.Int32Value.toObject(includeInstance, f),
-    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    count: (f = msg.getCount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f),
+    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3472,13 +3472,13 @@ proto.threads.PromotedStats.deserializeBinaryFromReader = function(msg, reader) 
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new google_protobuf_wrappers_pb.Int32Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int32Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setCount(value);
       break;
     case 2:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -3515,7 +3515,7 @@ proto.threads.PromotedStats.serializeBinaryToWriter = function(message, writer) 
     writer.writeMessage(
       1,
       f,
-      google_protobuf_wrappers_pb.Int32Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
   f = message.getAmount();
@@ -3523,24 +3523,24 @@ proto.threads.PromotedStats.serializeBinaryToWriter = function(message, writer) 
     writer.writeMessage(
       2,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * optional google.protobuf.Int32Value count = 1;
- * @return {?proto.google.protobuf.Int32Value}
+ * optional google.protobuf.UInt64Value count = 1;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.PromotedStats.prototype.getCount = function() {
-  return /** @type{?proto.google.protobuf.Int32Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int32Value, 1));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 1));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int32Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.PromotedStats} returns this
 */
 proto.threads.PromotedStats.prototype.setCount = function(value) {
@@ -3567,17 +3567,17 @@ proto.threads.PromotedStats.prototype.hasCount = function() {
 
 
 /**
- * optional google.protobuf.Int64Value amount = 2;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value amount = 2;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.PromotedStats.prototype.getAmount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 2));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 2));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.PromotedStats} returns this
 */
 proto.threads.PromotedStats.prototype.setAmount = function(value) {
@@ -3635,8 +3635,8 @@ proto.threads.DonationsStats.prototype.toObject = function(opt_includeInstance) 
  */
 proto.threads.DonationsStats.toObject = function(includeInstance, msg) {
   var f, obj = {
-    count: (f = msg.getCount()) && google_protobuf_wrappers_pb.Int32Value.toObject(includeInstance, f),
-    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
+    count: (f = msg.getCount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f),
+    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3674,13 +3674,13 @@ proto.threads.DonationsStats.deserializeBinaryFromReader = function(msg, reader)
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var value = new google_protobuf_wrappers_pb.Int32Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int32Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setCount(value);
       break;
     case 2:
-      var value = new google_protobuf_wrappers_pb.Int64Value;
-      reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
+      var value = new google_protobuf_wrappers_pb.UInt64Value;
+      reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
     default:
@@ -3717,7 +3717,7 @@ proto.threads.DonationsStats.serializeBinaryToWriter = function(message, writer)
     writer.writeMessage(
       1,
       f,
-      google_protobuf_wrappers_pb.Int32Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
   f = message.getAmount();
@@ -3725,24 +3725,24 @@ proto.threads.DonationsStats.serializeBinaryToWriter = function(message, writer)
     writer.writeMessage(
       2,
       f,
-      google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
+      google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
     );
   }
 };
 
 
 /**
- * optional google.protobuf.Int32Value count = 1;
- * @return {?proto.google.protobuf.Int32Value}
+ * optional google.protobuf.UInt64Value count = 1;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.DonationsStats.prototype.getCount = function() {
-  return /** @type{?proto.google.protobuf.Int32Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int32Value, 1));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 1));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int32Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.DonationsStats} returns this
 */
 proto.threads.DonationsStats.prototype.setCount = function(value) {
@@ -3769,17 +3769,17 @@ proto.threads.DonationsStats.prototype.hasCount = function() {
 
 
 /**
- * optional google.protobuf.Int64Value amount = 2;
- * @return {?proto.google.protobuf.Int64Value}
+ * optional google.protobuf.UInt64Value amount = 2;
+ * @return {?proto.google.protobuf.UInt64Value}
  */
 proto.threads.DonationsStats.prototype.getAmount = function() {
-  return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 2));
+  return /** @type{?proto.google.protobuf.UInt64Value} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.UInt64Value, 2));
 };
 
 
 /**
- * @param {?proto.google.protobuf.Int64Value|undefined} value
+ * @param {?proto.google.protobuf.UInt64Value|undefined} value
  * @return {!proto.threads.DonationsStats} returns this
 */
 proto.threads.DonationsStats.prototype.setAmount = function(value) {

@@ -1,4 +1,5 @@
 // source: threads.proto
+// @ts-nocheck
 /**
  * @fileoverview
  * @enhanceable

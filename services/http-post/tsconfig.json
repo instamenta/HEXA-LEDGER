@@ -76,7 +76,6 @@
     // "preserveSymlinks": true,                         /* Disable resolving symlinks to their realpath. This correlates to the same flag in node. */
     "forceConsistentCasingInFileNames": true,
     /* Ensure that casing is correct in imports. */
-
     /* Type Checking */
     "strict": true,
     /* Enable all strict type-checking options. */
@@ -100,5 +99,6 @@
     // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
     "skipLibCheck": true
     /* Skip type checking all .d.ts files. */
-  }
+  },
+  "exclude": ["__test__", "dist"]
 }

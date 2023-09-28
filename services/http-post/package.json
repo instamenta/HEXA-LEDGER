@@ -7,7 +7,8 @@
 		"lint-fix": "eslint src/**/*.ts --fix",
 		"seed": "node ./database/seed/thread.seed.mjs",
 		"start": "tsc -p tsconfig.json && node ./dist/src/index.js",
-		"proto-build": "grpc_tools_node_protoc  --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts  --ts_out=grpc_js:./src/generated/grpc/types  --js_out=import_style=commonjs,binary:./src/generated/grpc/javascript  --grpc_out=grpc_js:./src/generated/grpc/javascript  -I ./src/generated/grpc/  ./src/generated/grpc/threads.proto"
+		"proto-build": "grpc_tools_node_protoc  --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts  --ts_out=grpc_js:./src/generated/grpc/types  --js_out=import_style=commonjs,binary:./src/generated/grpc/javascript  --grpc_out=grpc_js:./src/generated/grpc/javascript  -I ./src/generated/grpc/  ./src/generated/grpc/threads.proto",
+		"test": "jest"
 	},
 	"dependencies": {
 		"@clerk/clerk-sdk-node": "^4.12.6",
@@ -40,12 +41,13 @@
 		"@types/jest": "^29.5.5",
 		"@types/morgan": "^1.9.5",
 		"@types/node": "^20.6.2",
+		"@types/supertest": "^2.0.13",
 		"@typescript-eslint/eslint-plugin": "^6.7.2",
 		"@typescript-eslint/parser": "^6.7.2",
 		"eslint": "^8.49.0",
 		"grpc_tools_node_protoc_ts": "^5.3.3",
 		"grpc-tools": "^1.12.4",
-		"ts-jest": "^29.1.1",
+		"supertest": "^6.3.3",
 		"ts-node": "^10.9.1",
 		"ts-proto": "^1.158.0",
 		"typescript": "^5.2.2"

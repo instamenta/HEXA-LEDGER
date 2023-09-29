@@ -4,13 +4,13 @@ import ThreadModel from '../models/thread.model';
 import {HandleMongoError} from '../utilities/errors/error.handler';
 import {Readable as NodeRStream} from 'node:stream';
 import StatsModel from '../models/statistics.model';
+import ThreadBuilder from '../models/builder-models/thread.builder';
 import {
    Db, ObjectId, Collection, MongoError,
    Filter, UpdateFilter, FindOptions, FindOneAndUpdateOptions,
    InsertOneResult, ReturnDocument, UpdateResult,
    WithId, CursorStreamOptions,
 } from 'mongodb';
-import ThreadMessageModel from '../models/grpc-models/thread.message.model';
 
 export default class ThreadRepository {
 
@@ -326,7 +326,7 @@ export default class ThreadRepository {
       }
    }
 
-   public async getMany_$(skip: number, limit: number,): Promise<NodeRStream & AsyncIterable<ThreadMessageModel>> {
+   public async getMany_$(skip: number, limit: number,): Promise<NodeRStream & AsyncIterable<ThreadBuilder>> {
       try {
          const filter: Filter<I.IThreadSchema> = {
             del: false
@@ -335,7 +335,7 @@ export default class ThreadRepository {
             skip, limit,
          };
          const streamOptions: CursorStreamOptions = {
-            transform: (doc: WithId<I.IThreadSchema>): ThreadMessageModel => new ThreadMessageModel(doc)
+            transform: (doc: WithId<I.IThreadSchema>): ThreadBuilder => new ThreadBuilder(doc)
          };
          return this.collection
             .find(filter, options)

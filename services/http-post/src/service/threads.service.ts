@@ -1,7 +1,8 @@
 import * as GRPC_I from '../generated/grpc/types/threads_pb';
 import ERRORS from '../utilities/errors/grpc.errors';
-import ThreadMessageModel from '../models/grpc-models/thread.message.model';
+import ThreadBuilder from '../../src/models/builder-models/thread.builder';
 import ThreadRepository from '../repositories/thread.repository';
+import {IThreadsServer} from '../generated/grpc/types/threads_grpc_pb'
 import {Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {Transform} from 'stream';
@@ -13,13 +14,15 @@ import {
 } from '@grpc/grpc-js';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-export default class ThreadsServiceImpl {
+export default class ThreadsServiceImpl implements IThreadsServer {
 
-   private readonly repository: ThreadRepository;
+   readonly #repository: ThreadRepository;
 
    constructor(threadRepository: ThreadRepository) {
-      this.repository = threadRepository;
+      this.#repository = threadRepository;
    }
+
+   [name: string]: import("@grpc/grpc-js").UntypedHandleCall;
 
    public async create(
       call: ServerUnaryCall<GRPC_I.CreateRequest, GRPC_I.ThreadModel>,
@@ -52,11 +55,11 @@ export default class ThreadsServiceImpl {
       };
       const skip = req.page * req.limit + req.limit;
 
-      const $_database = await this.repository.getMany_$(skip, req.limit);
+      const $_database = await this.#repository.getMany_$(skip, req.limit);
       const $_transform = new Transform({readableObjectMode: true, writableObjectMode: true});
       let counter = 0;
 
-      $_transform._transform = (model: ThreadMessageModel, encryption, call) => {
+      $_transform._transform = (model: ThreadBuilder, encryption, call) => {
          call(null, model.build_GRPC());
          counter++;
       };

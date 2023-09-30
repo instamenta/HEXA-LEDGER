@@ -1,5 +1,5 @@
 import {StringValue, UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
-import {DonationObject} from "../types/threads_pb";
+import {DonationObject} from "../typescript/threads_pb";
 
 export default class DonationObjectBuilder {
    private readonly message: DonationObject;

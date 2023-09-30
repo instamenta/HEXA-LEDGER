@@ -1,5 +1,5 @@
 import {BoolValue, StringValue} from "google-protobuf/google/protobuf/wrappers_pb";
-import {CreateRequest} from "../types/threads_pb";
+import {CreateRequest} from "../typescript/threads_pb";
 
 export default class CreateRequestBuilder {
    private readonly message: CreateRequest;

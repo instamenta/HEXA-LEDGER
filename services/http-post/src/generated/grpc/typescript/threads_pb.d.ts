@@ -260,6 +260,11 @@ export class AmountWithAuthRequest extends jspb.Message {
     getAmount(): google_protobuf_wrappers_pb.UInt64Value | undefined;
     setAmount(value?: google_protobuf_wrappers_pb.UInt64Value): AmountWithAuthRequest;
 
+    hasThreadId(): boolean;
+    clearThreadId(): void;
+    getThreadId(): google_protobuf_wrappers_pb.StringValue | undefined;
+    setThreadId(value?: google_protobuf_wrappers_pb.StringValue): AmountWithAuthRequest;
+
     serializeBinary(): Uint8Array;
     toObject(includeInstance?: boolean): AmountWithAuthRequest.AsObject;
     static toObject(includeInstance: boolean, msg: AmountWithAuthRequest): AmountWithAuthRequest.AsObject;
@@ -274,6 +279,7 @@ export namespace AmountWithAuthRequest {
     export type AsObject = {
         auth?: google_protobuf_wrappers_pb.StringValue.AsObject,
         amount?: google_protobuf_wrappers_pb.UInt64Value.AsObject,
+        threadId?: google_protobuf_wrappers_pb.StringValue.AsObject,
     }
 }
 

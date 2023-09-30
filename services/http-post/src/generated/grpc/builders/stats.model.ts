@@ -1,4 +1,4 @@
-import {StatsModel} from "../types/threads_pb";
+import {StatsModel} from "../typescript/threads_pb";
 import {Int64Value, StringValue} from "google-protobuf/google/protobuf/wrappers_pb";
 import PromotedStatsBuilder from "./promoted.stats";
 import DonationsStatsBuilder from "./donation.stats";

@@ -1,5 +1,5 @@
 // GENERATED CODE -- DO NOT EDIT!
-// @ts-nocheck
+
 'use strict';
 var grpc = require('@grpc/grpc-js');
 var threads_pb = require('./threads_pb.js');

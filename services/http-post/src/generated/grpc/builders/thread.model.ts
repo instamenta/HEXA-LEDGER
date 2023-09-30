@@ -1,4 +1,4 @@
-import {ThreadModel} from "../types/threads_pb";
+import {ThreadModel} from "../typescript/threads_pb";
 import {BoolValue, StringValue, UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
 import PromotedObjectBuilder from './promoted.object'
 import DonationObjectBuilder from './donation.object'

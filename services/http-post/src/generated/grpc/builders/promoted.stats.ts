@@ -1,5 +1,5 @@
 import {UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
-import {PromotedStats} from "../types/threads_pb";
+import {PromotedStats} from "../typescript/threads_pb";
 
 export default class PromotedStatsBuilder {
    private readonly message: PromotedStats;

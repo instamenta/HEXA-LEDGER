@@ -1,5 +1,5 @@
 import {StringValue, UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
-import {PromotedObject} from "../types/threads_pb";
+import {PromotedObject} from "../typescript/threads_pb";
 
 export default class PromotedObjectBuilder {
    private readonly message: PromotedObject;

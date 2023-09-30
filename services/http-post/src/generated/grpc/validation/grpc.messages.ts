@@ -95,7 +95,10 @@ export const AmountWithAuthRequest = z.object({
       .optional(),
    amount: z.number()
       .positive({message: '🚫 Amount must be a positive number.'})
-      .optional()
+      .optional(),
+   threadId: z.string()
+      .min(23, {message: '🚫 threadId must be at least 23 character.'})
+      .optional(),
 });
 
 export const Pagination = z.object({

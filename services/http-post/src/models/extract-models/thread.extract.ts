@@ -1,9 +1,6 @@
-import GRPC_I from "../../generated/grpc/types/threads_pb";
-import * as I from "../../types/types";
+import {ThreadModel, PromotedObject, DonationObject} from "../../generated/grpc/typescript/threads_pb";
 import * as GI from "../../types/grpc.types";
 import {EO_build_ThreadModel} from "../../types/grpc.types";
-
-const proto = require('../../generated/grpc/javascript/threads_pb');
 
 export default class ThreadExtract {
    private readonly id: string | null;
@@ -23,7 +20,7 @@ export default class ThreadExtract {
    private readonly dislikes: string[];
    private readonly tags: string[];
 
-   constructor(m: GRPC_I.ThreadModel) {
+   constructor(m: ThreadModel) {
       this.id = m.hasId() ? m.getId()!.getValue() : null
       this.name = m.hasName() ? m.getName()!.getValue() : null
       this.description = m.hasDescription() ? m.getDescription()!.getValue() : null
@@ -43,7 +40,7 @@ export default class ThreadExtract {
    }
 
 
-   #extract_PromotedObject(data: GRPC_I.PromotedObject): GI.EOPromotedObject {
+   #extract_PromotedObject(data: PromotedObject): GI.EOPromotedObject {
       return {
          date: data.hasDate() ? new Date(data.getDate()!.getValue()) : null,
          amount: data.hasAmount() ? data.getAmount()!.getValue() : null,
@@ -51,7 +48,7 @@ export default class ThreadExtract {
       };
    }
 
-   #extract_DonationObject(data: GRPC_I.DonationObject): GI.EODonationObject {
+   #extract_DonationObject(data: DonationObject): GI.EODonationObject {
       return {
          date: data.hasDate() ? new Date(data.getDate()!.getValue()) : null,
          amount: data.hasAmount() ? data.getAmount()!.getValue() : null,

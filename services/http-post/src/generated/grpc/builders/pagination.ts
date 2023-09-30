@@ -1,5 +1,5 @@
 import {UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
-import {Pagination} from '../types/threads_pb'
+import {Pagination} from '../typescript/threads_pb'
 
 export default class PaginationBuilder {
    private readonly message: Pagination;

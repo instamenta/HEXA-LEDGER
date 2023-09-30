@@ -37,7 +37,7 @@ export default class BaseStatistics {
       return {
          count: this.do?.length,
          amount: this.do?.reduce((total, d) => total + d.amount, 0)
-      }
+      };
    }
 
    get likes(): number {

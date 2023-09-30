@@ -1,4 +1,4 @@
-import {AmountWithAuthRequest} from "../types/threads_pb";
+import {AmountWithAuthRequest} from "../typescript/threads_pb";
 import {StringValue, UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
 
 export default class AmountWithAuthRequestBuilder {

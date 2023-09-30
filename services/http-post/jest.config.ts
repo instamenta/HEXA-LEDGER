@@ -5,7 +5,8 @@ const config: Config = {
    testEnvironment: 'node',
    moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
    moduleDirectories: ['node_modules'],
-    modulePathIgnorePatterns: ['./dist/'],
+   modulePathIgnorePatterns: ['./dist/'],
+   preset: 'ts-jest'
 };
 
 export default config;

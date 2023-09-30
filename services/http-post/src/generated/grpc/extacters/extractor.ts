@@ -10,82 +10,82 @@ import {
    DonationObject,
    AmountWithAuthRequest,
    WalletWithAuthRequest,
-} from "../types/threads_pb";
+} from "../typescript/threads_pb";
 
-class ThreadModelExtractor {
-   private message: ThreadModel;
+export class ThreadModelExtractor {
+   #message: ThreadModel;
 
    constructor(message: ThreadModel) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getId(): string | null {
-      return this.message.getId()?.getValue() ?? null;
+   public getId(): string | null {
+      return this.#message.getId()?.getValue() ?? null;
    }
 
-   getName(): string | null {
-      return this.message.getName()?.getValue() ?? null;
+   public getName(): string | null {
+      return this.#message.getName()?.getValue() ?? null;
    }
 
-   getDescription(): string | null {
-      return this.message.getDescription()?.getValue() ?? null;
+   public getDescription(): string | null {
+      return this.#message.getDescription()?.getValue() ?? null;
    }
 
-   getContent(): string | null {
-      return this.message.getContent()?.getValue() ?? null;
+   public getContent(): string | null {
+      return this.#message.getContent()?.getValue() ?? null;
    }
 
-   getImagesList(): string[] {
-      return this.message.getImagesList().map((value) => value?.getValue());
+   public getImagesList(): string[] {
+      return this.#message.getImagesList().map((value) => value?.getValue());
    }
 
-   getCreatedAt(): Date | null {
-      const data = this.message.getCreatedAt()?.getValue()
-      return  data ? new Date(data) : null;
-   }
-
-   getUpdatedAt(): Date | null {
-      const data = this.message.getUpdatedAt()?.getValue()
+   public getCreatedAt(): Date | null {
+      const data = this.#message.getCreatedAt()?.getValue()
       return data ? new Date(data) : null;
    }
 
-   getOwner(): string | null {
-      return this.message.getOwner()?.getValue() ?? null;
+   public getUpdatedAt(): Date | null {
+      const data = this.#message.getUpdatedAt()?.getValue()
+      return data ? new Date(data) : null;
    }
 
-   getDeleted(): boolean | null {
-      return this.message.getDeleted()?.getValue() ?? null;
+   public getOwner(): string | null {
+      return this.#message.getOwner()?.getValue() ?? null;
    }
 
-   getPromotedList(): PromotedObjectValues[] {
-      return this.message.getPromotedList().map((promoted) => new PromotedObjectExtractor(promoted).extract());
+   public getDeleted(): boolean | null {
+      return this.#message.getDeleted()?.getValue() ?? null;
    }
 
-   getDonationsList(): DonationObjectValues[] {
-      return this.message.getDonationsList().map((donation) => new DonationObjectExtractor(donation).extract());
+   public getPromotedList(): PromotedObjectValues[] {
+      return this.#message.getPromotedList().map((promoted) => new PromotedObjectExtractor(promoted).extract());
    }
 
-   getLikesList(): string[] {
-      return this.message.getLikesList().map((value) => value?.getValue());
+   public getDonationsList(): DonationObjectValues[] {
+      return this.#message.getDonationsList().map((donation) => new DonationObjectExtractor(donation).extract());
    }
 
-   getDislikesList(): string[] {
-      return this.message.getDislikesList().map((value) => value?.getValue());
+   public getLikesList(): string[] {
+      return this.#message.getLikesList().map((value) => value?.getValue());
    }
 
-   getTagsList(): string[] {
-      return this.message.getTagsList().map((value) => value?.getValue());
+   public getDislikesList(): string[] {
+      return this.#message.getDislikesList().map((value) => value?.getValue());
    }
 
-   getLikesCount(): number | null {
-      return this.message.getLikesCount()?.getValue() ?? null;
+   public getTagsList(): string[] {
+      return this.#message.getTagsList().map((value) => value?.getValue());
    }
 
-   getDislikesCount(): number | null {
-      return this.message.getDislikesCount()?.getValue() ?? null;
+   public getLikesCount(): number | null {
+      return this.#message.getLikesCount()?.getValue() ?? null;
    }
 
-   extract(): ThreadModelValues {
+   public getDislikesCount(): number | null {
+      return this.#message.getDislikesCount()?.getValue() ?? null;
+   }
+
+   public extract(): ThreadModelValues {
       return {
          id: this.getId(),
          name: this.getName(),
@@ -107,27 +107,27 @@ class ThreadModelExtractor {
    }
 }
 
-class PromotedObjectExtractor {
-   private message: PromotedObject;
+export class PromotedObjectExtractor {
+   #message: PromotedObject;
 
    constructor(message: PromotedObject) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getPromoter(): string | null {
-      return this.message.getPromoter()?.getValue() ?? null;
+   public getPromoter(): string | null {
+      return this.#message.getPromoter()?.getValue() ?? null;
    }
 
-   getDate(): Date| null {
-      const data = this.message.getDate()?.getValue()
+   public getDate(): Date | null {
+      const data = this.#message.getDate()?.getValue()
       return data ? new Date(data) : null;
    }
 
-   getAmount(): number | null {
-      return this.message.getAmount()?.getValue() ?? null;
+   public getAmount(): number | null {
+      return this.#message.getAmount()?.getValue() ?? null;
    }
 
-   extract(): PromotedObjectValues {
+   public extract(): PromotedObjectValues {
       return {
          promoter: this.getPromoter(),
          date: this.getDate(),
@@ -136,27 +136,27 @@ class PromotedObjectExtractor {
    }
 }
 
-class DonationObjectExtractor {
-   private message: DonationObject;
+export class DonationObjectExtractor {
+   #message: DonationObject;
 
    constructor(message: DonationObject) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getDonator(): string | null {
-      return this.message.getDonator()?.getValue() ?? null;
+   public getDonator(): string | null {
+      return this.#message.getDonator()?.getValue() ?? null;
    }
 
-   getDate(): Date | null {
-      const data = this.message.getDate()?.getValue();
-      return  data ? new Date(data) : null;
+   public getDate(): Date | null {
+      const data = this.#message.getDate()?.getValue();
+      return data ? new Date(data) : null;
    }
 
-   getAmount(): number | null {
-      return this.message.getAmount()?.getValue() ?? null;
+   public getAmount(): number | null {
+      return this.#message.getAmount()?.getValue() ?? null;
    }
 
-   extract(): DonationObjectValues {
+   public extract(): DonationObjectValues {
       return {
          donator: this.getDonator(),
          date: this.getDate(),
@@ -165,46 +165,46 @@ class DonationObjectExtractor {
    }
 }
 
-class CreateRequestExtractor {
-   private message: CreateRequest;
+export class CreateRequestExtractor {
+   #message: CreateRequest;
 
    constructor(message: CreateRequest) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getName(): string | null {
-      return this.message.getName()?.getValue() ?? null;
+   public getName(): string | null {
+      return this.#message.getName()?.getValue() ?? null;
    }
 
-   getDescription(): string | null {
-      return this.message.getDescription()?.getValue() ?? null;
+   public getDescription(): string | null {
+      return this.#message.getDescription()?.getValue() ?? null;
    }
 
-   getContent(): string | null {
-      return this.message.getContent()?.getValue() ?? null;
+   public getContent(): string | null {
+      return this.#message.getContent()?.getValue() ?? null;
    }
 
-   getOwner(): string | null {
-      return this.message.getOwner()?.getValue() ?? null;
+   public getOwner(): string | null {
+      return this.#message.getOwner()?.getValue() ?? null;
    }
 
-   getImagesList(): string[] {
-      return this.message.getImagesList().map((value) => value?.getValue());
+   public getImagesList(): string[] {
+      return this.#message.getImagesList().map((value) => value?.getValue());
    }
 
-   getTagsList(): string [] {
-      return this.message.getTagsList().map((value) => value?.getValue());
+   public getTagsList(): string [] {
+      return this.#message.getTagsList().map((value) => value?.getValue());
    }
 
-   getIsPromoted(): boolean | null {
-      return this.message.getIspromoted()?.getValue() ?? null;
+   public getIsPromoted(): boolean | null {
+      return this.#message.getIspromoted()?.getValue() ?? null;
    }
 
-   getAuth(): string | null {
-      return this.message.getAuth()?.getValue() ?? null;
+   public getAuth(): string | null {
+      return this.#message.getAuth()?.getValue() ?? null;
    }
 
-   extract(): CreateRequestValues {
+   public extract(): CreateRequestValues {
       return {
          name: this.getName(),
          description: this.getDescription(),
@@ -218,45 +218,50 @@ class CreateRequestExtractor {
    }
 }
 
-class AmountWithAuthRequestExtractor {
-   private message: AmountWithAuthRequest;
+export class AmountWithAuthRequestExtractor {
+   #message: AmountWithAuthRequest;
 
    constructor(message: AmountWithAuthRequest) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getAuth(): string | null {
-      return this.message.getAuth()?.getValue() ?? null;
+   public getAuth(): string | null {
+      return this.#message.getAuth()?.getValue() ?? null;
    }
 
-   getAmount(): number | null {
-      return this.message.getAmount()?.getValue() ?? null;
+   public getAmount(): number | null {
+      return this.#message.getAmount()?.getValue() ?? null;
    }
 
-   extract(): AmountWithAuthRequestValues {
+   public getThreadId(): string | null {
+      return this.#message.getThreadId()?.getValue() ?? null;
+   }
+
+   public extract(): AmountWithAuthRequestValues {
       return {
          auth: this.getAuth(),
          amount: this.getAmount(),
+         threadId: this.getThreadId(),
       };
    }
 }
 
-class PaginationExtractor {
-   private message: Pagination;
+export class PaginationExtractor {
+   #message: Pagination;
 
    constructor(message: Pagination) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getPage(): number | null {
-      return this.message.getPage()?.getValue() ?? null;
+   public getPage(): number | null {
+      return this.#message.getPage()?.getValue() ?? null;
    }
 
-   getLimit(): number | null {
-      return this.message.getLimit()?.getValue() ?? null;
+   public getLimit(): number | null {
+      return this.#message.getLimit()?.getValue() ?? null;
    }
 
-   extract(): PaginationValues {
+   public extract(): PaginationValues {
       return {
          page: this.getPage(),
          limit: this.getLimit(),
@@ -264,22 +269,22 @@ class PaginationExtractor {
    }
 }
 
-class WalletWithAuthRequestExtractor {
-   private message: WalletWithAuthRequest;
+export class WalletWithAuthRequestExtractor {
+   #message: WalletWithAuthRequest;
 
    constructor(message: WalletWithAuthRequest) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getWallet(): string | null {
-      return this.message.getWallet()?.getValue() ?? null;
+   public getWallet(): string | null {
+      return this.#message.getWallet()?.getValue() ?? null;
    }
 
-   getId(): string | null {
-      return this.message.getId()?.getValue() ?? null;
+   public getId(): string | null {
+      return this.#message.getId()?.getValue() ?? null;
    }
 
-   extract(): WalletWithAuthRequestValues {
+   public extract(): WalletWithAuthRequestValues {
       return {
          wallet: this.getWallet(),
          id: this.getId(),
@@ -287,56 +292,56 @@ class WalletWithAuthRequestExtractor {
    }
 }
 
-class IdRequestExtractor {
-   private message: IdRequest;
+export class IdRequestExtractor {
+   #message: IdRequest;
 
    constructor(message: IdRequest) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getId(): string | null {
-      return this.message.getId()?.getValue() ?? null;
+   public getId(): string | null {
+      return this.#message.getId()?.getValue() ?? null;
    }
 
-   extract(): IdRequestValues {
+   public extract(): IdRequestValues {
       return {
          id: this.getId(),
       };
    }
 }
 
-class StatsModelExtractor {
-   private message: StatsModel;
+export class StatsModelExtractor {
+   #message: StatsModel;
 
    constructor(message: StatsModel) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getId(): string | null {
-      return this.message.getId()?.getValue() ?? null;
+   public getId(): string | null {
+      return this.#message.getId()?.getValue() ?? null;
    }
 
-   getName(): string | null {
-      return this.message.getName()?.getValue() ?? null;
+   public getName(): string | null {
+      return this.#message.getName()?.getValue() ?? null;
    }
 
-   getPromotedList(): PromotedStatsValues[] {
-      return this.message.getPromotedList().map((p) => new PromotedStatsExtractor(p).extract());
+   public getPromotedList(): PromotedStatsValues[] {
+      return this.#message.getPromotedList().map((p) => new PromotedStatsExtractor(p).extract());
    }
 
-   getDonationsList(): DonationsStatsValues[] {
-      return this.message.getDonationsList().map((d) => new DonationsStatsExtractor(d).extract());
+   public getDonationsList(): DonationsStatsValues[] {
+      return this.#message.getDonationsList().map((d) => new DonationsStatsExtractor(d).extract());
    }
 
-   getLikesCount(): number | null {
-      return this.message.getLikesCount()?.getValue() ?? null;
+   public getLikesCount(): number | null {
+      return this.#message.getLikesCount()?.getValue() ?? null;
    }
 
-   getDislikesCount(): number | null {
-      return this.message.getDislikesCount()?.getValue() ?? null;
+   public getDislikesCount(): number | null {
+      return this.#message.getDislikesCount()?.getValue() ?? null;
    }
 
-   extract(): StatsModelValues {
+   public extract(): StatsModelValues {
       return {
          id: this.getId(),
          name: this.getName(),
@@ -348,22 +353,22 @@ class StatsModelExtractor {
    }
 }
 
-class PromotedStatsExtractor {
-   private message: PromotedStats;
+export class PromotedStatsExtractor {
+   #message: PromotedStats;
 
    constructor(message: PromotedStats) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getCount(): number | null {
-      return this.message.getCount()?.getValue() ?? null;
+   public getCount(): number | null {
+      return this.#message.getCount()?.getValue() ?? null;
    }
 
-   getAmount(): number | null {
-      return this.message.getAmount()?.getValue() ?? null;
+   public getAmount(): number | null {
+      return this.#message.getAmount()?.getValue() ?? null;
    }
 
-   extract(): PromotedStatsValues {
+   public extract(): PromotedStatsValues {
       return {
          count: this.getCount(),
          amount: this.getAmount(),
@@ -371,22 +376,22 @@ class PromotedStatsExtractor {
    }
 }
 
-class DonationsStatsExtractor {
-   private message: DonationsStats;
+export class DonationsStatsExtractor {
+   #message: DonationsStats;
 
    constructor(message: DonationsStats) {
-      this.message = message;
+      this.#message = message;
    }
 
-   getCount(): number | null {
-      return this.message.getCount()?.getValue() ?? null;
+   public getCount(): number | null {
+      return this.#message.getCount()?.getValue() ?? null;
    }
 
-   getAmount(): number | null {
-      return this.message.getAmount()?.getValue() ?? null;
+   public getAmount(): number | null {
+      return this.#message.getAmount()?.getValue() ?? null;
    }
 
-   extract(): DonationsStatsValues {
+   public extract(): DonationsStatsValues {
       return {
          count: this.getCount(),
          amount: this.getAmount(),
@@ -440,6 +445,7 @@ type CreateRequestValues = {
 type AmountWithAuthRequestValues = {
    auth: string | null;
    amount: number | null;
+   threadId: string | null;
 };
 
 type PaginationValues = {

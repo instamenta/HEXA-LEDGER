@@ -1,5 +1,4 @@
 // source: threads.proto
-// @ts-nocheck
 /**
  * @fileoverview
  * @enhanceable
@@ -2261,7 +2260,8 @@ proto.threads.AmountWithAuthRequest.prototype.toObject = function(opt_includeIns
 proto.threads.AmountWithAuthRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
     auth: (f = msg.getAuth()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
-    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f)
+    amount: (f = msg.getAmount()) && google_protobuf_wrappers_pb.UInt64Value.toObject(includeInstance, f),
+    threadId: (f = msg.getThreadId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2308,6 +2308,11 @@ proto.threads.AmountWithAuthRequest.deserializeBinaryFromReader = function(msg, 
       reader.readMessage(value,google_protobuf_wrappers_pb.UInt64Value.deserializeBinaryFromReader);
       msg.setAmount(value);
       break;
+    case 3:
+      var value = new google_protobuf_wrappers_pb.StringValue;
+      reader.readMessage(value,google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
+      msg.setThreadId(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2351,6 +2356,14 @@ proto.threads.AmountWithAuthRequest.serializeBinaryToWriter = function(message, 
       2,
       f,
       google_protobuf_wrappers_pb.UInt64Value.serializeBinaryToWriter
+    );
+  }
+  f = message.getThreadId();
+  if (f != null) {
+    writer.writeMessage(
+      3,
+      f,
+      google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter
     );
   }
 };
@@ -2427,6 +2440,43 @@ proto.threads.AmountWithAuthRequest.prototype.clearAmount = function() {
  */
 proto.threads.AmountWithAuthRequest.prototype.hasAmount = function() {
   return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional google.protobuf.StringValue thread_id = 3;
+ * @return {?proto.google.protobuf.StringValue}
+ */
+proto.threads.AmountWithAuthRequest.prototype.getThreadId = function() {
+  return /** @type{?proto.google.protobuf.StringValue} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.StringValue, 3));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.StringValue|undefined} value
+ * @return {!proto.threads.AmountWithAuthRequest} returns this
+*/
+proto.threads.AmountWithAuthRequest.prototype.setThreadId = function(value) {
+  return jspb.Message.setWrapperField(this, 3, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.threads.AmountWithAuthRequest} returns this
+ */
+proto.threads.AmountWithAuthRequest.prototype.clearThreadId = function() {
+  return this.setThreadId(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.threads.AmountWithAuthRequest.prototype.hasThreadId = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 

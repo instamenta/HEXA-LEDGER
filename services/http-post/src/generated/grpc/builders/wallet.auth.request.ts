@@ -1,4 +1,4 @@
-import {WalletWithAuthRequest} from "../types/threads_pb";
+import {WalletWithAuthRequest} from "../typescript/threads_pb";
 import {StringValue} from "google-protobuf/google/protobuf/wrappers_pb";
 
 export default class WalletWithAuthRequestBuilder {

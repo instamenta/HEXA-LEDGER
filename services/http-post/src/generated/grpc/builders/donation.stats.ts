@@ -1,5 +1,5 @@
 import {UInt64Value} from "google-protobuf/google/protobuf/wrappers_pb";
-import {DonationsStats} from "../types/threads_pb";
+import {DonationsStats} from "../typescript/threads_pb";
 
 export default class DonationsStatsBuilder {
    private readonly message: DonationsStats;

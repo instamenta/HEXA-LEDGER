@@ -1,17 +1,14 @@
-import * as GRPC_I from '../generated/grpc/types/threads_pb';
+import * as GRPC_I from '../generated/grpc/typescript/threads_pb';
 import ERRORS from '../utilities/errors/grpc.errors';
 import ThreadBuilder from '../../src/models/builder-models/thread.builder';
 import ThreadRepository from '../repositories/thread.repository';
-import {IThreadsServer} from '../generated/grpc/types/threads_grpc_pb'
+import {IThreadsServer} from '../generated/grpc/typescript/threads_grpc_pb';
 import {Int32Value} from 'google-protobuf/google/protobuf/wrappers_pb';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {Transform} from 'stream';
-import {
-   ServerUnaryCall,
-   sendUnaryData,
-   ServerWritableStream,
-   Metadata,
-} from '@grpc/grpc-js';
+import {ServerUnaryCall, sendUnaryData, ServerWritableStream, Metadata} from '@grpc/grpc-js';
+import {AmountWithAuthRequestExtractor} from "../generated/grpc/extacters/extractor";
+import {AmountWithAuthRequest} from '../generated/grpc/validation/grpc.messages'
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class ThreadsServiceImpl implements IThreadsServer {
@@ -22,7 +19,7 @@ export default class ThreadsServiceImpl implements IThreadsServer {
       this.#repository = threadRepository;
    }
 
-   [name: string]: import("@grpc/grpc-js").UntypedHandleCall;
+   [name: string]: import('@grpc/grpc-js').UntypedHandleCall;
 
    public async create(
       call: ServerUnaryCall<GRPC_I.CreateRequest, GRPC_I.ThreadModel>,
@@ -130,14 +127,16 @@ export default class ThreadsServiceImpl implements IThreadsServer {
       call: ServerUnaryCall<GRPC_I.WalletWithAuthRequest, Empty>,
       callback: sendUnaryData<Empty>
    ): Promise<void> {
-      // Implement the logic for the "Dislike" RPC call
+
    }
 
    public async donate(
       call: ServerUnaryCall<GRPC_I.AmountWithAuthRequest, Empty>,
       callback: sendUnaryData<Empty>
    ): Promise<void> {
-      // Implement the logic for the "Donate" RPC call
+      const request = new AmountWithAuthRequestExtractor(call.request).extract();
+
+
    }
 
    public async promote(

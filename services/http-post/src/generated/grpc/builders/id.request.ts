@@ -1,5 +1,5 @@
 import {StringValue} from "google-protobuf/google/protobuf/wrappers_pb";
-import {IdRequest} from "../types/threads_pb";
+import {IdRequest} from "../typescript/threads_pb";
 
 export default class IdRequestBuilder {
    private readonly message: IdRequest;

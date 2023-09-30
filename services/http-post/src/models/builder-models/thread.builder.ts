@@ -2,7 +2,7 @@ import BaseThread from "../base/base.thread";
 import PromotedObjectBuilder from "../../generated/grpc/builders/promoted.object";
 import DonationObjectBuilder from "../../generated/grpc/builders/donation.object";
 import ThreadModelBuilder from "../../generated/grpc/builders/thread.model";
-import {ThreadModel} from "../../generated/grpc/types/threads_pb";
+import {ThreadModel} from "../../generated/grpc/typescript/threads_pb";
 import {IThreadSchema} from "../../types/types";
 import {IP_build_DonationObject, IP_build_PromotedObject} from "../../types/grpc.types";
 import {WithId} from "mongodb";

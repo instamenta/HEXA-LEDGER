@@ -73,6 +73,7 @@ message CreateRequest {
 message AmountWithAuthRequest {
   google.protobuf.StringValue auth = 1;
   google.protobuf.UInt64Value amount = 2;
+  google.protobuf.StringValue thread_id= 3;
 }
 
 message Pagination {

@@ -14,10 +14,10 @@ import {
 
 export default class ThreadRepository {
 
-   private collection: Collection<I.IThreadSchema>;
+   readonly #collection: Collection<I.IThreadSchema>;
 
    constructor(db: Db) {
-      this.collection = db.collection(config.DB_THREADS_COLLECTION);
+      this.#collection = db.collection(config.DB_THREADS_COLLECTION);
    }
 
    public async create(d: I.PCreateData): Promise<ThreadModel | null> {
@@ -38,7 +38,7 @@ export default class ThreadRepository {
          do: [], li: [], di: [],
          del: false,
       };
-      return this.collection
+      return this.#collection
          .insertOne(record)
          .then((res: InsertOneResult<I.IThreadSchema>) => res.insertedId
             ? new ThreadModel({...record, _id: res.insertedId})
@@ -53,7 +53,7 @@ export default class ThreadRepository {
       const filter: Filter<I.IThreadSchema> = {
          del: false
       };
-      return this.collection.countDocuments(filter)
+      return this.#collection.countDocuments(filter)
          .catch((e: MongoError | unknown) => {
             HandleMongoError(e);
             throw e;
@@ -70,7 +70,7 @@ export default class ThreadRepository {
       const options: FindOneAndUpdateOptions = {
          returnDocument: 'after' as ReturnDocument
       };
-      return this.collection
+      return this.#collection
          .findOneAndUpdate(filter, update, options)
          .then((res: WithId<I.IThreadSchema> | null) => res
             ? new ThreadModel(res)
@@ -100,7 +100,7 @@ export default class ThreadRepository {
       if (d.tags) Object.assign(update.$set, {
          t: (d.tags).map((tag) => Buffer.from(tag))
       });
-      return this.collection
+      return this.#collection
          .findOneAndUpdate(filter, update, options)
          .then((res: WithId<I.IThreadSchema> | null) => res
             ? new ThreadModel(res)
@@ -115,7 +115,7 @@ export default class ThreadRepository {
       const filter: Filter<I.IThreadSchema> = {
          _id: new ObjectId(threadId), del: false
       };
-      return this.collection
+      return this.#collection
          .findOne(filter)
          .then((res: WithId<I.IThreadSchema> | null) => res
             ? new ThreadModel(res)
@@ -134,7 +134,7 @@ export default class ThreadRepository {
          const options: FindOptions<I.IThreadSchema> = {
             skip, limit
          };
-         return this.collection
+         return this.#collection
             .find(filter, options)
             .toArray()
             .then((models) => models.map((data) => new ThreadModel(data)));
@@ -151,7 +151,7 @@ export default class ThreadRepository {
       const options: FindOptions<I.IThreadSchema> = {
          skip, limit,
       };
-      return this.collection
+      return this.#collection
          .find(filter, options)
          .toArray()
          .then((models) => models.map((data) => new ThreadModel(data)))
@@ -171,7 +171,7 @@ export default class ThreadRepository {
          $addToSet: {li: Buffer.from(wallet.replace(/^0x/, ''), 'hex')},
          $pull: {di: Buffer.from(wallet.replace(/^0x/, ''), 'hex')}
       };
-      return this.collection
+      return this.#collection
          .updateOne(filter, update)
          .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
          .catch((e: MongoError) => {
@@ -190,7 +190,7 @@ export default class ThreadRepository {
          $addToSet: {di: Buffer.from(wallet.replace(/^0x/, ''), 'hex')},
          $pull: {li: Buffer.from(wallet.replace(/^0x/, ''), 'hex')}
       };
-      return this.collection
+      return this.#collection
          .updateOne(filter, update)
          .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
          .catch((e: MongoError) => {
@@ -212,7 +212,7 @@ export default class ThreadRepository {
             }
          }
       };
-      return this.collection
+      return this.#collection
          .updateOne(filter, update)
          .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
          .catch((e: MongoError) => {
@@ -234,7 +234,7 @@ export default class ThreadRepository {
             }
          }
       };
-      return this.collection
+      return this.#collection
          .updateOne(filter, update)
          .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
          .catch((e: MongoError) => {
@@ -252,7 +252,7 @@ export default class ThreadRepository {
       const update: UpdateFilter<I.IThreadSchema> = {
          $set: {o: Buffer.from(newOwner, 'hex')}
       };
-      return this.collection
+      return this.#collection
          .updateOne(filter, update)
          .then((res: UpdateResult<I.IThreadSchema>) => !!res.modifiedCount)
          .catch((e: MongoError) => {
@@ -268,7 +268,7 @@ export default class ThreadRepository {
       const options: FindOptions<I.IThreadSchema> = {
          projection: {li: 1}
       };
-      return this.collection
+      return this.#collection
          .findOne(filter, options)
          .then((thread: Pick<WithId<I.IThreadSchema>, 'li'> | null) => thread
             ? thread.li.map((likes: Buffer) => '0x' + likes.toString('hex'))
@@ -286,7 +286,7 @@ export default class ThreadRepository {
       const options: FindOptions<I.IThreadSchema> = {
          projection: {di: 1}
       };
-      return this.collection
+      return this.#collection
          .findOne(filter, options)
          .then((thread: Pick<WithId<I.IThreadSchema>, 'di'> | null) => thread
             ? thread.di.map((dislikes: Buffer) => '0x' + dislikes.toString('hex'))
@@ -307,14 +307,14 @@ export default class ThreadRepository {
          };
          if (threadId) {
             filter._id = new ObjectId(threadId);
-            return this.collection
+            return this.#collection
                .findOne(filter, options)
                .then((thread: I.IStatsModel | null) => thread
                   ? new StatsModel(thread)
                   : null
                );
          } else {
-            return this.collection
+            return this.#collection
                .find(filter, options)
                .toArray()
                .then((threads: I.IStatsModel[]) =>
@@ -337,7 +337,7 @@ export default class ThreadRepository {
          const streamOptions: CursorStreamOptions = {
             transform: (doc: WithId<I.IThreadSchema>): ThreadBuilder => new ThreadBuilder(doc)
          };
-         return this.collection
+         return this.#collection
             .find(filter, options)
             .stream(streamOptions);
       } catch (e: MongoError | unknown) {
@@ -355,7 +355,7 @@ export default class ThreadRepository {
          transform: (doc: WithId<I.IThreadSchema>): ThreadModel => new ThreadModel(doc)
       };
       try {
-         return this.collection
+         return this.#collection
             .find(filter)
             .skip(skip)
             .limit(limit)

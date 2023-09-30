@@ -3,7 +3,7 @@ import {ServerCredentials, Server} from '@grpc/grpc-js';
 import ThreadsService from './service/threads.service';
 import {config} from "./utilities/config";
 
-const {ThreadsService: grpc_threads_service} = require('./generated/grpc/javascript/threads_grpc_pb.js');
+import { ThreadsService  as grpc_threads_service} from './generated/grpc/typescript/threads_grpc_pb'
 
 export function start_grpc_server(threadRepository: ThreadRepository) {
    const _grpc_server = new Server();
@@ -16,7 +16,7 @@ export function start_grpc_server(threadRepository: ThreadRepository) {
       (error: Error | null, port: number): void => {
          if (error) {
             console.error(error);
-            process.exit(1);
+            process.exit();
          }
          console.log(`[ GRPC Service running on PORT: [${port}] ]`);
          _grpc_server.start();

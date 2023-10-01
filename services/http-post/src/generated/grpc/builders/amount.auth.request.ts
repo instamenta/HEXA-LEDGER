@@ -18,6 +18,11 @@ export default class AmountWithAuthRequestBuilder {
       return this;
    }
 
+   withThreadId(threadId: string): this {
+      this.message.setThreadId(new StringValue().setValue(threadId));
+      return this;
+   }
+
    build(): AmountWithAuthRequest {
       return this.message;
    }

@@ -10,6 +10,7 @@ import * as google_protobuf_wrappers_pb from "google-protobuf/google/protobuf/wr
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 
 interface IThreadsService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
+    pingPong: IThreadsService_IPingPong;
     create: IThreadsService_ICreate;
     update: IThreadsService_IUpdate;
     delete: IThreadsService_IDelete;
@@ -26,6 +27,15 @@ interface IThreadsService extends grpc.ServiceDefinition<grpc.UntypedServiceImpl
     promote: IThreadsService_IPromote;
 }
 
+interface IThreadsService_IPingPong extends grpc.MethodDefinition<threads_pb.PingPongMessage, threads_pb.PingPongMessage> {
+    path: "/threads.Threads/PingPong";
+    requestStream: false;
+    responseStream: false;
+    requestSerialize: grpc.serialize<threads_pb.PingPongMessage>;
+    requestDeserialize: grpc.deserialize<threads_pb.PingPongMessage>;
+    responseSerialize: grpc.serialize<threads_pb.PingPongMessage>;
+    responseDeserialize: grpc.deserialize<threads_pb.PingPongMessage>;
+}
 interface IThreadsService_ICreate extends grpc.MethodDefinition<threads_pb.CreateRequest, threads_pb.ThreadModel> {
     path: "/threads.Threads/Create";
     requestStream: false;
@@ -98,23 +108,23 @@ interface IThreadsService_IGetStatistics extends grpc.MethodDefinition<threads_p
     responseSerialize: grpc.serialize<threads_pb.StatsModel>;
     responseDeserialize: grpc.deserialize<threads_pb.StatsModel>;
 }
-interface IThreadsService_IGetLikes extends grpc.MethodDefinition<threads_pb.IdRequest, google_protobuf_wrappers_pb.Int32Value> {
+interface IThreadsService_IGetLikes extends grpc.MethodDefinition<threads_pb.IdRequest, google_protobuf_wrappers_pb.StringValue> {
     path: "/threads.Threads/GetLikes";
     requestStream: false;
-    responseStream: false;
+    responseStream: true;
     requestSerialize: grpc.serialize<threads_pb.IdRequest>;
     requestDeserialize: grpc.deserialize<threads_pb.IdRequest>;
-    responseSerialize: grpc.serialize<google_protobuf_wrappers_pb.Int32Value>;
-    responseDeserialize: grpc.deserialize<google_protobuf_wrappers_pb.Int32Value>;
+    responseSerialize: grpc.serialize<google_protobuf_wrappers_pb.StringValue>;
+    responseDeserialize: grpc.deserialize<google_protobuf_wrappers_pb.StringValue>;
 }
-interface IThreadsService_IGetDislikes extends grpc.MethodDefinition<threads_pb.IdRequest, google_protobuf_wrappers_pb.Int32Value> {
+interface IThreadsService_IGetDislikes extends grpc.MethodDefinition<threads_pb.IdRequest, google_protobuf_wrappers_pb.StringValue> {
     path: "/threads.Threads/GetDislikes";
     requestStream: false;
-    responseStream: false;
+    responseStream: true;
     requestSerialize: grpc.serialize<threads_pb.IdRequest>;
     requestDeserialize: grpc.deserialize<threads_pb.IdRequest>;
-    responseSerialize: grpc.serialize<google_protobuf_wrappers_pb.Int32Value>;
-    responseDeserialize: grpc.deserialize<google_protobuf_wrappers_pb.Int32Value>;
+    responseSerialize: grpc.serialize<google_protobuf_wrappers_pb.StringValue>;
+    responseDeserialize: grpc.deserialize<google_protobuf_wrappers_pb.StringValue>;
 }
 interface IThreadsService_ILike extends grpc.MethodDefinition<threads_pb.WalletWithAuthRequest, google_protobuf_empty_pb.Empty> {
     path: "/threads.Threads/Like";
@@ -156,6 +166,7 @@ interface IThreadsService_IPromote extends grpc.MethodDefinition<threads_pb.Amou
 export const ThreadsService: IThreadsService;
 
 export interface IThreadsServer extends grpc.UntypedServiceImplementation {
+    pingPong: grpc.handleUnaryCall<threads_pb.PingPongMessage, threads_pb.PingPongMessage>;
     create: grpc.handleUnaryCall<threads_pb.CreateRequest, threads_pb.ThreadModel>;
     update: grpc.handleUnaryCall<threads_pb.ThreadModel, threads_pb.ThreadModel>;
     delete: grpc.handleUnaryCall<threads_pb.IdRequest, threads_pb.ThreadModel>;
@@ -164,8 +175,8 @@ export interface IThreadsServer extends grpc.UntypedServiceImplementation {
     getByOwner: grpc.handleServerStreamingCall<threads_pb.IdRequest, threads_pb.ThreadModel>;
     getOne: grpc.handleUnaryCall<threads_pb.IdRequest, threads_pb.ThreadModel>;
     getStatistics: grpc.handleServerStreamingCall<threads_pb.Pagination, threads_pb.StatsModel>;
-    getLikes: grpc.handleUnaryCall<threads_pb.IdRequest, google_protobuf_wrappers_pb.Int32Value>;
-    getDislikes: grpc.handleUnaryCall<threads_pb.IdRequest, google_protobuf_wrappers_pb.Int32Value>;
+    getLikes: grpc.handleServerStreamingCall<threads_pb.IdRequest, google_protobuf_wrappers_pb.StringValue>;
+    getDislikes: grpc.handleServerStreamingCall<threads_pb.IdRequest, google_protobuf_wrappers_pb.StringValue>;
     like: grpc.handleUnaryCall<threads_pb.WalletWithAuthRequest, google_protobuf_empty_pb.Empty>;
     dislike: grpc.handleUnaryCall<threads_pb.WalletWithAuthRequest, google_protobuf_empty_pb.Empty>;
     donate: grpc.handleUnaryCall<threads_pb.AmountWithAuthRequest, google_protobuf_empty_pb.Empty>;
@@ -173,6 +184,9 @@ export interface IThreadsServer extends grpc.UntypedServiceImplementation {
 }
 
 export interface IThreadsClient {
+    pingPong(request: threads_pb.PingPongMessage, callback: (error: grpc.ServiceError | null, response: threads_pb.PingPongMessage) => void): grpc.ClientUnaryCall;
+    pingPong(request: threads_pb.PingPongMessage, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: threads_pb.PingPongMessage) => void): grpc.ClientUnaryCall;
+    pingPong(request: threads_pb.PingPongMessage, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: threads_pb.PingPongMessage) => void): grpc.ClientUnaryCall;
     create(request: threads_pb.CreateRequest, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
     create(request: threads_pb.CreateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
     create(request: threads_pb.CreateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
@@ -194,12 +208,10 @@ export interface IThreadsClient {
     getOne(request: threads_pb.IdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
     getStatistics(request: threads_pb.Pagination, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<threads_pb.StatsModel>;
     getStatistics(request: threads_pb.Pagination, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<threads_pb.StatsModel>;
-    getLikes(request: threads_pb.IdRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    getLikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    getLikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    getDislikes(request: threads_pb.IdRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    getDislikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    getDislikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
+    getLikes(request: threads_pb.IdRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+    getLikes(request: threads_pb.IdRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+    getDislikes(request: threads_pb.IdRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+    getDislikes(request: threads_pb.IdRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
     like(request: threads_pb.WalletWithAuthRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
     like(request: threads_pb.WalletWithAuthRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
     like(request: threads_pb.WalletWithAuthRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
@@ -216,6 +228,9 @@ export interface IThreadsClient {
 
 export class ThreadsClient extends grpc.Client implements IThreadsClient {
     constructor(address: string, credentials: grpc.ChannelCredentials, options?: Partial<grpc.ClientOptions>);
+    public pingPong(request: threads_pb.PingPongMessage, callback: (error: grpc.ServiceError | null, response: threads_pb.PingPongMessage) => void): grpc.ClientUnaryCall;
+    public pingPong(request: threads_pb.PingPongMessage, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: threads_pb.PingPongMessage) => void): grpc.ClientUnaryCall;
+    public pingPong(request: threads_pb.PingPongMessage, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: threads_pb.PingPongMessage) => void): grpc.ClientUnaryCall;
     public create(request: threads_pb.CreateRequest, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
     public create(request: threads_pb.CreateRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
     public create(request: threads_pb.CreateRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
@@ -237,12 +252,10 @@ export class ThreadsClient extends grpc.Client implements IThreadsClient {
     public getOne(request: threads_pb.IdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: threads_pb.ThreadModel) => void): grpc.ClientUnaryCall;
     public getStatistics(request: threads_pb.Pagination, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<threads_pb.StatsModel>;
     public getStatistics(request: threads_pb.Pagination, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<threads_pb.StatsModel>;
-    public getLikes(request: threads_pb.IdRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    public getLikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    public getLikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    public getDislikes(request: threads_pb.IdRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    public getDislikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
-    public getDislikes(request: threads_pb.IdRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_wrappers_pb.Int32Value) => void): grpc.ClientUnaryCall;
+    public getLikes(request: threads_pb.IdRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+    public getLikes(request: threads_pb.IdRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+    public getDislikes(request: threads_pb.IdRequest, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+    public getDislikes(request: threads_pb.IdRequest, metadata?: grpc.Metadata, options?: Partial<grpc.CallOptions>): grpc.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
     public like(request: threads_pb.WalletWithAuthRequest, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
     public like(request: threads_pb.WalletWithAuthRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;
     public like(request: threads_pb.WalletWithAuthRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: google_protobuf_empty_pb.Empty) => void): grpc.ClientUnaryCall;

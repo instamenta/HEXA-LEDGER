@@ -6,6 +6,7 @@ import "google/protobuf/wrappers.proto";
 import "google/protobuf/empty.proto";
 
 service Threads {
+  rpc PingPong(PingPongMessage) returns (PingPongMessage);
   // CUD
   rpc Create(CreateRequest) returns (ThreadModel);
   rpc Update(ThreadModel) returns (ThreadModel);
@@ -18,13 +19,18 @@ service Threads {
   rpc GetOne(IdRequest) returns (ThreadModel);
   rpc GetStatistics(Pagination) returns (stream StatsModel);
 
-  rpc GetLikes(IdRequest) returns (google.protobuf.Int32Value);
-  rpc GetDislikes(IdRequest) returns (google.protobuf.Int32Value);
+  rpc GetLikes(IdRequest) returns (stream google.protobuf.StringValue);
+  rpc GetDislikes(IdRequest) returns (stream google.protobuf.StringValue);
   // INTERACTIONS
   rpc Like(WalletWithAuthRequest) returns (google.protobuf.Empty);
   rpc Dislike(WalletWithAuthRequest) returns (google.protobuf.Empty);
   rpc Donate(AmountWithAuthRequest) returns (google.protobuf.Empty);
   rpc Promote(AmountWithAuthRequest) returns (google.protobuf.Empty);
+}
+
+message PingPongMessage {
+  google.protobuf.StringValue name = 1;
+  google.protobuf.Int64Value timestamp = 2;
 }
 
 message ThreadModel {
@@ -73,7 +79,7 @@ message CreateRequest {
 message AmountWithAuthRequest {
   google.protobuf.StringValue auth = 1;
   google.protobuf.UInt64Value amount = 2;
-  google.protobuf.StringValue thread_id= 3;
+  google.protobuf.StringValue thread_id = 3;
 }
 
 message Pagination {

@@ -252,7 +252,7 @@ export default class ThreadController {
 
          this.threadRepository.getLikes(threadId)
             .then((res: string[] | null) => res
-               ? w.status(StatusCode.OK).end()
+               ? w.status(StatusCode.OK).json(res).end()
                : w.status(StatusCode.NOT_FOUND).end()
             );
       } catch (e: Error | ZodError | MongoError | unknown) {

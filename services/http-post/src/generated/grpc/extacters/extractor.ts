@@ -8,6 +8,7 @@ import {
    PromotedObject,
    DonationsStats,
    DonationObject,
+   PingPongMessage,
    AmountWithAuthRequest,
    WalletWithAuthRequest,
 } from "../typescript/threads_pb";
@@ -372,6 +373,29 @@ export class PromotedStatsExtractor {
       return {
          count: this.getCount(),
          amount: this.getAmount(),
+      };
+   }
+}
+
+export class PingPongExtractor {
+   #message: PingPongMessage;
+
+   constructor(message: PingPongMessage) {
+      this.#message = message;
+   }
+
+   public getTimestamp(): number | null {
+      return this.#message.getTimestamp()?.getValue() ?? null;
+   }
+
+   public getName(): string | null {
+      return this.#message.getName()?.getValue() ?? null;
+   }
+
+   public extract(): { timestamp: number | null, name: string | null } {
+      return {
+         timestamp: this.getTimestamp(),
+         name: this.getName(),
       };
    }
 }

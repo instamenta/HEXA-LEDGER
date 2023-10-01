@@ -1,3 +1,4 @@
+// @ts-nocheck
 // GENERATED CODE -- DO NOT EDIT!
 
 'use strict';
@@ -26,6 +27,17 @@ function serialize_google_protobuf_Int32Value(arg) {
 
 function deserialize_google_protobuf_Int32Value(buffer_arg) {
   return google_protobuf_wrappers_pb.Int32Value.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_google_protobuf_StringValue(arg) {
+  if (!(arg instanceof google_protobuf_wrappers_pb.StringValue)) {
+    throw new Error('Expected argument of type google.protobuf.StringValue');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_google_protobuf_StringValue(buffer_arg) {
+  return google_protobuf_wrappers_pb.StringValue.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_threads_AmountWithAuthRequest(arg) {
@@ -72,6 +84,17 @@ function deserialize_threads_Pagination(buffer_arg) {
   return threads_pb.Pagination.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_threads_PingPongMessage(arg) {
+  if (!(arg instanceof threads_pb.PingPongMessage)) {
+    throw new Error('Expected argument of type threads.PingPongMessage');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_threads_PingPongMessage(buffer_arg) {
+  return threads_pb.PingPongMessage.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_threads_StatsModel(arg) {
   if (!(arg instanceof threads_pb.StatsModel)) {
     throw new Error('Expected argument of type threads.StatsModel');
@@ -107,6 +130,17 @@ function deserialize_threads_WalletWithAuthRequest(buffer_arg) {
 
 
 var ThreadsService = exports.ThreadsService = {
+  pingPong: {
+    path: '/threads.Threads/PingPong',
+    requestStream: false,
+    responseStream: false,
+    requestType: threads_pb.PingPongMessage,
+    responseType: threads_pb.PingPongMessage,
+    requestSerialize: serialize_threads_PingPongMessage,
+    requestDeserialize: deserialize_threads_PingPongMessage,
+    responseSerialize: serialize_threads_PingPongMessage,
+    responseDeserialize: deserialize_threads_PingPongMessage,
+  },
   // CUD
 create: {
     path: '/threads.Threads/Create',
@@ -200,24 +234,24 @@ getMany: {
   getLikes: {
     path: '/threads.Threads/GetLikes',
     requestStream: false,
-    responseStream: false,
+    responseStream: true,
     requestType: threads_pb.IdRequest,
-    responseType: google_protobuf_wrappers_pb.Int32Value,
+    responseType: google_protobuf_wrappers_pb.StringValue,
     requestSerialize: serialize_threads_IdRequest,
     requestDeserialize: deserialize_threads_IdRequest,
-    responseSerialize: serialize_google_protobuf_Int32Value,
-    responseDeserialize: deserialize_google_protobuf_Int32Value,
+    responseSerialize: serialize_google_protobuf_StringValue,
+    responseDeserialize: deserialize_google_protobuf_StringValue,
   },
   getDislikes: {
     path: '/threads.Threads/GetDislikes',
     requestStream: false,
-    responseStream: false,
+    responseStream: true,
     requestType: threads_pb.IdRequest,
-    responseType: google_protobuf_wrappers_pb.Int32Value,
+    responseType: google_protobuf_wrappers_pb.StringValue,
     requestSerialize: serialize_threads_IdRequest,
     requestDeserialize: deserialize_threads_IdRequest,
-    responseSerialize: serialize_google_protobuf_Int32Value,
-    responseDeserialize: deserialize_google_protobuf_Int32Value,
+    responseSerialize: serialize_google_protobuf_StringValue,
+    responseDeserialize: deserialize_google_protobuf_StringValue,
   },
   // INTERACTIONS
 like: {

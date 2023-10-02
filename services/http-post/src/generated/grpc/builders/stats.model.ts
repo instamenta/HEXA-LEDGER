@@ -20,13 +20,13 @@ export default class StatsModelBuilder {
       return this;
    }
 
-   withPromoted(promoted: PromotedStatsBuilder[]): this {
-      this.message.setPromotedList(promoted.map((p) => p.build()));
+   withPromoted(promoted: PromotedStatsBuilder): this {
+      this.message.setPromoted(promoted.build());
       return this;
    }
 
-   withDonations(donations: DonationsStatsBuilder[]): this {
-      this.message.setDonationsList(donations.map((d) => d.build()));
+   withDonations(donations: DonationsStatsBuilder): this {
+      this.message.setDonations(donations.build());
       return this;
    }
 

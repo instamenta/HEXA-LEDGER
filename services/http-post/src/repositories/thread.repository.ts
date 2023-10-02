@@ -346,7 +346,6 @@ export default class ThreadRepository {
       }
    }
 
-
    public async getByOwner_$(ownerAddr: string, skip: number, limit: number): Promise<NodeRStream & AsyncIterable<ThreadModel>> {
       const filter: Filter<I.IThreadSchema> = {
          o: Buffer.from(ownerAddr.replace(/^0x/, ''), 'hex'), del: false
@@ -360,6 +359,28 @@ export default class ThreadRepository {
             .skip(skip)
             .limit(limit)
             .stream(streamOptions);
+      } catch (e: MongoError | unknown) {
+         HandleMongoError(e);
+         throw e;
+      }
+   }
+
+   public async getStatistics_$(skip: number, limit: number): Promise<NodeRStream & AsyncIterable<WithId<StatsModel>>> {
+      try {
+         const filter: Filter<I.IThreadSchema> = {
+            del: false
+         };
+         const options: FindOptions<I.IThreadSchema> = {
+            projection: {li: 1, do: 1, p: 1, di: 1, n: 1}
+         };
+         const streamOptions: CursorStreamOptions = {
+            transform: (doc: WithId<I.IStatsModel>): StatsModel => new StatsModel(doc)
+         };
+         return this.#collection
+            .find(filter, options)
+            .skip(skip)
+            .limit(limit)
+            .stream(streamOptions)
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;

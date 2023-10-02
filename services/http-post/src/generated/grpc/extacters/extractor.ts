@@ -326,12 +326,12 @@ export class StatsModelExtractor {
       return this.#message.getName()?.getValue() ?? null;
    }
 
-   public getPromotedList(): PromotedStatsValues[] {
-      return this.#message.getPromotedList().map((p) => new PromotedStatsExtractor(p).extract());
+   public getPromoted(): PromotedStatsValues {
+      return new PromotedStatsExtractor(this.#message.getPromoted() ?? new PromotedStats()).extract()
    }
 
-   public getDonationsList(): DonationsStatsValues[] {
-      return this.#message.getDonationsList().map((d) => new DonationsStatsExtractor(d).extract());
+   public getDonations(): DonationsStatsValues {
+      return new DonationsStatsExtractor(this.#message.getDonations() ?? new DonationsStats()).extract()
    }
 
    public getLikesCount(): number | null {
@@ -346,8 +346,8 @@ export class StatsModelExtractor {
       return {
          id: this.getId(),
          name: this.getName(),
-         promotedList: this.getPromotedList(),
-         donationsList: this.getDonationsList(),
+         promoted: this.getPromoted(),
+         donations: this.getDonations(),
          likesCount: this.getLikesCount(),
          dislikesCount: this.getDislikesCount(),
       };
@@ -489,8 +489,8 @@ type IdRequestValues = {
 type StatsModelValues = {
    id: string | null;
    name: string | null;
-   promotedList: PromotedStatsValues[];
-   donationsList: DonationsStatsValues[];
+   promoted: PromotedStatsValues;
+   donations: DonationsStatsValues;
    likesCount: number | null;
    dislikesCount: number | null;
 };

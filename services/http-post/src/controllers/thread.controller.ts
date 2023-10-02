@@ -142,9 +142,8 @@ export default class ThreadController {
    ): Promise<void> {
       try {
          this.threadRepository.getTotalCount()
-            .then((res: number) => res
-               ? w.status(StatusCode.OK).json(res).end()
-               : w.status(StatusCode.NOT_FOUND).end());
+            .then((res: number) =>
+               w.status(StatusCode.OK).json(res).end())
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }

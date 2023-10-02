@@ -11,13 +11,20 @@ import {
    PingPongExtractor,
    PaginationExtractor,
    WalletWithAuthRequestExtractor,
-   AmountWithAuthRequestExtractor,
+   AmountWithAuthRequestExtractor, IdRequestExtractor, CreateRequestExtractor,
 } from "../generated/grpc/extacters/extractor";
 import * as zod from '../generated/grpc/validation/grpc.messages'
-import {ZodError} from "zod";
-import {MongoError} from "mongodb";
+import {ZodError, z} from "zod";
+import {Filter, FindOptions, MongoError, ObjectId} from "mongodb";
 import {handleZodError} from "../utilities/errors/grpc.handler";
 import PingPongBuilder from "../generated/grpc/builders/pingpong";
+import * as I from "../types/types";
+import StatsModel from "../models/statistics.model";
+import StatusCode from "@instamenta/http-status-codes";
+import StatsModelBuilder from "../generated/grpc/builders/stats.model";
+import PromotedStatsBuilder from "../generated/grpc/builders/promoted.stats";
+import DonationsStatsBuilder from "../generated/grpc/builders/donation.stats";
+import ThreadModel from "../models/thread.model";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class ThreadsService implements IThreadsServer {
@@ -33,7 +40,22 @@ export default class ThreadsService implements IThreadsServer {
       call: ServerUnaryCall<GRPC_I.CreateRequest, GRPC_I.ThreadModel>,
       callback: sendUnaryData<GRPC_I.ThreadModel>
    ): Promise<void> {
-      // Implement the logic for the "Create" RPC call
+      try {
+         const _request = new CreateRequestExtractor(call.request);
+         const threadData = zod.CreateRequest.parse(_request);
+
+         type IAdditionalData = { images: string[], tags: string[], promoted: number };
+         let data = threadData as z.infer<typeof zod.CreateRequest> & IAdditionalData;
+         data = {...data, images: threadData.imagesList, tags: threadData.tagsList, promoted: 0};
+
+         this.#repository.create(data)
+            .then((model: ThreadModel | null) => model instanceof ThreadModel
+               ? callback(null, new ThreadBuilder(model).build_GRPC())
+               : callback(ERRORS.NOT_FOUND));
+      } catch (e) {
+         (e instanceof ZodError) ? callback(handleZodError(e)) : callback(ERRORS.INTERNAL);
+         console.log(`${this.constructor.name}.create(): `, e);
+      }
    }
 
    public async update(
@@ -47,23 +69,29 @@ export default class ThreadsService implements IThreadsServer {
       call: ServerUnaryCall<GRPC_I.IdRequest, GRPC_I.ThreadModel>,
       callback: sendUnaryData<GRPC_I.ThreadModel>
    ): Promise<void> {
-      // Implement the logic for the "Delete" RPC call
+      try {
+         const _request = new IdRequestExtractor(call.request);
+
+         const {id: threadId} = zod.IdRequest.parse(_request);
+
+         this.#repository.deleteById(threadId)
+            .then((model: ThreadModel | null) => model instanceof ThreadModel
+               ? callback(null, new ThreadBuilder(model).build_GRPC())
+               : callback(ERRORS.NOT_FOUND));
+      } catch (e: Error | ZodError | MongoError | unknown) {
+         (e instanceof ZodError) ? callback(handleZodError(e)) : callback(ERRORS.INTERNAL);
+         console.log(`${this.constructor.name}.getOne(): `, e);
+      }
    }
 
    public async getMany(
       call: ServerWritableStream<GRPC_I.Pagination, GRPC_I.ThreadModel>
    ): Promise<void> {
-      const _request = new PaginationExtractor(call.request).extract();
-      let data;
       try {
-         data = zod.Pagination.parse(_request)
-      } catch (e: unknown | ZodError) {
-         call.emit('error', handleZodError(e as ZodError))
-         return console.log(`${this.constructor.name}.getMany(): `, e);
-      }
-      const {page, limit} = data;
-      const skip = page * limit + limit;
-      try {
+         const _request = new PaginationExtractor(call.request).extract();
+         const {page, limit} = zod.Pagination.parse(_request);
+         const skip = page * limit + limit;
+
          const $_database = await this.#repository.getMany_$(skip, limit)
          const $_transform = new Transform({readableObjectMode: true, writableObjectMode: true});
          let counter = 0;
@@ -91,7 +119,11 @@ export default class ThreadsService implements IThreadsServer {
          // @ts-ignore
          $_database.pipe($_transform).pipe(call);
 
-      } catch (e: Error | MongoError | unknown) {
+      } catch (e: Error | MongoError | ZodError | unknown) {
+         if (e instanceof ZodError) {
+            call.emit('error', handleZodError(e as ZodError))
+            return console.log(`${this.constructor.name}.getMany(): `, e);
+         }
          call.emit('error', ERRORS.INTERNAL);
          console.log(`${this.constructor.name}.getMany(): `, e);
       }
@@ -101,7 +133,14 @@ export default class ThreadsService implements IThreadsServer {
       call: ServerUnaryCall<Empty, Int32Value>,
       callback: sendUnaryData<Int32Value>
    ): Promise<void> {
-      // Implement the logic for the "GetTotalCount" RPC call
+      try {
+         this.#repository.getTotalCount()
+            .then((res: number) =>
+               callback(null, new Int32Value().setValue(res)))
+      } catch (e: Error | MongoError | unknown) {
+         callback(ERRORS.INTERNAL);
+         console.log(`${this.constructor.name}.getTotalCount(): `, e);
+      }
    }
 
    public async getByOwner(
@@ -114,13 +153,73 @@ export default class ThreadsService implements IThreadsServer {
       call: ServerUnaryCall<GRPC_I.IdRequest, GRPC_I.ThreadModel>,
       callback: sendUnaryData<GRPC_I.ThreadModel>
    ): Promise<void> {
-      // Implement the logic for the "GetOne" RPC call
+      try {
+         const _request = new IdRequestExtractor(call.request);
+         const {id: threadId} = zod.IdRequest.parse(_request);
+
+         this.#repository.getOneById(threadId)
+            .then((model: ThreadModel | null) => model
+               ? callback(null, new ThreadBuilder(model).build_GRPC())
+               : callback(ERRORS.NOT_FOUND));
+      } catch (e: ZodError | unknown) {
+         (e instanceof ZodError) ? callback(handleZodError(e)) : callback(ERRORS.INTERNAL);
+         console.log(`${this.constructor.name}.getOne(): `, e);
+      }
    }
 
    public async getStatistics(
       call: ServerWritableStream<GRPC_I.Pagination, GRPC_I.StatsModel>
    ): Promise<void> {
-      // Implement the logic for the "GetStatistics" RPC call
+      try {
+         const _request = new PaginationExtractor(call.request)
+            , {page, limit} = zod.Pagination.parse(_request)
+            , skip = page * limit + limit;
+
+         const $_database = await this.#repository.getStatistics_$(skip, limit)
+            , $_transform = new Transform({readableObjectMode: true, writableObjectMode: true});
+         let counter = 0;
+
+         $_transform._transform = (model: StatsModel, encryption, call) => {
+            const _data = model.get()
+               , promoted = new PromotedStatsBuilder()
+               .withAmount(_data.promoted.amount).withCount(_data.donations.count)
+               , donations = new DonationsStatsBuilder()
+               .withAmount(_data.donations.amount).withCount(_data.donations.count);
+            call(null, new StatsModelBuilder()
+               .withId(_data.id)
+               .withPromoted(promoted)
+               .withDonations(donations)
+               .withName(_data.name)
+               .withLikesCount(_data.likes)
+               .withDislikesCount(_data.dislikes)
+               .build()
+            );
+            counter++;
+         };
+
+         $_transform.on('end', () => {
+            if (!counter) {
+               const _error = ERRORS.NOT_FOUND;
+               _error.details = `Threads for [Page: ${page}], [Limit: ${limit}] not found.`;
+               call.emit('error', _error);
+            }
+            const metadata = new Metadata();
+            metadata.set('count', counter.toString());
+            call.end(metadata);
+         });
+
+         $_transform.on('error', (e: Error) => {
+            call.emit('error', ERRORS.INTERNAL);
+         });
+
+         // @ts-ignore
+         $_database.pipe($_transform).pipe(call);
+      } catch (e: Error | MongoError | ZodError | unknown) {
+         (e instanceof ZodError)
+            ? call.emit('error', handleZodError(e as ZodError))
+            : call.emit('error', ERRORS.INTERNAL);
+         console.log(`${this.constructor.name}.getStatistics(): `, e);
+      }
    }
 
    public async getLikes(

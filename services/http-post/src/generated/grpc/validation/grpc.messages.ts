@@ -67,26 +67,21 @@ export const ThreadModel = z.object({
 export const CreateRequest = z.object({
    name: z.string()
       .min(1, {message: 'Name must be at least 1 character.'})
-      .max(48, {message: 'Name cannot exceed 48 characters.'})
-      .optional(),
+      .max(48, {message: 'Name cannot exceed 48 characters.'}),
    description: z.string()
       .min(3, {message: 'Description must be at least 3 characters.'})
-      .max(120, {message: 'Description cannot exceed 120 characters.'})
-      .optional(),
+      .max(120, {message: 'Description cannot exceed 120 characters.'}),
    content: z.string()
       .min(26, {message: 'Content must be at least 26 characters.'})
-      .max(360, {message: 'Content cannot exceed 360 characters.'})
-      .optional(),
+      .max(360, {message: 'Content cannot exceed 360 characters.'}),
    owner: z.string()
       .min(24, {message: 'Owner must be at least 24 characters.'})
-      .max(42, {message: 'Owner cannot exceed 42 characters.'})
-      .optional(),
-   imagesList: z.array(z.string().optional()),
-   tagsList: z.array(z.string().optional()),
-   isPromoted: z.boolean().optional(),
+      .max(42, {message: 'Owner cannot exceed 42 characters.'}),
+   imagesList: z.array(z.string()),
+   tagsList: z.array(z.string()),
+   isPromoted: z.boolean(),
    auth: z.string()
       .min(1, {message: 'Auth must be at least 1 character.'})
-      .optional(),
 });
 
 export const AmountWithAuthRequest = z.object({
@@ -153,8 +148,8 @@ export const StatsModel = z.object({
       .min(1, {message: 'Name must be at least 1 character.'})
       .max(48, {message: 'Name cannot exceed 48 characters.'})
       .optional(),
-   promotedList: z.array(PromotedStats),
-   donationsList: z.array(DonationsStats),
+   promotedList: PromotedStats,
+   donationsList: DonationsStats,
    likesCount: z.number()
       .min(0, {message: 'Likes count cannot be negative.'})
       .optional(),

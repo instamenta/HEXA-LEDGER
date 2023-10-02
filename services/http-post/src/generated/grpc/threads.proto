@@ -99,10 +99,10 @@ message IdRequest {
 message StatsModel {
   google.protobuf.StringValue id = 1;
   google.protobuf.StringValue name = 2;
-  repeated PromotedStats promoted = 10;
-  repeated DonationsStats  donations = 11;
-  google.protobuf.Int64Value likes_count = 15;
-  google.protobuf.Int64Value dislikes_count = 16;
+  PromotedStats promoted = 3;
+  DonationsStats  donations = 4;
+  google.protobuf.Int64Value likes_count = 5;
+  google.protobuf.Int64Value dislikes_count = 6;
 }
 
 message PromotedStats {

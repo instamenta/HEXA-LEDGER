@@ -2,7 +2,7 @@ import {credentials, ServerErrorResponse, ServiceError} from '@grpc/grpc-js'
 import {ThreadsClient} from '../src/generated/grpc/typescript/threads_grpc_pb'
 import {PingPongMessage, ThreadModel} from '../src/generated/grpc/typescript/threads_pb'
 import PaginationBuilder from '../src/generated/grpc/builders/pagination'
-import {PingPongExtractor, ThreadModelExtractor} from "../src/generated/grpc/extacters/extractor";
+import { ThreadModelExtractor} from "../src/generated/grpc/extacters/extractor";
 import AmountWithAuthRequestBuilder from "../src/generated/grpc/builders/amount.auth.request";
 import {Empty} from "google-protobuf/google/protobuf/empty_pb";
 import PingPongBuilder from "../src/generated/grpc/builders/pingpong";

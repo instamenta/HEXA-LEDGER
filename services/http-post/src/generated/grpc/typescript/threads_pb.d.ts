@@ -404,14 +404,16 @@ export class StatsModel extends jspb.Message {
     clearName(): void;
     getName(): google_protobuf_wrappers_pb.StringValue | undefined;
     setName(value?: google_protobuf_wrappers_pb.StringValue): StatsModel;
-    clearPromotedList(): void;
-    getPromotedList(): Array<PromotedStats>;
-    setPromotedList(value: Array<PromotedStats>): StatsModel;
-    addPromoted(value?: PromotedStats, index?: number): PromotedStats;
-    clearDonationsList(): void;
-    getDonationsList(): Array<DonationsStats>;
-    setDonationsList(value: Array<DonationsStats>): StatsModel;
-    addDonations(value?: DonationsStats, index?: number): DonationsStats;
+
+    hasPromoted(): boolean;
+    clearPromoted(): void;
+    getPromoted(): PromotedStats | undefined;
+    setPromoted(value?: PromotedStats): StatsModel;
+
+    hasDonations(): boolean;
+    clearDonations(): void;
+    getDonations(): DonationsStats | undefined;
+    setDonations(value?: DonationsStats): StatsModel;
 
     hasLikesCount(): boolean;
     clearLikesCount(): void;
@@ -437,8 +439,8 @@ export namespace StatsModel {
     export type AsObject = {
         id?: google_protobuf_wrappers_pb.StringValue.AsObject,
         name?: google_protobuf_wrappers_pb.StringValue.AsObject,
-        promotedList: Array<PromotedStats.AsObject>,
-        donationsList: Array<DonationsStats.AsObject>,
+        promoted?: PromotedStats.AsObject,
+        donations?: DonationsStats.AsObject,
         likesCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
         dislikesCount?: google_protobuf_wrappers_pb.Int64Value.AsObject,
     }

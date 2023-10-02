@@ -238,7 +238,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.threads.StatsModel = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, proto.threads.StatsModel.repeatedFields_, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
 goog.inherits(proto.threads.StatsModel, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -3261,13 +3261,6 @@ proto.threads.IdRequest.prototype.hasId = function() {
 
 
 
-/**
- * List of repeated fields within this message type.
- * @private {!Array<number>}
- * @const
- */
-proto.threads.StatsModel.repeatedFields_ = [10,11];
-
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -3301,10 +3294,8 @@ proto.threads.StatsModel.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: (f = msg.getId()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
     name: (f = msg.getName()) && google_protobuf_wrappers_pb.StringValue.toObject(includeInstance, f),
-    promotedList: jspb.Message.toObjectList(msg.getPromotedList(),
-    proto.threads.PromotedStats.toObject, includeInstance),
-    donationsList: jspb.Message.toObjectList(msg.getDonationsList(),
-    proto.threads.DonationsStats.toObject, includeInstance),
+    promoted: (f = msg.getPromoted()) && proto.threads.PromotedStats.toObject(includeInstance, f),
+    donations: (f = msg.getDonations()) && proto.threads.DonationsStats.toObject(includeInstance, f),
     likesCount: (f = msg.getLikesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f),
     dislikesCount: (f = msg.getDislikesCount()) && google_protobuf_wrappers_pb.Int64Value.toObject(includeInstance, f)
   };
@@ -3353,22 +3344,22 @@ proto.threads.StatsModel.deserializeBinaryFromReader = function(msg, reader) {
       reader.readMessage(value,google_protobuf_wrappers_pb.StringValue.deserializeBinaryFromReader);
       msg.setName(value);
       break;
-    case 10:
+    case 3:
       var value = new proto.threads.PromotedStats;
       reader.readMessage(value,proto.threads.PromotedStats.deserializeBinaryFromReader);
-      msg.addPromoted(value);
+      msg.setPromoted(value);
       break;
-    case 11:
+    case 4:
       var value = new proto.threads.DonationsStats;
       reader.readMessage(value,proto.threads.DonationsStats.deserializeBinaryFromReader);
-      msg.addDonations(value);
+      msg.setDonations(value);
       break;
-    case 15:
+    case 5:
       var value = new google_protobuf_wrappers_pb.Int64Value;
       reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
       msg.setLikesCount(value);
       break;
-    case 16:
+    case 6:
       var value = new google_protobuf_wrappers_pb.Int64Value;
       reader.readMessage(value,google_protobuf_wrappers_pb.Int64Value.deserializeBinaryFromReader);
       msg.setDislikesCount(value);
@@ -3418,18 +3409,18 @@ proto.threads.StatsModel.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_wrappers_pb.StringValue.serializeBinaryToWriter
     );
   }
-  f = message.getPromotedList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      10,
+  f = message.getPromoted();
+  if (f != null) {
+    writer.writeMessage(
+      3,
       f,
       proto.threads.PromotedStats.serializeBinaryToWriter
     );
   }
-  f = message.getDonationsList();
-  if (f.length > 0) {
-    writer.writeRepeatedMessage(
-      11,
+  f = message.getDonations();
+  if (f != null) {
+    writer.writeMessage(
+      4,
       f,
       proto.threads.DonationsStats.serializeBinaryToWriter
     );
@@ -3437,7 +3428,7 @@ proto.threads.StatsModel.serializeBinaryToWriter = function(message, writer) {
   f = message.getLikesCount();
   if (f != null) {
     writer.writeMessage(
-      15,
+      5,
       f,
       google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
     );
@@ -3445,7 +3436,7 @@ proto.threads.StatsModel.serializeBinaryToWriter = function(message, writer) {
   f = message.getDislikesCount();
   if (f != null) {
     writer.writeMessage(
-      16,
+      6,
       f,
       google_protobuf_wrappers_pb.Int64Value.serializeBinaryToWriter
     );
@@ -3528,88 +3519,86 @@ proto.threads.StatsModel.prototype.hasName = function() {
 
 
 /**
- * repeated PromotedStats promoted = 10;
- * @return {!Array<!proto.threads.PromotedStats>}
+ * optional PromotedStats promoted = 3;
+ * @return {?proto.threads.PromotedStats}
  */
-proto.threads.StatsModel.prototype.getPromotedList = function() {
-  return /** @type{!Array<!proto.threads.PromotedStats>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.threads.PromotedStats, 10));
+proto.threads.StatsModel.prototype.getPromoted = function() {
+  return /** @type{?proto.threads.PromotedStats} */ (
+    jspb.Message.getWrapperField(this, proto.threads.PromotedStats, 3));
 };
 
 
 /**
- * @param {!Array<!proto.threads.PromotedStats>} value
+ * @param {?proto.threads.PromotedStats|undefined} value
  * @return {!proto.threads.StatsModel} returns this
 */
-proto.threads.StatsModel.prototype.setPromotedList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 10, value);
+proto.threads.StatsModel.prototype.setPromoted = function(value) {
+  return jspb.Message.setWrapperField(this, 3, value);
 };
 
 
 /**
- * @param {!proto.threads.PromotedStats=} opt_value
- * @param {number=} opt_index
- * @return {!proto.threads.PromotedStats}
- */
-proto.threads.StatsModel.prototype.addPromoted = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 10, opt_value, proto.threads.PromotedStats, opt_index);
-};
-
-
-/**
- * Clears the list making it empty but non-null.
+ * Clears the message field making it undefined.
  * @return {!proto.threads.StatsModel} returns this
  */
-proto.threads.StatsModel.prototype.clearPromotedList = function() {
-  return this.setPromotedList([]);
+proto.threads.StatsModel.prototype.clearPromoted = function() {
+  return this.setPromoted(undefined);
 };
 
 
 /**
- * repeated DonationsStats donations = 11;
- * @return {!Array<!proto.threads.DonationsStats>}
+ * Returns whether this field is set.
+ * @return {boolean}
  */
-proto.threads.StatsModel.prototype.getDonationsList = function() {
-  return /** @type{!Array<!proto.threads.DonationsStats>} */ (
-    jspb.Message.getRepeatedWrapperField(this, proto.threads.DonationsStats, 11));
+proto.threads.StatsModel.prototype.hasPromoted = function() {
+  return jspb.Message.getField(this, 3) != null;
 };
 
 
 /**
- * @param {!Array<!proto.threads.DonationsStats>} value
+ * optional DonationsStats donations = 4;
+ * @return {?proto.threads.DonationsStats}
+ */
+proto.threads.StatsModel.prototype.getDonations = function() {
+  return /** @type{?proto.threads.DonationsStats} */ (
+    jspb.Message.getWrapperField(this, proto.threads.DonationsStats, 4));
+};
+
+
+/**
+ * @param {?proto.threads.DonationsStats|undefined} value
  * @return {!proto.threads.StatsModel} returns this
 */
-proto.threads.StatsModel.prototype.setDonationsList = function(value) {
-  return jspb.Message.setRepeatedWrapperField(this, 11, value);
+proto.threads.StatsModel.prototype.setDonations = function(value) {
+  return jspb.Message.setWrapperField(this, 4, value);
 };
 
 
 /**
- * @param {!proto.threads.DonationsStats=} opt_value
- * @param {number=} opt_index
- * @return {!proto.threads.DonationsStats}
- */
-proto.threads.StatsModel.prototype.addDonations = function(opt_value, opt_index) {
-  return jspb.Message.addToRepeatedWrapperField(this, 11, opt_value, proto.threads.DonationsStats, opt_index);
-};
-
-
-/**
- * Clears the list making it empty but non-null.
+ * Clears the message field making it undefined.
  * @return {!proto.threads.StatsModel} returns this
  */
-proto.threads.StatsModel.prototype.clearDonationsList = function() {
-  return this.setDonationsList([]);
+proto.threads.StatsModel.prototype.clearDonations = function() {
+  return this.setDonations(undefined);
 };
 
 
 /**
- * optional google.protobuf.Int64Value likes_count = 15;
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.threads.StatsModel.prototype.hasDonations = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional google.protobuf.Int64Value likes_count = 5;
  * @return {?proto.google.protobuf.Int64Value}
  */
 proto.threads.StatsModel.prototype.getLikesCount = function() {
   return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 15));
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 5));
 };
 
 
@@ -3618,7 +3607,7 @@ proto.threads.StatsModel.prototype.getLikesCount = function() {
  * @return {!proto.threads.StatsModel} returns this
 */
 proto.threads.StatsModel.prototype.setLikesCount = function(value) {
-  return jspb.Message.setWrapperField(this, 15, value);
+  return jspb.Message.setWrapperField(this, 5, value);
 };
 
 
@@ -3636,17 +3625,17 @@ proto.threads.StatsModel.prototype.clearLikesCount = function() {
  * @return {boolean}
  */
 proto.threads.StatsModel.prototype.hasLikesCount = function() {
-  return jspb.Message.getField(this, 15) != null;
+  return jspb.Message.getField(this, 5) != null;
 };
 
 
 /**
- * optional google.protobuf.Int64Value dislikes_count = 16;
+ * optional google.protobuf.Int64Value dislikes_count = 6;
  * @return {?proto.google.protobuf.Int64Value}
  */
 proto.threads.StatsModel.prototype.getDislikesCount = function() {
   return /** @type{?proto.google.protobuf.Int64Value} */ (
-    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 16));
+    jspb.Message.getWrapperField(this, google_protobuf_wrappers_pb.Int64Value, 6));
 };
 
 
@@ -3655,7 +3644,7 @@ proto.threads.StatsModel.prototype.getDislikesCount = function() {
  * @return {!proto.threads.StatsModel} returns this
 */
 proto.threads.StatsModel.prototype.setDislikesCount = function(value) {
-  return jspb.Message.setWrapperField(this, 16, value);
+  return jspb.Message.setWrapperField(this, 6, value);
 };
 
 
@@ -3673,7 +3662,7 @@ proto.threads.StatsModel.prototype.clearDislikesCount = function() {
  * @return {boolean}
  */
 proto.threads.StatsModel.prototype.hasDislikesCount = function() {
-  return jspb.Message.getField(this, 16) != null;
+  return jspb.Message.getField(this, 6) != null;
 };
 
 

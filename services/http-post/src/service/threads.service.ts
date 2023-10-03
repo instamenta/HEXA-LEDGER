@@ -1,31 +1,31 @@
 import * as GRPC_I from '../generated/grpc/typescript/threads_pb';
 import ERRORS from '../utilities/errors/grpc.errors';
-import ThreadBuilder from '../../src/models/builder-models/thread.builder';
+import ThreadBuilder from '../models/builder-models/thread.builder';
 import ThreadRepository from '../repositories/thread.repository';
 import {IThreadsServer} from '../generated/grpc/typescript/threads_grpc_pb';
 import {Int32Value, StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {Transform} from 'stream';
 import {ServerUnaryCall, sendUnaryData, ServerWritableStream, Metadata} from '@grpc/grpc-js';
+import * as zod from '../generated/grpc/validation/grpc.messages';
+import {ZodError, z} from 'zod';
+import {handleZodError} from '../utilities/errors/grpc.handler';
+import PingPongBuilder from '../generated/grpc/builders/pingpong';
+import StatsModel from '../models/statistics.model';
+import StatsModelBuilder from '../generated/grpc/builders/stats.model';
+import PromotedStatsBuilder from '../generated/grpc/builders/promoted.stats';
+import DonationsStatsBuilder from '../generated/grpc/builders/donation.stats';
+import ThreadModel from '../models/thread.model';
 import {
    PingPongExtractor,
    PaginationExtractor,
    WalletWithAuthRequestExtractor,
-   AmountWithAuthRequestExtractor, IdRequestExtractor, CreateRequestExtractor,
-} from "../generated/grpc/extacters/extractor";
-import * as zod from '../generated/grpc/validation/grpc.messages'
-import {ZodError, z} from "zod";
-import {Filter, FindOptions, MongoError, ObjectId} from "mongodb";
-import {handleZodError} from "../utilities/errors/grpc.handler";
-import PingPongBuilder from "../generated/grpc/builders/pingpong";
-import * as I from "../types/types";
-import StatsModel from "../models/statistics.model";
-import StatusCode from "@instamenta/http-status-codes";
-import StatsModelBuilder from "../generated/grpc/builders/stats.model";
-import PromotedStatsBuilder from "../generated/grpc/builders/promoted.stats";
-import DonationsStatsBuilder from "../generated/grpc/builders/donation.stats";
-import ThreadModel from "../models/thread.model";
+   AmountWithAuthRequestExtractor,
+   IdRequestExtractor,
+   CreateRequestExtractor,
+} from '../generated/grpc/extacters/extractor';
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import {type MongoError} from 'mongodb';
 
 export default class ThreadsService implements IThreadsServer {
    readonly #repository: ThreadRepository;
@@ -62,7 +62,7 @@ export default class ThreadsService implements IThreadsServer {
       call: ServerUnaryCall<GRPC_I.ThreadModel, GRPC_I.ThreadModel>,
       callback: sendUnaryData<GRPC_I.ThreadModel>
    ): Promise<void> {
-      // Implement the logic for the "Update" RPC call
+
    }
 
    public async delete(
@@ -71,7 +71,6 @@ export default class ThreadsService implements IThreadsServer {
    ): Promise<void> {
       try {
          const _request = new IdRequestExtractor(call.request);
-
          const {id: threadId} = zod.IdRequest.parse(_request);
 
          this.#repository.deleteById(threadId)
@@ -92,7 +91,7 @@ export default class ThreadsService implements IThreadsServer {
          const {page, limit} = zod.Pagination.parse(_request);
          const skip = page * limit + limit;
 
-         const $_database = await this.#repository.getMany_$(skip, limit)
+         const $_database = await this.#repository.getMany_$(skip, limit);
          const $_transform = new Transform({readableObjectMode: true, writableObjectMode: true});
          let counter = 0;
 
@@ -121,7 +120,7 @@ export default class ThreadsService implements IThreadsServer {
 
       } catch (e: Error | MongoError | ZodError | unknown) {
          if (e instanceof ZodError) {
-            call.emit('error', handleZodError(e as ZodError))
+            call.emit('error', handleZodError(e as ZodError));
             return console.log(`${this.constructor.name}.getMany(): `, e);
          }
          call.emit('error', ERRORS.INTERNAL);
@@ -136,7 +135,7 @@ export default class ThreadsService implements IThreadsServer {
       try {
          this.#repository.getTotalCount()
             .then((res: number) =>
-               callback(null, new Int32Value().setValue(res)))
+               callback(null, new Int32Value().setValue(res)));
       } catch (e: Error | MongoError | unknown) {
          callback(ERRORS.INTERNAL);
          console.log(`${this.constructor.name}.getTotalCount(): `, e);
@@ -182,9 +181,9 @@ export default class ThreadsService implements IThreadsServer {
          $_transform._transform = (model: StatsModel, encryption, call) => {
             const _data = model.get()
                , promoted = new PromotedStatsBuilder()
-               .withAmount(_data.promoted.amount).withCount(_data.donations.count)
+                  .withAmount(_data.promoted.amount).withCount(_data.donations.count)
                , donations = new DonationsStatsBuilder()
-               .withAmount(_data.donations.amount).withCount(_data.donations.count);
+                  .withAmount(_data.donations.amount).withCount(_data.donations.count);
             call(null, new StatsModelBuilder()
                .withId(_data.id)
                .withPromoted(promoted)

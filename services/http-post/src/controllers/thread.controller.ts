@@ -143,7 +143,7 @@ export default class ThreadController {
       try {
          this.threadRepository.getTotalCount()
             .then((res: number) =>
-               w.status(StatusCode.OK).json(res).end())
+               w.status(StatusCode.OK).json(res).end());
       } catch (e: Error | ZodError | MongoError | unknown) {
          RespondGeneralPurpose(e, w);
       }

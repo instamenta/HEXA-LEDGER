@@ -15,7 +15,6 @@ import {
    idRequest
 } from '../protos/generated/types/users_pb';
 
-
 export default class AuthService {
 
    public static getInstance(): AuthService {

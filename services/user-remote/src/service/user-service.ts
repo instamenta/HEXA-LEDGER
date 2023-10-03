@@ -17,7 +17,6 @@ import {
    UnfollowUserRequest,
 } from '../protos/generated/types/users_pb';
 
-
 interface MyBulkWriteOperation {
    updateOne: {
       filter: Record<string, any>;

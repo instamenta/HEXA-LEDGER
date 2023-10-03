@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' cdn.jsdelivr.net 'unsafe-inline';">
+    <title>MetaMask Connection</title>
+</head>
+<body>
+<h1>MetaMask Connection</h1>
+<form id="connectForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required pattern="[a-zA-Z0-9]+">
+    <br>
+
+    <label for="picture">Picture URL:</label>
+    <input type="text" id="picture" name="picture">
+    <br>
+
+    <button type="button" id="connectButton">Connect with MetaMask</button>
+</form>
+<script>
+	document.addEventListener("DOMContentLoaded", () => {
+		document.getElementById("connectButton").addEventListener("click", () => {
+			if(typeof window.ethereum !== "undefined") {
+				window.ethereum
+					.request({ method: "eth_requestAccounts" })
+					.then((accounts) => {
+						fetch("/api/auth", {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								username: document.getElementById("username").value,
+								picture: document.getElementById("picture").value,
+								address: accounts[0],
+							}),
+						})
+							.then(console.log)
+							.catch((e) => console.log(e));
+					}).catch((e) => console.log(e));
+			} else {
+				console.log("install metamask");
+			}
+		});
+	});
+</script>
+</body>
+</html>

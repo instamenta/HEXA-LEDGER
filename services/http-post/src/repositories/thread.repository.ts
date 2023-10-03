@@ -380,7 +380,7 @@ export default class ThreadRepository {
             .find(filter, options)
             .skip(skip)
             .limit(limit)
-            .stream(streamOptions)
+            .stream(streamOptions);
       } catch (e: MongoError | unknown) {
          HandleMongoError(e);
          throw e;

@@ -1,23 +1,16 @@
-const { ethers } = require("hardhat");
+const {ethers, HardhatEthersSigner} = require("hardhat");
 
-async function main() {
-
-  const minUnit = 100;
-  const minAuctionAd = 10;
-  const [owner, user1] = await ethers.getSigners();
-
-  const contract = await ethers.deployContract(
-    "Lock", [minUnit, minAuctionAd],
-    { value: ethers.parseEther('1') }
-  );
-
-  const tx = await contract.connect(owner)
-    .createUnit("password", 0, 5, { value: minUnitPrice });
-
-  console.log(tx);
+/**
+ * @return {Promise<{owner: HardhatEthersSigner, contract: *, user: HardhatEthersSigner[]}>}
+ */
+async function useContract() {
+    /** @type {[HardhatEthersSigner, HardhatEthersSigner[]]} */
+    const [owner, ...user] = await ethers.getSigners();
+    return {
+        contract: await ethers.deployContract("Localization", owner),
+        owner,
+        user,
+    };
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+module.exports =  useContract;

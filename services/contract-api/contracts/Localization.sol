@@ -41,7 +41,8 @@ contract Localization is Ownable {
     event UnitSold(
         string name,
         string description,
-        uint256 indexed boughtFor
+        uint256 indexed boughtFor,
+        string location
     );
 
     function createUnit(
@@ -93,7 +94,8 @@ contract Localization is Ownable {
         emit UnitSold({
             name: unit.name,
             description: unit.description,
-            boughtFor: msg.value
+            boughtFor: msg.value,
+            location: unit.location
         });
     }
 }

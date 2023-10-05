@@ -4,7 +4,7 @@ import {ClerkExpressWithAuth, LooseAuthProp} from '@clerk/clerk-sdk-node';
 import {MongoClient} from 'mongodb';
 import {config} from './config';
 import express from 'express';
-import {Web3} from 'web3'
+import {Web3} from 'web3';
 
 
 export function initialize_server(): express.Express {
@@ -69,8 +69,8 @@ export function initializeWeb3Provider(): Web3 {
     const web3 =  new Web3(new Web3.providers.HttpProvider(
         `https://${config.ETHEREUM_NETWORK}.infura.io/v3/${config.PROVIDER_API_KEY}`
     ));
-    console.log(`[Connected Web3 Provider on network: ${config.ETHEREUM_NETWORK}]`)
-    return web3
+    console.log(`[Connected Web3 Provider on network: ${config.ETHEREUM_NETWORK}]`);
+    return web3;
 }
 
 declare global {

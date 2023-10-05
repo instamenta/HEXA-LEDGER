@@ -1,8 +1,8 @@
 import {config} from '../utilities/config';
 import {HandleMongoError} from '../utilities/errors/error.handler';
-import {Db, Filter, ObjectId, Collection, MongoError,} from 'mongodb';
-import * as I from "../types/types";
-import {TxObject} from "../types/types";
+import {Db, Filter, ObjectId, Collection, MongoError, WithId,} from 'mongodb';
+import type * as I from '../types/types';
+import TxModel from '../models/tx.model';
 
 export default class TxRepository {
     readonly #collection: Collection<I.ITxModel>;
@@ -17,7 +17,7 @@ export default class TxRepository {
             bn: d.blockNumber,
             ci:d.chainId,
             fr: Buffer.from(d.from.replace(/^0x/, ''), 'hex'),
-            gas: d.gas,
+            ga: d.gas,
             gp: d.gasPrice,
             h: Buffer.from(d.hash.replace(/^0x/, ''), 'hex'),
             i: Buffer.from(d.input.replace(/^0x/, ''), 'hex'),
@@ -28,7 +28,7 @@ export default class TxRepository {
             ti: d.transactionIndex,
             t: d.type,
             v: d.v,
-            val: d.value,
+            va: d.value,
             d: Buffer.from(d.data.replace(/^0x/, ''), 'hex'),
         };
 
@@ -41,15 +41,24 @@ export default class TxRepository {
             });
     }
 
-    public async getTx(): Promise<number> {
-        const filter: Filter = {
-            del: false
+    public async getTx(hash: string): Promise<TxModel | null> {
+        const filter: Filter<I.ITxModel> = {
+            h: Buffer.from(hash.replace(/^0x/, ''), 'hex')
         };
-        return this.#collection.countDocuments(filter)
+        return this.#collection.findOne(filter)
+            .then(tx => tx ? new TxModel(tx) : null)
             .catch((e: MongoError | unknown) => {
                 HandleMongoError(e);
                 throw e;
             });
     }
 
+    public async countTx(): Promise<number | null> {
+        return this.#collection.countDocuments()
+            .then(count => count ? count :null)
+            .catch((e: MongoError | unknown) => {
+                HandleMongoError(e);
+                throw e;
+            });
+    }
 }

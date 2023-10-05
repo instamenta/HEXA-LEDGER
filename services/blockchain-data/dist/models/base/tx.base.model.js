@@ -1,25 +1,7 @@
-import * as I from "../../types/types";
-
-export default class BaseTxModel {
-     protected bh: Buffer; //! blockHash
-     protected bn: bigint; //! blockNumber
-     protected ci: bigint; //! chainId
-     protected fr: Buffer; //! from
-     protected ga: bigint; //! gas
-     protected gp: bigint; //! gasPrice
-     protected h: Buffer;  //! hash
-     protected i: Buffer;  //! input
-     protected n: bigint;  //! nonce
-     protected r: Buffer;  //! r
-     protected s: Buffer;  //! s
-     protected to: Buffer; //! to
-     protected ti: bigint; //! transactionIndex
-     protected t: bigint;  //! type
-     protected v: bigint;  //! v
-     protected va: bigint;//! value
-     protected d: Buffer;  //! data
-
-    constructor(props: I.ITxModel) {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class BaseTxModel {
+    constructor(props) {
         this.bh = props.bh;
         this.bn = props.bn;
         this.ci = props.ci;
@@ -38,73 +20,56 @@ export default class BaseTxModel {
         this.va = props.va;
         this.d = props.d;
     }
-
-    get hash(): string {
+    get hash() {
         return '0x' + this.h.toString('hex');
     }
-
-    get blockHash(): string {
+    get blockHash() {
         return '0x' + this.bh.toString('hex');
     }
-
-    get blockNumber(): string {
+    get blockNumber() {
         return this.bn.toString();
     }
-
-    get chainId(): string {
+    get chainId() {
         return this.ci.toString();
     }
-
-    get from(): string {
+    get from() {
         return '0x' + this.fr.toString('hex');
     }
-
-    get gas(): string {
+    get gas() {
         return this.ga.toString();
     }
-
-    get gasPrice(): string {
+    get gasPrice() {
         return this.gp.toString();
     }
-
-    get input(): string {
+    get input() {
         return '0x' + this.i.toString('hex');
     }
-
-    get nonce(): string {
+    get nonce() {
         return this.n.toString();
     }
-
-    get _r(): string {
+    get _r() {
         return '0x' + this.r.toString('hex');
     }
-
-    get _s(): string {
+    get _s() {
         return '0x' + this.s.toString('hex');
     }
-
-    get toAddress(): string {
+    get toAddress() {
         return '0x' + this.to.toString('hex');
     }
-
-    get index(): string {
+    get index() {
         return this.ti.toString();
     }
-
-    get type(): string {
+    get type() {
         return this.t.toString();
     }
-
-    get _v(): string {
+    get _v() {
         return this.v.toString();
     }
-
-    get value(): string {
+    get value() {
         return this.va.toString();
     }
-
-    get data(): string {
+    get data() {
         return '0x' + this.d.toString('hex');
     }
-
 }
+exports.default = BaseTxModel;

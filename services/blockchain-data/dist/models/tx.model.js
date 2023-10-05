@@ -1,13 +1,14 @@
-import BaseTxModel from './base/tx.base.model';
-import * as I from '../types/types';
-
-export default class TxModel extends BaseTxModel {
-
-    constructor(props: I.ITxModel) {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const tx_base_model_1 = __importDefault(require("./base/tx.base.model"));
+class TxModel extends tx_base_model_1.default {
+    constructor(props) {
         super(props);
     }
-
-    public getTx(): I.OGetTx {
+    getTx() {
         return {
             blockHash: this.blockHash,
             blockNumber: this.blockNumber,
@@ -28,8 +29,7 @@ export default class TxModel extends BaseTxModel {
             data: this.data,
         };
     }
-
-    public rawTx(): I.ORawTx {
+    rawTx() {
         return {
             blockHash: this.blockHash,
             blockNumber: this.bn,
@@ -51,3 +51,4 @@ export default class TxModel extends BaseTxModel {
         };
     }
 }
+exports.default = TxModel;

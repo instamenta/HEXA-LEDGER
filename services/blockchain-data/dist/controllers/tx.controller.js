@@ -42,7 +42,6 @@ const http_status_codes_1 = __importDefault(require("@instamenta/http-status-cod
 const zod = __importStar(require("../validation/zod"));
 const error_handler_1 = require("../utilities/errors/error.handler");
 const web3_1 = require("web3");
-const functions_1 = require("../utilities/functions");
 class TxController {
     constructor(repository, web3) {
         _TxController_repository.set(this, void 0);
@@ -62,12 +61,13 @@ class TxController {
                 console.log('[NOT FOUND IN DB]');
             const newTx = await __classPrivateFieldGet(this, _TxController_web3, "f").eth.getTransaction(__classPrivateFieldGet(this, _TxController_web3, "f").utils.hexToBytes(hash), web3_1.DEFAULT_RETURN_FORMAT);
             if (newTx) {
-                w.status(http_status_codes_1.default.OK).json((0, functions_1.prepare_to_stringify)(newTx)).end();
+                w.status(http_status_codes_1.default.OK).json(newTx).end();
                 // @ts-ignore
                 await __classPrivateFieldGet(this, _TxController_repository, "f").saveTx(newTx);
-                return console.table(newTx);
+                console.table(newTx);
             }
-            w.status(http_status_codes_1.default.NOT_FOUND).end();
+            else
+                w.status(http_status_codes_1.default.NOT_FOUND).end();
         }
         catch (e) {
             (0, error_handler_1.RespondGeneralPurpose)(e, w);

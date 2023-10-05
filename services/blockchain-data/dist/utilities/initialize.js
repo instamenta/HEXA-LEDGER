@@ -11,6 +11,10 @@ const mongodb_1 = require("mongodb");
 const config_1 = require("./config");
 const express_1 = __importDefault(require("express"));
 const web3_1 = require("web3");
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+    return this.toString();
+};
 function initialize_server() {
     const _server = (0, express_1.default)();
     //* Extensions

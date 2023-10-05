@@ -37,7 +37,7 @@ export default class TxController {
             );
 
             if (newTx) {
-                w.status(StatusCode.OK).json(prepare_to_stringify(newTx)).end();
+                w.status(StatusCode.OK).json(newTx).end();
                 // @ts-ignore
                 await this.#repository.saveTx(newTx);
                 console.table(newTx);

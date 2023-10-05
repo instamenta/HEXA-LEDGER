@@ -6,6 +6,10 @@ import {config} from './config';
 import express from 'express';
 import {Web3} from 'web3';
 
+// @ts-ignore
+BigInt.prototype.toJSON = function () {
+    return this.toString()
+};
 
 export function initialize_server(): express.Express {
     const _server = express();
@@ -37,7 +41,6 @@ export function initialize_database() {
 }
 
 export class Graceful_Shutdown {
-
     public static process_on(_cases_: string[]): void {
         _cases_.forEach((_type_: string) => {
             process.on(_type_, (error: Error) => {

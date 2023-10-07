@@ -11,6 +11,7 @@ const envSchema = zod_1.z.object({
     CLERK_JWT_PUBLIC_KEY: zod_1.z.string(),
     PROVIDER_API_KEY: zod_1.z.string(),
     ETHEREUM_NETWORK: zod_1.z.string(),
+    DB_BALANCE_COLLECTION: zod_1.z.string(),
 });
 const env = envSchema.parse(process.env);
 exports.config = {
@@ -23,4 +24,5 @@ exports.config = {
     CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
     PROVIDER_API_KEY: env.PROVIDER_API_KEY,
     ETHEREUM_NETWORK: env.ETHEREUM_NETWORK,
+    DB_BALANCE_COLLECTION: env.DB_BALANCE_COLLECTION
 };

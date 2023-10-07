@@ -13,37 +13,25 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var _TxRepository_collection;
+var _BalanceRepository_collection;
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("../utilities/config");
 const error_handler_1 = require("../utilities/errors/error.handler");
-const tx_model_1 = __importDefault(require("../models/tx.model"));
-class TxRepository {
+const balance_model_1 = __importDefault(require("../models/balance.model"));
+class BalanceRepository {
     constructor(db) {
-        _TxRepository_collection.set(this, void 0);
-        __classPrivateFieldSet(this, _TxRepository_collection, db.collection(config_1.config.DB_THREADS_COLLECTION), "f");
+        _BalanceRepository_collection.set(this, void 0);
+        __classPrivateFieldSet(this, _BalanceRepository_collection, db.collection(config_1.config.DB_BALANCE_COLLECTION), "f");
     }
-    async saveTx(d) {
+    async saveAddressBalance(d) {
         const record = {
-            bh: Buffer.from(d.blockHash.replace(/^0x/, ''), 'hex'),
-            bn: d.blockNumber,
-            ci: d.chainId,
-            fr: Buffer.from(d.from.replace(/^0x/, ''), 'hex'),
-            ga: d.gas,
-            gp: d.gasPrice,
-            h: Buffer.from(d.hash.replace(/^0x/, ''), 'hex'),
-            i: Buffer.from(d.input.replace(/^0x/, ''), 'hex'),
-            n: d.nonce,
-            r: Buffer.from(d.r.replace(/^0x/, ''), 'hex'),
-            s: Buffer.from(d.s.replace(/^0x/, ''), 'hex'),
-            to: Buffer.from(d.to.replace(/^0x/, ''), 'hex'),
-            ti: d.transactionIndex,
-            t: d.type,
-            v: d.v,
-            va: d.value,
-            d: Buffer.from(d.data.replace(/^0x/, ''), 'hex'),
+            a: Buffer.from(d.address.replace(/^0x/, ''), 'hex'),
+            bs: [{
+                    b: d.balance,
+                    d: new Date(),
+                }]
         };
-        return __classPrivateFieldGet(this, _TxRepository_collection, "f")
+        return __classPrivateFieldGet(this, _BalanceRepository_collection, "f")
             .insertOne(record)
             .then(() => true)
             .catch((e) => {
@@ -51,25 +39,17 @@ class TxRepository {
             throw e;
         });
     }
-    async getTransaction(hash) {
+    async getAddressBalance(address) {
         const filter = {
-            h: Buffer.from(hash.replace(/^0x/, ''), 'hex')
+            a: Buffer.from(address.replace(/^0x/, ''), 'hex')
         };
-        return __classPrivateFieldGet(this, _TxRepository_collection, "f").findOne(filter)
-            .then(tx => tx ? new tx_model_1.default(tx) : null)
-            .catch((e) => {
-            (0, error_handler_1.HandleMongoError)(e);
-            throw e;
-        });
-    }
-    async countTx() {
-        return __classPrivateFieldGet(this, _TxRepository_collection, "f").countDocuments()
-            .then(count => count ? count : null)
+        return __classPrivateFieldGet(this, _BalanceRepository_collection, "f").findOne(filter)
+            .then(d => d ? new balance_model_1.default(d) : null)
             .catch((e) => {
             (0, error_handler_1.HandleMongoError)(e);
             throw e;
         });
     }
 }
-_TxRepository_collection = new WeakMap();
-exports.default = TxRepository;
+_BalanceRepository_collection = new WeakMap();
+exports.default = BalanceRepository;

@@ -10,6 +10,7 @@ import {
     Graceful_Shutdown,
     initializeWeb3Provider
 } from './utilities/initialize';
+import BalanceRepository from "./repositories/balance.repository";
 
 (function initializeService(): void {
     const _server = initialize_server();
@@ -17,8 +18,10 @@ import {
     const web3 = initializeWeb3Provider();
 
     //! Components
-    const repository = new TxRepository(db);
-    const controller = new TxController(repository, web3);
+    const txRepository = new TxRepository(db);
+    const balanceRepository = new BalanceRepository(db);
+
+    const controller = new TxController(web3, txRepository, balanceRepository);
     const router = new ThreadRouter(controller).getRouter();
     _server.use('/blockchain', router)
 

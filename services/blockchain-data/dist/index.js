@@ -10,13 +10,15 @@ const tx_controller_1 = __importDefault(require("./controllers/tx.controller"));
 const tx_repository_1 = __importDefault(require("./repositories/tx.repository"));
 const error_middleware_1 = require("./middlewares/error.middleware");
 const initialize_1 = require("./utilities/initialize");
+const balance_repository_1 = __importDefault(require("./repositories/balance.repository"));
 (function initializeService() {
     const _server = (0, initialize_1.initialize_server)();
     const db = (0, initialize_1.initialize_database)();
     const web3 = (0, initialize_1.initializeWeb3Provider)();
     //! Components
-    const repository = new tx_repository_1.default(db);
-    const controller = new tx_controller_1.default(repository, web3);
+    const txRepository = new tx_repository_1.default(db);
+    const balanceRepository = new balance_repository_1.default(db);
+    const controller = new tx_controller_1.default(web3, txRepository, balanceRepository);
     const router = new router_1.default(controller).getRouter();
     _server.use('/blockchain', router);
     //! Error & Not-Found Handling

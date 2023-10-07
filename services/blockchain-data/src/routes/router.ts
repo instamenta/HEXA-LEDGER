@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import TxController from '../controllers/tx.controller';
+import type TxController from '../controllers/tx.controller';
 
 export default class HttpRouter {
 
@@ -10,8 +10,15 @@ export default class HttpRouter {
     }
 
     private initialize(c: TxController) {
-        this.router.route('/:hash')
-            .get(c.getTxById.bind(c));
+
+        this.router.route('/transaction/:hash')
+            .get(c.getTransactionByHash.bind(c));
+
+        this.router.route('/transaction/receipt/:hash')
+            .get(c.getTransactionReceiptByHash.bind(c));
+
+        this.router.route('/address/balance/:address')
+            .get(c.getBalanceByAddress.bind(c));
     }
 
     public getRouter(): Router {

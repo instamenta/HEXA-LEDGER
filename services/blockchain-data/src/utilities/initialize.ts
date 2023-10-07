@@ -8,7 +8,7 @@ import {Web3} from 'web3';
 
 // @ts-ignore
 BigInt.prototype.toJSON = function () {
-    return this.toString()
+    return this.toString();
 };
 
 export function initialize_server(): express.Express {

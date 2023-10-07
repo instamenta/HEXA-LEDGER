@@ -8,7 +8,7 @@ class TxModel extends tx_base_model_1.default {
     constructor(props) {
         super(props);
     }
-    getTx() {
+    getTransaction() {
         return {
             blockHash: this.blockHash,
             blockNumber: this.blockNumber,
@@ -29,7 +29,7 @@ class TxModel extends tx_base_model_1.default {
             data: this.data,
         };
     }
-    rawTx() {
+    getTransactionRaw() {
         return {
             blockHash: this.blockHash,
             blockNumber: this.bn,

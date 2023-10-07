@@ -1,11 +1,16 @@
 import {z} from 'zod';
 
-export const txHashSchema = z.string().refine(
+export const transactionHashSchema = z.string().refine(
     hash => /^0x[0-9a-fA-F]{64}$/.test(hash)
         || /^[0-9a-fA-F]{64}$/.test(hash),
     {message: '🚫 Invalid Ethereum transaction hash'}
 );
 
+export const addressSchema = z.string().refine(
+    address => /^0x[a-fA-F0-9]{40}$/.test(address)
+        || /^0x0{40}$/.test(address),
+    {message: '🚫 Invalid Ethereum address',}
+);
 
 export const amountBody = z.object({
     amount: z.coerce.number()

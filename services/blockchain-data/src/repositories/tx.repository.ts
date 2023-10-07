@@ -41,7 +41,7 @@ export default class TxRepository {
             });
     }
 
-    public async getTx(hash: string): Promise<TxModel | null> {
+    public async getTransaction(hash: string): Promise<TxModel | null> {
         const filter: Filter<I.ITxModel> = {
             h: Buffer.from(hash.replace(/^0x/, ''), 'hex')
         };

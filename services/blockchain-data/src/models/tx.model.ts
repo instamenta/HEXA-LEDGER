@@ -7,7 +7,7 @@ export default class TxModel extends BaseTxModel {
         super(props);
     }
 
-    public getTx(): I.OGetTx {
+    public getTransaction(): I.OGetTx {
         return {
             blockHash: this.blockHash,
             blockNumber: this.blockNumber,
@@ -29,7 +29,7 @@ export default class TxModel extends BaseTxModel {
         };
     }
 
-    public rawTx(): I.ORawTx {
+    public getTransactionRaw(): I.ORawTx {
         return {
             blockHash: this.blockHash,
             blockNumber: this.bn,

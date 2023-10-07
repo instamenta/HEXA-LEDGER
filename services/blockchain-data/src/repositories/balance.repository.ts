@@ -1,4 +1,4 @@
-import {config} from '../utilities/config';
+importconfig from '../utilities/config';
 import {HandleMongoError} from '../utilities/errors/error.handler';
 import {Db, Filter, Collection, MongoError} from 'mongodb';
 import type * as I from '../types/types';

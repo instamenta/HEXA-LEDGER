@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-import {_metrics_endpoint, _metrics_middleware} from '../middlewares/monitoring.middleware';
-import {ClerkExpressWithAuth, LooseAuthProp} from '@clerk/clerk-sdk-node';
-import {MongoClient} from 'mongodb';
-importconfig from './config';
-import express from 'express';
-import {Web3} from 'web3';
+const {_metrics_endpoint, _metrics_middleware} = require('../middlewares/monitoring.middleware')
+    , {ClerkExpressWithAuth, LooseAuthProp} = require('@clerk/clerk-sdk-node')
+    , {MongoClient} = require('mongodb')
+    , config = require('./config')
+    , express = require('express')
+    , {Web3} = require('web3')
+;
 
-// @ts-ignore
-BigInt.prototype.toJSON = function () {
+BigInt.prototype.toJSON = function() {
     return this.toString();
 };
 
-export function initialize_server(): express.Express {
+/** @return {express.Express} */
+function initialize_server() {
+    /** @type {express.Express} */
     const _server = express();
 
     //* Extensions
@@ -26,13 +27,11 @@ export function initialize_server(): express.Express {
     _server.use(_metrics_middleware);
     _server.get('/metrics', _metrics_endpoint);
 
-    //* Clerk
-    _server.use(ClerkExpressWithAuth({jwtKey: config.CLERK_JWT_PUBLIC_KEY} as any));
-
     return _server;
 }
 
-export function initialize_database() {
+/** @return {import('mongodb').Db} */
+function initialize_database() {
     console.log('[Connecting to Mongo Client]');
     const db_client = new MongoClient(config.DB_URI, config.DB_OPTIONS);
 
@@ -40,10 +39,17 @@ export function initialize_database() {
     return db_client.db(config.DB_NAME);
 }
 
-export class Graceful_Shutdown {
-    public static process_on(_cases_: string[]): void {
-        _cases_.forEach((_type_: string) => {
-            process.on(_type_, (error: Error) => {
+/**
+ * @class Graceful_Shutdown
+ */
+class Graceful_Shutdown {
+    /**
+     * @param {string[]} _cases_
+     * @public
+     */
+    static process_on(_cases_) {
+        _cases_.forEach(/**@param {string} _type_*/_type_ => {
+            process.on(_type_, (error) => {
                 try {
                     console.error({message: `[${config.SERVICE_NAME}] ~ process.on: [${_type_}] `, error});
                 } catch {
@@ -53,9 +59,13 @@ export class Graceful_Shutdown {
         });
     }
 
-    public static process_once(_cases_: string[]): void {
-        _cases_.forEach((_type_: string) => {
-            process.once(_type_, (error: Error) => {
+    /**
+     * @param {string[]} _cases_
+     * @public
+     */
+    static process_once(_cases_) {
+        _cases_.forEach(/**@param {string} _type_*/_type_ => {
+            process.once(_type_, (error) => {
                 try {
                     console.error({message: `[${config.SERVICE_NAME}] - process.on: [${_type_}] `, error});
                     process.exit(0);
@@ -67,19 +77,17 @@ export class Graceful_Shutdown {
     }
 }
 
-export function initializeWeb3Provider(): Web3 {
-    // @ts-ignore
-    const web3 =  new Web3(new Web3.providers.HttpProvider(
+/** @return {Web3} */
+function initializeWeb3Provider() {
+    console.log(`[Connected Web3 Provider on network: ${config.ETHEREUM_NETWORK}]`);
+    return new Web3(new Web3.providers.HttpProvider(
         `https://${config.ETHEREUM_NETWORK}.infura.io/v3/${config.PROVIDER_API_KEY}`
     ));
-    console.log(`[Connected Web3 Provider on network: ${config.ETHEREUM_NETWORK}]`);
-    return web3;
 }
 
-declare global {
-    namespace Express {
-        interface Request extends LooseAuthProp {
-        }
-    }
+module.exports = {
+    initialize_server,
+    initialize_database,
+    Graceful_Shutdown,
+    initializeWeb3Provider,
 }
-

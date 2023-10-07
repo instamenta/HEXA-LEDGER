@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import {config} from './utilities/config'
+importconfig from './utilities/config'
 import ThreadRouter from "./routes/router";
 import TxController from "./controllers/tx.controller";
 import TxRepository from "./repositories/tx.repository";

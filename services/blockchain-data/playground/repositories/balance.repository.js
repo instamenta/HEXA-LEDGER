@@ -1,6 +1,6 @@
 const config = require('../utilities/config')
     , {HandleMongoError} = require('../utilities/errors/error.handler')
-    , {Collection, Db} = require('mongodb')
+    , {Collection, Db, WithId} = require('mongodb')
 ;
 
 /** @class BalanceRepository */
@@ -18,12 +18,11 @@ class BalanceRepository {
     /**
      * @param {string} address
      * @param {bigint} balance
-     * @return {Promise<boolean>}
+     * @return {Promise<void>}
      * @public
      */
     async saveAddressBalance(address, balance) {
         return this.#collection.insertOne({address, balance})
-            .then(() => true)
             .catch((error) => {
                 HandleMongoError(error);
                 throw error;
@@ -32,7 +31,7 @@ class BalanceRepository {
 
     /**
      * @param {string} address
-     * @return {Promise<{address: string, balance: bigint}|null>}
+     * @return {Promise<WithId<{address: string, balance: bigint}>|null>}
      * @public
      */
     async getAddressBalance(address) {

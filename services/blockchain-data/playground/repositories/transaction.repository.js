@@ -17,12 +17,11 @@ class TransactionRepository {
 
     /**
      * @param {object} transaction
-     * @return {Promise<boolean>}
+     * @return {Promise<void>}
      * @public
      */
     async saveTx(transaction) {
         return this.#collection.insertOne(transaction)
-            .then(() => true)
             .catch((error) => {
                 HandleMongoError(error);
                 throw error;
@@ -36,7 +35,7 @@ class TransactionRepository {
      */
     async getTransaction(hash) {
         return this.#collection.findOne(
-            {transactionHash: hash}
+            {hash}
         )
             .then(transaction => transaction ? transaction : null)
             .catch((error) => {

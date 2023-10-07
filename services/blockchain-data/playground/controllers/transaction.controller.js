@@ -3,7 +3,7 @@ const StatusCode = require('../utilities/statusCodes')
     , {Request, Response} = require('express')
     , {Web3} = require('web3')
     , {RespondGeneralPurpose} = require('../utilities/errors/error.handler')
-    , TransactionRepository = require('../repositories/tx.repository')
+    , TransactionRepository = require('../repositories/transaction.repository')
     , BalanceRepository = require('../repositories/balance.repository')
     , ReceiptRepository = require('../repositories/receipt.repository')
 ;
@@ -33,7 +33,7 @@ class TransactionController {
     /**
      * @param {Request} request
      * @param {Response} response
-     * @return {Promise<void>}
+     * @return {Promise<*>}
      * @public
      */
     async getTransactionByHash(request, response) {
@@ -43,16 +43,15 @@ class TransactionController {
 
             let transaction = await this.#transactionRepository.getTransaction(hash);
             if (transaction) {
-                response.status(StatusCode.OK).json(transaction).end();
-                return console.log(transaction);
+                delete transaction._id
+                return response.status(StatusCode.OK).json(transaction).end();
             }
             transaction = await this.#web3.eth.getTransaction(
                 this.#web3.utils.hexToBytes(hash),
             );
             if (transaction) {
                 response.status(StatusCode.OK).json(transaction).end();
-                await this.#transactionRepository.saveTx(transaction);
-                return console.table(transaction);
+                return await this.#transactionRepository.saveTx(transaction);
             }
             response.status(StatusCode.NOT_FOUND).end();
         } catch (error) {
@@ -63,7 +62,7 @@ class TransactionController {
     /**
      * @param {Request} request
      * @param {Response} response
-     * @return {Promise<void>}
+     * @return {Promise<*>}
      * @public
      */
     async getAddressBalance(request, response) {
@@ -73,14 +72,13 @@ class TransactionController {
 
             let balance = await this.#balanceRepository.getAddressBalance(address);
             if (balance) {
-                response.status(StatusCode.OK).json(balance).end();
-                return console.table(balance);
+                delete balance._id
+                return response.status(StatusCode.OK).json(balance).end();
             }
             balance = await this.#web3.eth.getBalance(address);
             if (balance) {
                 response.status(StatusCode.OK).json(balance).end();
-                await this.#balanceRepository.saveAddressBalance(address, balance);
-                return console.log(balance);
+                return this.#balanceRepository.saveAddressBalance(address, balance);
             }
             response.status(StatusCode.NOT_FOUND).end();
         } catch (error) {
@@ -91,7 +89,7 @@ class TransactionController {
     /**
      * @param {Request} request
      * @param {Response} response
-     * @return {Promise<void>}
+     * @return {Promise<*>}
      * @public
      */
     async getTransactionReceiptByHash(request, response) {
@@ -101,16 +99,15 @@ class TransactionController {
 
             let receipt = await this.#receiptRepository.getReceiptByTransactionHash(hash);
             if (receipt) {
-                response.status(StatusCode.OK).json(receipt).end();
-                return console.table(receipt);
+                delete receipt._id
+                return response.status(StatusCode.OK).json(receipt).end();
             }
             receipt = await this.#web3.eth.getTransactionReceipt(
                 this.#web3.utils.hexToBytes(hash)
             );
             if (receipt) {
                 response.status(StatusCode.OK).json(receipt).end();
-                await this.#receiptRepository.saveReceipt(receipt)
-                return console.table(receipt);
+                return this.#receiptRepository.saveReceipt(receipt);
             }
             response.status(StatusCode.NOT_FOUND).end();
         } catch (error) {

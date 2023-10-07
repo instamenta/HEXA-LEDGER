@@ -1,7 +1,7 @@
 require('dotenv').config();
 const config = require('./utilities/config')
     , ThreadRouter = require("./routes/router")
-    , TxRepository = require("./repositories/tx.repository")
+    , TxRepository = require("./repositories/transaction.repository")
     , BalanceRepository = require("./repositories/balance.repository")
     , TransactionController = require("./controllers/transaction.controller")
     , ReceiptRepository = require("./repositories/receipt.repository")

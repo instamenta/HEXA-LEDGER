@@ -1,6 +1,5 @@
 const {_metrics_endpoint, _metrics_middleware} = require('../middlewares/monitoring.middleware')
-    , {ClerkExpressWithAuth, LooseAuthProp} = require('@clerk/clerk-sdk-node')
-    , {MongoClient} = require('mongodb')
+    , {MongoClient, Long} = require('mongodb')
     , config = require('./config')
     , express = require('express')
     , {Web3} = require('web3')
@@ -8,6 +7,10 @@ const {_metrics_endpoint, _metrics_middleware} = require('../middlewares/monitor
 
 BigInt.prototype.toJSON = function() {
     return this.toString();
+};
+
+Long.prototype.toJSON = function () {
+    return this.toString(); // Convert the Long to a string
 };
 
 /** @return {express.Express} */

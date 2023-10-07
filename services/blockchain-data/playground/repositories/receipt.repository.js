@@ -17,12 +17,11 @@ class ReceiptRepository {
 
     /**
      * @param {object} receipt
-     * @return {Promise<boolean>}
+     * @return {Promise<void>}
      * @public
      */
     async saveReceipt(receipt) {
         return this.#collection.insertOne(receipt)
-            .then(() => true)
             .catch((error) => {
                 HandleMongoError(error);
                 throw error;

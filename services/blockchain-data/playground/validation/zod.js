@@ -12,7 +12,13 @@ const addressSchema = z.string().refine(
     {message: '🚫 Invalid Ethereum address',}
 );
 
+const hashSchema = z.string().regex(
+    /^(0x)?[0-9a-fA-F]+$/,
+    {message: "Invalid hash format"}
+);
+
 module.exports = {
     transactionHashSchema,
     addressSchema,
+    hashSchema,
 }

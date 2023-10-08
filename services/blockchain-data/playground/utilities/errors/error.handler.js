@@ -67,8 +67,10 @@ function HandleMongoError(error) {
                 console.error('❓ Unknown Mongo Error', error);
                 break;
         }
+        throw error;
     } else if (error instanceof MongoNetworkError) {
         console.error('🌐 MongoNetworkError:', error);
+        throw error;
     }
 }
 

@@ -3,26 +3,38 @@ const config = require('../utilities/config')
     , {Db, Collection, MongoError} = require('mongodb')
 ;
 
-/** @class TransactionRepository */
-class TransactionRepository {
+/** @class BlockRepository */
+class BlockRepository {
     /** @type {Collection} */ #collection;
 
     /**
-     * @constructor TransactionRepository
+     * @constructor BlockRepository
      * @param {Db} db
      */
     constructor(db) {
-        this.#collection = db.collection(config.DB_TRANSACTION_COLLECTION);
+        this.#collection = db.collection(config.DB_BLOCK_COLLECTION);
     }
 
     /**
-     * @param {object} transaction
+     * @param {object} block
      * @return {Promise<void>}
      * @public
      * @throws {Error|MongoError}
      */
-    async save(transaction) {
-        return this.#collection.insertOne(transaction)
+    async save(block) {
+        return this.#collection.insertOne(block)
+            .catch((e) => HandleMongoError(e));
+    }
+
+    /**
+     * @param {bigint} number
+     * @return {Promise<object | null>}
+     * @public
+     * @throws {Error|MongoError}
+     */
+    async getByNumber(number) {
+        return this.#collection.findOne({number})
+            .then(block => block ? block : null)
             .catch((e) => HandleMongoError(e));
     }
 
@@ -34,7 +46,7 @@ class TransactionRepository {
      */
     async getByHash(hash) {
         return this.#collection.findOne({hash})
-            .then(transaction => transaction ? transaction : null)
+            .then(block => block ? block : null)
             .catch((e) => HandleMongoError(e));
     }
 
@@ -50,4 +62,4 @@ class TransactionRepository {
     }
 }
 
-module.exports = TransactionRepository;
+module.exports = BlockRepository;

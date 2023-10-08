@@ -1,5 +1,5 @@
 const {Router} = require('express')
-    , TxController = require('../controllers/transaction.controller')
+    , TransactionController = require('../controllers/transaction.controller')
 ;
 
 /** @class HttpRouter */
@@ -29,7 +29,16 @@ class HttpRouter {
             .get(c.getTransactionReceiptByHash.bind(c));
 
         this.#router.route('/address/balance/:address')
-            .get(c.getAddressBalance.bind(c));
+            .get(c.getAddressBalanceByAddress.bind(c));
+
+        this.#router.route('/block/')
+            .get(c.getBlockLatest.bind(c));
+
+        this.#router.route('/block/:hash')
+            .get(c.getBlockByHash.bind(c));
+
+        this.#router.route('/block/number/:number')
+            .get(c.getBlockByNumber.bind(c));
     }
 
     /**

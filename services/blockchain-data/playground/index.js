@@ -1,36 +1,32 @@
-require('dotenv').config();
-const config = require('./utilities/config')
-    , ThreadRouter = require("./routes/router")
-    , TxRepository = require("./repositories/transaction.repository")
+const TransactionController = require("./controllers/transaction.controller")
+    , TransactionRepository = require("./repositories/transaction.repository")
     , BalanceRepository = require("./repositories/balance.repository")
-    , TransactionController = require("./controllers/transaction.controller")
     , ReceiptRepository = require("./repositories/receipt.repository")
-const {
-    _404Handler,
-    _errorHandler
-} = require("./middlewares/error.middleware");
-const {
-    Graceful_Shutdown, initialize_server, initialize_database, initializeWeb3Provider
-} = require('./utilities/initialize');
+    , BlockRepository = require("./repositories/block.repository")
+    , ThreadRouter = require("./routes/router")
+    , config = require('./utilities/config')
+    , {_404Handler, _errorHandler} = require("./middlewares/error.middleware")
+    , {
+        Graceful_Shutdown,
+        initialize_server,
+        initialize_database,
+        initializeWeb3Provider
+    } = require('./utilities/initialize')
+;
 
 (function initializeService() {
     const _server = initialize_server()
         , web3 = initializeWeb3Provider()
-        , db = initialize_database()
-    ;
+        , db = initialize_database();
     //! Components
-    const transactionRepository = new TxRepository(db)
-        , receiptRepository = new ReceiptRepository(db)
-        , balanceRepository = new BalanceRepository(db)
-    ;
-
     const controller = new TransactionController(
-        web3,
-        transactionRepository,
-        receiptRepository,
-        balanceRepository,
+        web3, {
+            transaction: new TransactionRepository(db),
+            receipt: new ReceiptRepository(db),
+            balance: new BalanceRepository(db),
+            block: new BlockRepository(db),
+        }
     );
-
     const router = new ThreadRouter(controller).getRouter();
     _server.use('/blockchain', router)
 
@@ -43,7 +39,6 @@ const {
         `[${config.SERVICE_NAME}] Running on port: [${config.PORT}]`));
     _server.on('error', e => console.log(
         `${config.SERVICE_NAME} ran into Error:`, e));
-
 })();
 
 Graceful_Shutdown.process_on(['unhandledRejection', 'uncaughtException']);

@@ -1,6 +1,6 @@
 const config = require('../utilities/config')
     , {HandleMongoError} = require('../utilities/errors/error.handler')
-    , {Collection, Db, WithId} = require('mongodb')
+    , {Collection, Db, WithId, MongoError} = require('mongodb')
 ;
 
 /** @class BalanceRepository */
@@ -20,42 +20,34 @@ class BalanceRepository {
      * @param {bigint} balance
      * @return {Promise<void>}
      * @public
+     * @throws {Error|MongoError}
      */
-    async saveAddressBalance(address, balance) {
+    async save(address, balance) {
         return this.#collection.insertOne({address, balance})
-            .catch((error) => {
-                HandleMongoError(error);
-                throw error;
-            });
+            .catch((e) => HandleMongoError(e));
     }
 
     /**
      * @param {string} address
      * @return {Promise<WithId<{address: string, balance: bigint}>|null>}
      * @public
+     * @throws {Error|MongoError}
      */
-    async getAddressBalance(address) {
-        return this.#collection.findOne(
-            {address}
-        )
+    async getByAddress(address) {
+        return this.#collection.findOne({address})
             .then(data => data ? data : null)
-            .catch((error) => {
-                HandleMongoError(error);
-                throw error;
-            });
+            .catch((e) => HandleMongoError(e));
     }
 
     /**
      * @return {Promise<number | null>}
      * @public
+     * @throws {Error|MongoError}
      */
-    async countAddressBalance() {
+    async count() {
         return this.#collection.countDocuments()
             .then(count => count ? count : null)
-            .catch((error) => {
-                HandleMongoError(error);
-                throw error;
-            });
+            .catch((e) => HandleMongoError(e));
     }
 
 }

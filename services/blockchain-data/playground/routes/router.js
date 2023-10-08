@@ -2,23 +2,21 @@ const {Router} = require('express')
     , TransactionController = require('../controllers/transaction.controller')
 ;
 
-/** @class HttpRouter */
+/**@class HttpRouter*/
 class HttpRouter {
-    /** @type {Router} */ #router = Router();
-    /** @type {TransactionController} */ #controller;
+    /**@type {Router}*/ #router = Router();
+    /**@type {TransactionController}*/ #controller;
 
-    /**
-     * @constructor HttpRouter
+    /** @constructor HttpRouter
      * @param {TransactionController} controller
      */
     constructor(controller) {
-        this.#controller = controller
+        this.#controller = controller;
 
         this.initialize(this.#controller);
     }
 
-    /**
-     * @param {TransactionController} c
+    /** @param {TransactionController} c
      * @private
      */
     initialize(c) {
@@ -41,8 +39,7 @@ class HttpRouter {
             .get(c.getBlockByNumber.bind(c));
     }
 
-    /**
-     * @returns {Router}
+    /** @returns {Router}
      * @public
      */
     getRouter() {

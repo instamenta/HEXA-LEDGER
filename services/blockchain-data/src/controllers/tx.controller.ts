@@ -9,7 +9,7 @@ import {type ZodError, z} from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {type MongoError} from 'mongodb';
 import {Web3, DEFAULT_RETURN_FORMAT, FMT_NUMBER} from 'web3';
-import {TransactionReceipt} from 'web3-types'
+import {TransactionReceipt} from 'web3-types';
 import type BalanceRepository from '../repositories/balance.repository';
 import BalanceModel from '../models/balance.model';
 
@@ -91,7 +91,7 @@ export default class TxController {
                 this.#web3.utils.hexToBytes(hash)
             );
 
-            console.table(newReceipt)
+            console.table(newReceipt);
 
             // if (newTransaction) {
             //     w.status(StatusCode.OK).json(newTransaction).end();

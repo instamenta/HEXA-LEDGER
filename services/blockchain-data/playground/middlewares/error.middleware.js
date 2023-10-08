@@ -26,4 +26,4 @@ function _404Handler(request, response, next) {
 module.exports = {
     _errorHandler,
     _404Handler,
-}
+};

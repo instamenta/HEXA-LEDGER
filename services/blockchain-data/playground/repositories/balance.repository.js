@@ -1,37 +1,33 @@
 const config = require('../utilities/config')
     , {HandleMongoError} = require('../utilities/errors/error.handler')
-    , {Collection, Db, WithId, MongoError} = require('mongodb')
 ;
 
 /** @class BalanceRepository */
 class BalanceRepository {
-    /** @type {Collection<{address: string, balance: bigint}>} */ #collection;
+    /** @type {import('mongodb').Collection<{address: string, balance: bigint}>} */ #collection;
 
-    /**
-     * @constructor BalanceRepository
-     * @param {Db} db
+    /**@constructor BalanceRepository
+     * @param {import('mongodb').Db} db
      */
     constructor(db) {
         this.#collection = db.collection(config.DB_BALANCE_COLLECTION);
     }
 
-    /**
-     * @param {string} address
+    /**@param {string} address
      * @param {bigint} balance
      * @return {Promise<void>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async save(address, balance) {
         return this.#collection.insertOne({address, balance})
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @param {string} address
-     * @return {Promise<WithId<{address: string, balance: bigint}>|null>}
+    /**@param {string} address
+     * @return {Promise<import('mongodb').WithId<{address: string, balance: bigint}>|null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async getByAddress(address) {
         return this.#collection.findOne({address})
@@ -39,10 +35,9 @@ class BalanceRepository {
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @return {Promise<number | null>}
+    /**@return {Promise<number | null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async count() {
         return this.#collection.countDocuments()

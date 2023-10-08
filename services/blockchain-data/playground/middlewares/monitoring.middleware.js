@@ -60,4 +60,4 @@ function _metrics_middleware(request, response, next) {
 module.exports = {
     _metrics_endpoint,
     _metrics_middleware,
-}
+};

@@ -2,7 +2,7 @@
 import {_metrics_endpoint, _metrics_middleware} from '../middlewares/monitoring.middleware';
 import {ClerkExpressWithAuth, LooseAuthProp} from '@clerk/clerk-sdk-node';
 import {MongoClient} from 'mongodb';
-importconfig from './config';
+import {config} from './config';
 import express from 'express';
 import {Web3} from 'web3';
 

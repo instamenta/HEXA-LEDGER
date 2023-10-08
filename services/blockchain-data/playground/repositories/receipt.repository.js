@@ -1,36 +1,32 @@
 const config = require('../utilities/config')
     , {HandleMongoError} = require('../utilities/errors/error.handler')
-    , {Db, Collection, MongoError} = require('mongodb')
 ;
 
 /** @class ReceiptRepository */
 class ReceiptRepository {
-    /** @type {Collection} */ #collection;
+    /** @type {import('mongodb').Collection} */ #collection;
 
-    /**
-     * @constructor
-     * @param {Db} db
+    /**@constructor
+     * @param {import('mongodb').Db} db
      */
     constructor(db) {
         this.#collection = db.collection(config.DB_RECEIPT_COLLECTION);
     }
 
-    /**
-     * @param {object} receipt
+    /**@param {object} receipt
      * @return {Promise<void>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async save(receipt) {
         return this.#collection.insertOne(receipt)
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @param {string} hash
+    /**@param {string} hash
      * @return {Promise<object | null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async getByHash(hash) {
         return this.#collection.findOne({transactionHash: hash})
@@ -38,10 +34,9 @@ class ReceiptRepository {
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @return {Promise<number | null>}
+    /**@return {Promise<number | null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async count() {
         return this.#collection.countDocuments()

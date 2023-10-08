@@ -14,11 +14,11 @@ const addressSchema = z.string().refine(
 
 const hashSchema = z.string().regex(
     /^(0x)?[0-9a-fA-F]+$/,
-    {message: "Invalid hash format"}
+    {message: 'Invalid hash format'}
 );
 
 module.exports = {
     transactionHashSchema,
     addressSchema,
     hashSchema,
-}
+};

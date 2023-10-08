@@ -3,36 +3,27 @@ const StatusCode = require('../utilities/statusCodes')
     , {Request, Response} = require('express')
     , {Web3} = require('web3')
     , {RespondGeneralPurpose} = require('../utilities/errors/error.handler')
-    , TransactionRepository = require('../repositories/transaction.repository')
-    , BalanceRepository = require('../repositories/balance.repository')
-    , ReceiptRepository = require('../repositories/receipt.repository')
-    , BlockRepository = require('../repositories/block.repository')
 ;
 
-/** @class TransactionController */
+/** @typedef {Object} Repositories
+ * @property {import('playground/repositories/transaction.repository')} transaction
+ * @property {import('playground/repositories/receipt.repository')} receipt
+ * @property {import('playground/repositories/balance.repository')} balance
+ * @property {import('playground/repositories/block.repository')} block
+ */
+
+/**@class TransactionController*/
 class TransactionController {
+    /**@type {Repositories}*/#repository;
     /**@type {Web3}*/#web3;
 
-    /** @type {{
-     transaction: TransactionRepository,
-     receipt: ReceiptRepository,
-     balance: BalanceRepository,
-     block: BlockRepository
-     }} */
-    #repository;
-
-    /**
-     * @constructor TransactionController
+    /**@constructor TransactionController
+     * @param {Repositories} param
      * @param {Web3} web3
-     * @param {Object} param
-     * @param {TransactionRepository} param.transaction
-     * @param {ReceiptRepository} param.receipt
-     * @param {BalanceRepository} param.balance
-     * @param {BlockRepository} param.block
      */
-    constructor(web3, {transaction, receipt, balance, block}) {
-        this.#web3 = web3;
+    constructor({transaction, receipt, balance, block}, web3) {
         this.#repository = {transaction, receipt, balance, block};
+        this.#web3 = web3;
     }
 
     /**
@@ -48,7 +39,7 @@ class TransactionController {
 
             let transaction = await this.#repository.transaction.getByHash(hash);
             if (transaction) {
-                delete transaction._id
+                delete transaction._id;
                 return response.status(StatusCode.OK).json(transaction).end();
             }
             transaction = await this.#web3.eth.getTransaction(
@@ -64,8 +55,7 @@ class TransactionController {
         }
     }
 
-    /**
-     * @param {Request} request
+    /**@param {Request} request
      * @param {Response} response
      * @return {Promise<*>}
      * @public
@@ -77,7 +67,7 @@ class TransactionController {
 
             let balance = await this.#repository.balance.getByAddress(address);
             if (balance) {
-                delete balance._id
+                delete balance._id;
                 return response.status(StatusCode.OK).json(balance).end();
             }
             balance = await this.#web3.eth.getBalance(address);
@@ -91,8 +81,7 @@ class TransactionController {
         }
     }
 
-    /**
-     * @param {Request} request
+    /**@param {Request} request
      * @param {Response} response
      * @return {Promise<*>}
      * @public
@@ -104,7 +93,7 @@ class TransactionController {
 
             let receipt = await this.#repository.receipt.getByHash(hash);
             if (receipt) {
-                delete receipt._id
+                delete receipt._id;
                 return response.status(StatusCode.OK).json(receipt).end();
             }
             receipt = await this.#web3.eth.getTransactionReceipt(
@@ -120,8 +109,7 @@ class TransactionController {
         }
     }
 
-    /**
-     * @param {Request} request
+    /**@param {Request} request
      * @param {Response} response
      * @return {Promise<*>}
      * @public
@@ -130,9 +118,9 @@ class TransactionController {
         try {
             const number = await this.#web3.eth.getBlockNumber();
 
-            let block= await this.#repository.block.getByNumber(number)
+            let block= await this.#repository.block.getByNumber(number);
             if (block) {
-                delete block._id
+                delete block._id;
                 return response.status(StatusCode.OK).json(block).end();
             }
             block = await this.#web3.eth.getBlock();
@@ -146,8 +134,7 @@ class TransactionController {
         }
     }
 
-    /**
-     * @param {Request} request
+    /**@param {Request} request
      * @param {Response} response
      * @return {Promise<*>}
      * @public
@@ -156,9 +143,9 @@ class TransactionController {
         try {
             let number = BigInt(request.params?.number);
 
-            let block = await this.#repository.block.getByNumber(number)
+            let block = await this.#repository.block.getByNumber(number);
             if (block) {
-                delete block._id
+                delete block._id;
                 return response.status(StatusCode.OK).json(block).end();
             }
             block = await this.#web3.eth.getBlock(number);
@@ -172,8 +159,7 @@ class TransactionController {
         }
     }
 
-    /**
-     * @param {Request} request
+    /**@param {Request} request
      * @param {Response} response
      * @return {Promise<*>}
      * @public
@@ -183,9 +169,9 @@ class TransactionController {
             let hash = zod.hashSchema.parse(request.params?.hash);
             if (!hash.startsWith('0x')) hash = '0x' + hash;
 
-            let block = await this.#repository.block.getByHash(hash)
+            let block = await this.#repository.block.getByHash(hash);
             if (block) {
-                delete block._id
+                delete block._id;
                 return response.status(StatusCode.OK).json(block).end();
             }
             block = await this.#web3.eth.getBlock(

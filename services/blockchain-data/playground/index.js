@@ -19,14 +19,12 @@ const TransactionController = require("./controllers/transaction.controller")
         , web3 = initializeWeb3Provider()
         , db = initialize_database();
     //! Components
-    const controller = new TransactionController(
-        web3, {
-            transaction: new TransactionRepository(db),
-            receipt: new ReceiptRepository(db),
-            balance: new BalanceRepository(db),
-            block: new BlockRepository(db),
-        }
-    );
+    const controller = new TransactionController({
+        transaction: new TransactionRepository(db),
+        receipt: new ReceiptRepository(db),
+        balance: new BalanceRepository(db),
+        block: new BlockRepository(db),
+    }, web3);
     const router = new ThreadRouter(controller).getRouter();
     _server.use('/blockchain', router)
 

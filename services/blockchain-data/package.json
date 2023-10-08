@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node dist/index.js",
+    "start:js": "node playground/index.js",
     "lint": "eslint src/**/*.ts",
     "lint-fix": "eslint src/**/*.ts --fix",
-    "start": "node dist/index.js"
+    "lint:js": "eslint playground/**/*.js",
+    "lint-fix:js": "eslint playground/**/*.js --fix"
   },
   "author": "",
   "license": "ISC",

@@ -1,36 +1,32 @@
 const config = require('../utilities/config')
     , {HandleMongoError} = require('../utilities/errors/error.handler')
-    , {Db, Collection, MongoError} = require('mongodb')
 ;
 
 /** @class BlockRepository */
 class BlockRepository {
-    /** @type {Collection} */ #collection;
+    /** @type {import('mongodb').Collection} */ #collection;
 
-    /**
-     * @constructor BlockRepository
-     * @param {Db} db
+    /**@constructor BlockRepository
+     * @param {import('mongodb').Db} db
      */
     constructor(db) {
         this.#collection = db.collection(config.DB_BLOCK_COLLECTION);
     }
 
-    /**
-     * @param {object} block
+    /**@param {object} block
      * @return {Promise<void>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async save(block) {
         return this.#collection.insertOne(block)
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @param {bigint} number
+    /**@param {bigint} number
      * @return {Promise<object | null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async getByNumber(number) {
         return this.#collection.findOne({number})
@@ -38,11 +34,10 @@ class BlockRepository {
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @param {string} hash
+    /**@param {string} hash
      * @return {Promise<object | null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async getByHash(hash) {
         return this.#collection.findOne({hash})
@@ -50,10 +45,9 @@ class BlockRepository {
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @return {Promise<number|null>}
+    /**@return {Promise<number|null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async count() {
         return this.#collection.countDocuments()

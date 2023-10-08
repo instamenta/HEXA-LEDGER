@@ -1,36 +1,32 @@
 const config = require('../utilities/config')
     , {HandleMongoError} = require('../utilities/errors/error.handler')
-    , {Db, Collection, MongoError} = require('mongodb')
 ;
 
 /** @class TransactionRepository */
 class TransactionRepository {
-    /** @type {Collection} */ #collection;
+    /** @type {import('mongodb').Collection} */ #collection;
 
-    /**
-     * @constructor TransactionRepository
-     * @param {Db} db
+    /**@constructor TransactionRepository
+     * @param {import('mongodb').Db} db
      */
     constructor(db) {
         this.#collection = db.collection(config.DB_TRANSACTION_COLLECTION);
     }
 
-    /**
-     * @param {object} transaction
+    /**@param {object} transaction
      * @return {Promise<void>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async save(transaction) {
         return this.#collection.insertOne(transaction)
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @param {string} hash
+    /**@param {string} hash
      * @return {Promise<object | null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async getByHash(hash) {
         return this.#collection.findOne({hash})
@@ -38,10 +34,9 @@ class TransactionRepository {
             .catch((e) => HandleMongoError(e));
     }
 
-    /**
-     * @return {Promise<number|null>}
+    /**@return {Promise<number|null>}
      * @public
-     * @throws {Error|MongoError}
+     * @throws {Error|import('mongodb').MongoError}
      */
     async count() {
         return this.#collection.countDocuments()

@@ -1,4 +1,4 @@
-import {Address} from "web3-types/src/eth_types";
+import {Address} from 'web3-types/src/eth_types';
 
 export interface TxObject {
     blockHash: string;

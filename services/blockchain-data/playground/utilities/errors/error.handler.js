@@ -24,7 +24,9 @@ const ZodIssueCode = {
     not_finite: 'not_finite',
 };
 
-/** @param {unknown} error */
+/** @param {unknown} error
+ * @throws {Error|import('mongodb').MongoError}
+ */
 function HandleMongoError(error) {
     if (error instanceof MongoError) {
         console.error('🚫 MongoError:', error);
@@ -133,8 +135,7 @@ function RespondMongoToError(error, res) {
     }
 }
 
-/**
- * @param {unknown} error
+/**@param {unknown} error
  * @param {Response} w
  */
 function RespondToError(error, w) {
@@ -143,8 +144,7 @@ function RespondToError(error, w) {
         .status(StatusCode.INTERNAL_SERVER_ERROR).end();
 }
 
-/**
- * @param {Error | ZodError | MongoError | unknown} error
+/**@param {Error | ZodError | MongoError | unknown} error
  * @param {Response} w
  */
 function RespondGeneralPurpose(error, w) {
@@ -158,8 +158,7 @@ function RespondGeneralPurpose(error, w) {
     }
 }
 
-/**
- * @param {unknown} error
+/**@param {unknown} error
  * @param {Response} res
  */
 function RespondToZodError(error, res) {

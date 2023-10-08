@@ -2,11 +2,13 @@ require('dotenv').config();
 const {z} = require('zod');
 
 const envSchema = z.object({
+    //! Service
     PORT: z.string().default('4003'),
     SERVICE_NAME: z.string().default('BLOCKCHAIN_DATA'),
+    //! Web3 Blockchain
     PROVIDER_API_KEY: z.string(),
     ETHEREUM_NETWORK: z.string(),
-
+    //! Database
     DB_URI: z.string(),
     DB_NAME: z.string().default('main'),
     DB_TRANSACTION_COLLECTION: z.string(),

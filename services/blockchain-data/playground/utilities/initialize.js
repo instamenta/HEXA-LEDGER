@@ -93,4 +93,4 @@ module.exports = {
     initialize_database,
     Graceful_Shutdown,
     initializeWeb3Provider,
-}
+};

@@ -1,84 +1,84 @@
-import {ServerErrorResponse} from "@grpc/grpc-js";
-import {Metadata} from "@grpc/grpc-js";
+import {ServerErrorResponse} from '@grpc/grpc-js';
+import {Metadata} from '@grpc/grpc-js';
 
 export const invalidArgumentError: ServerErrorResponse = {
-   name: "InvalidArgument",
+   name: 'InvalidArgument',
    code: 3, //? gRPC error code for "INVALID ARGUMENT"
    details: '',
    metadata: new Metadata(),
-   message: "Invalid argument provided.",
+   message: 'Invalid argument provided.',
 };
 
 export const deadlineExceededError: ServerErrorResponse = {
-   name: "DeadlineExceeded",
+   name: 'DeadlineExceeded',
    code: 4, //? gRPC error code for "DEADLINE EXCEEDED"
    details: '',
    metadata: new Metadata(),
-   message: "Deadline for the operation exceeded.",
+   message: 'Deadline for the operation exceeded.',
 };
 
 export const notFoundError: ServerErrorResponse = {
-   name: "NotFound",
+   name: 'NotFound',
    code: 5, //? gRPC error code for "NOT FOUND"
    details: '',
    metadata: new Metadata(),
-   message: "Resource not found.",
+   message: 'Resource not found.',
 };
 
 export const alreadyExistsError: ServerErrorResponse = {
-   name: "AlreadyExists",
+   name: 'AlreadyExists',
    code: 6, //? gRPC error code for "ALREADY EXISTS"
    details: '',
    metadata: new Metadata(),
-   message: "Resource already exists.",
+   message: 'Resource already exists.',
 };
 
 export const permissionDeniedError: ServerErrorResponse = {
-   name: "PermissionDenied",
+   name: 'PermissionDenied',
    code: 7, //? gRPC error code for "PERMISSION DENIED"
    details: '',
    metadata: new Metadata(),
-   message: "Permission denied for the operation.",
+   message: 'Permission denied for the operation.',
 };
 
 export const internalError: ServerErrorResponse = {
-   name: "Internal",
+   name: 'Internal',
    code: 13, //? gRPC error code for "INTERNAL"
    details: 'Server ran into unexpected internal error.',
    metadata: new Metadata(),
-   message: "Internal server error.",
+   message: 'Internal server error.',
 };
 
 export const unavailableError: ServerErrorResponse = {
-   name: "Unavailable",
+   name: 'Unavailable',
    code: 14, //? gRPC error code for "UNAVAILABLE"
    details: '',
    metadata: new Metadata(),
-   message: "Service unavailable.",
+   message: 'Service unavailable.',
 };
 
 export const dataLossError: ServerErrorResponse = {
-   name: "DataLoss",
+   name: 'DataLoss',
    code: 15, //? gRPC error code for "DATA LOSS"
    details: '',
    metadata: new Metadata(),
-   message: "Data loss occurred.",
+   message: 'Data loss occurred.',
 };
 
 export const unauthenticatedError: ServerErrorResponse = {
-   name: "Unauthenticated",
+   name: 'Unauthenticated',
    code: 16, //? gRPC error code for "UNAUTHENTICATED"
    details: '',
    metadata: new Metadata(),
-   message: "Request not authenticated.",
+   message: 'Request not authenticated.',
 };
 
 export const failedPreconditionError: ServerErrorResponse = {
-   name: "FailedPrecondition",
+   name: 'FailedPrecondition',
    code: 9, //? gRPC error code for "FAILED PRECONDITION"
    details: '',
    metadata: new Metadata(),
-   message: "Operation failed precondition check.",
+   message: 'Operation failed precondition check.',
 };
 
 const ERRORS = {
@@ -92,6 +92,6 @@ const ERRORS = {
    DATA_LOSS: dataLossError,
    UNAUTHENTICATED: unauthenticatedError,
    FAILED_PRECONDITION: failedPreconditionError,
-}
+};
 
-export default ERRORS
+export default ERRORS;

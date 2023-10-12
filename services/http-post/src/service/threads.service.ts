@@ -5,7 +5,7 @@ import {IThreadsServer} from '../generated/grpc/typescript/threads_grpc_pb';
 import {Int32Value, StringValue} from 'google-protobuf/google/protobuf/wrappers_pb';
 import {Empty} from 'google-protobuf/google/protobuf/empty_pb';
 import {Transform} from 'stream';
-import {ServerUnaryCall, sendUnaryData, ServerWritableStream, Metadata} from '@grpc/grpc-js';
+import {type ServerUnaryCall, type sendUnaryData, type ServerWritableStream} from '@grpc/grpc-js';
 import * as zod from '../generated/grpc/validation/grpc.messages';
 import {ZodError, z} from 'zod';
 import PingPongBuilder from '../generated/grpc/builders/pingpong';
@@ -26,7 +26,7 @@ import {
 import {type MongoError} from 'mongodb';
 import type Vlogger from "@instamenta/vlogger";
 import type {IVlog} from "@instamenta/vlogger";
-import {w} from "@instamenta/grpc-errors";
+import {w, Meta} from "@instamenta/grpc-errors";
 
 export default class ThreadsService implements IThreadsServer {
     readonly #repository: ThreadRepository;
@@ -47,16 +47,21 @@ export default class ThreadsService implements IThreadsServer {
             this.#vlog.debug({d: call.request.toObject(), f: 'create'});
             const threadData = zod.CreateRequest.parse(new CreateRequestExtractor(call.request).extract());
 
-            type IAdditionalData = { images: string[], tags: string[], promoted: number };
-            let data = threadData as z.infer<typeof zod.CreateRequest> & IAdditionalData;
+            type IAdditionalData =
+                { images: string[], tags: string[], promoted: number }
+                & z.infer<typeof zod.CreateRequest>;
+            let data = threadData as IAdditionalData;
             data = {...data, images: threadData.imagesList, tags: threadData.tagsList, promoted: 0};
 
             this.#repository.create(data)
-                .then((model: ThreadModel | null) => model instanceof ThreadModel
-                    ? callback(null, new ThreadBuilder(model).build_GRPC())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}))
+                .then((model) =>
+                    model instanceof ThreadModel
+                        ? callback(null, new ThreadBuilder(model).build_GRPC())
+                        : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
         } catch (e) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }
@@ -77,11 +82,13 @@ export default class ThreadsService implements IThreadsServer {
             const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract());
 
             this.#repository.deleteById(threadId)
-                .then((model: ThreadModel | null) => model instanceof ThreadModel
+                .then((model) => model instanceof ThreadModel
                     ? callback(null, new ThreadBuilder(model).build_GRPC())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}));
+                    : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
         } catch (e: Error | ZodError | MongoError | unknown) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }
@@ -93,31 +100,29 @@ export default class ThreadsService implements IThreadsServer {
             this.#vlog.debug({d: call.request.toObject(), f: 'getMany'});
             const {page, limit} = zod.Pagination.parse(new PaginationExtractor(call.request).extract())
                 , skip = page * limit + limit
-                , $_database = await this.#repository.getMany_$(skip, limit)
-                , $_transform = new Transform({readableObjectMode: true, writableObjectMode: true});
+                , db_stream = await this.#repository.getMany_$(skip, limit)
+                , transform = new Transform({readableObjectMode: true, writableObjectMode: true});
             let counter = 0;
 
-            $_transform._transform = (model: ThreadBuilder, encryption, call) => {
+            transform._transform = (model: ThreadBuilder, encryption, call) => {
                 call(null, model.build_GRPC());
                 counter++;
             };
 
-            $_transform.on('end', () => {
+            transform.on('end', () => {
                 if (!counter) return w.E({
                     call, _key: w.K.NOT_FOUND, _details: `Threads for [Page: ${page}], [Limit: ${limit}] not found.`
                 });
-                const metadata = new Metadata();
-                metadata.set('count', counter.toString());
-                call.end(metadata);
+                call.end(Meta.build().set('count', counter.toString()).get());
             });
 
-            $_transform.on('error', (e: Error) => {
+            transform.on('error', (e: Error) => {
                 w.E({call, _key: w.K.INTERNAL})
                 this.#vlog.error({e})
             });
 
             // @ts-ignore
-            $_database.pipe($_transform).pipe(call);
+            db_stream.pipe(transform).pipe(call);
         } catch (e: Error | MongoError | ZodError | unknown) {
             (e instanceof ZodError) ? call.emit('error', w.handleZodError(e)) : w.E({call, _key: w.K.INTERNAL});
             this.#vlog.error({e})
@@ -151,9 +156,12 @@ export default class ThreadsService implements IThreadsServer {
             const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract());
 
             this.#repository.getOneById(threadId)
-                .then((model: ThreadModel | null) => model ? callback(null, new ThreadBuilder(model).build_GRPC())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}));
-        } catch (e: ZodError | unknown) {
+                .then((model: ThreadModel | null) =>
+                    model
+                        ? callback(null, new ThreadBuilder(model).build_GRPC())
+                        : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
+        } catch (e: ZodError | Error | unknown) {
             (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
@@ -166,46 +174,42 @@ export default class ThreadsService implements IThreadsServer {
             this.#vlog.debug({d: call.request.toObject(), f: 'getStatistics'});
             const {page, limit} = zod.Pagination.parse(new PaginationExtractor(call.request).extract())
                 , skip = page * limit + limit
-                , $_database = await this.#repository.getStatistics_$(skip, limit)
-                , $_transform = new Transform({readableObjectMode: true, writableObjectMode: true});
+                , db_stream = await this.#repository.getStatistics_$(skip, limit)
+                , transform = new Transform({readableObjectMode: true, writableObjectMode: true});
             let counter = 0;
 
-            $_transform._transform = (model: StatsModel, encryption, call) => {
-                const _data = model.get()
-                    , promoted = new PromotedStatsBuilder()
-                    .withAmount(_data.promoted.amount).withCount(_data.donations.count)
-                    , donations = new DonationsStatsBuilder()
-                    .withAmount(_data.donations.amount).withCount(_data.donations.count);
+            transform._transform = (model: StatsModel, encryption, call) => {
+                const data = model.get()
+                const promoted = new PromotedStatsBuilder().withAmount(data.promoted.amount).withCount(data.donations.count);
+                const donations = new DonationsStatsBuilder().withAmount(data.donations.amount).withCount(data.donations.count);
                 call(null, new StatsModelBuilder()
-                    .withId(_data.id)
+                    .withId(data.id)
                     .withPromoted(promoted)
                     .withDonations(donations)
-                    .withName(_data.name)
-                    .withLikesCount(_data.likes)
-                    .withDislikesCount(_data.dislikes)
-                    .build()
-                );
+                    .withName(data.name)
+                    .withLikesCount(data.likes)
+                    .withDislikesCount(data.dislikes)
+                    .build());
                 counter++;
             };
 
-            $_transform.on('end', () => {
+            transform.on('end', () => {
                 if (!counter) return w.E({
                     call, _key: w.K.NOT_FOUND, _details: `Threads for [Page: ${page}], [Limit: ${limit}] not found.`
                 });
-                const metadata = new Metadata();
-                metadata.set('count', counter.toString());
-                call.end(metadata);
+                call.end(Meta.build().set('count', counter.toString()).get());
             });
 
-            $_transform.on('error', (e: Error) => {
+            transform.on('error', (e: Error) => {
                 w.E({call, _key: w.K.INTERNAL});
                 this.#vlog.error({e})
             });
 
             // @ts-ignore
-            $_database.pipe($_transform).pipe(call);
+            db_stream.pipe(transform).pipe(call);
         } catch (e: Error | MongoError | ZodError | unknown) {
-            (e instanceof ZodError) ? call.emit('error', w.handleZodError(e)) : w.E({call, _key: w.K.INTERNAL})
+            (e instanceof ZodError) ? call.emit('error', w.handleZodError(e))
+                : w.E({call, _key: w.K.INTERNAL})
             this.#vlog.error({e})
         }
     }
@@ -215,28 +219,26 @@ export default class ThreadsService implements IThreadsServer {
     ): Promise<void> {
         try {
             this.#vlog.debug({d: call.request.toObject(), f: 'getLikes'});
-            const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract())
-                , data: string[] | null = await this.#repository.getLikes(threadId)
-            ;
+            const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract());
+
+            const data = await this.#repository.getLikes(threadId);
             if (!data) {
                 w.E({call, _key: w.K.NOT_FOUND});
                 return this.#vlog.error({f: 'getLikes', e: 'Not Found'});
             }
+
             for (let i = 0; i < data.length; i++) {
                 call.write(new StringValue().setValue(data[i]));
             }
 
             call.on('end', () => {
-                const metadata = new Metadata();
-                metadata.set('count', data.length.toString());
-                call.end(metadata);
+                call.end(Meta.build().set('count', data.length.toString()).get())
             });
 
             call.on('error', (e) => {
                 w.E({call, _key: w.K.INTERNAL});
                 this.#vlog.error({e});
             });
-
         } catch (e: ZodError | MongoError | Error | unknown) {
             (e instanceof ZodError) ? call.emit('error', w.handleZodError(e))
                 : w.E({call, _key: w.K.INTERNAL})
@@ -249,21 +251,20 @@ export default class ThreadsService implements IThreadsServer {
     ): Promise<void> {
         try {
             this.#vlog.debug({d: call.request.toObject(), f: 'getDislikes'});
-            const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract())
-                , data: string[] | null = await this.#repository.getDislikes(threadId)
-            ;
+            const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract());
+
+            const data = await this.#repository.getDislikes(threadId);
             if (!data) {
                 w.E({call, _key: w.K.NOT_FOUND});
                 return this.#vlog.error({e: 'Not Found'});
             }
+
             for (let i = 0; i < data.length; i++) {
                 call.write(new StringValue().setValue(data[i]));
             }
 
             call.on('end', () => {
-                const metadata = new Metadata();
-                metadata.set('count', data.length.toString());
-                call.end(metadata);
+                call.end(Meta.build().set('count', data.length.toString()).get());
             });
 
             call.on('error', (e) => {
@@ -271,7 +272,8 @@ export default class ThreadsService implements IThreadsServer {
                 this.#vlog.error({e})
             });
         } catch (e: ZodError | MongoError | Error | unknown) {
-            (e instanceof ZodError) ? call.emit('error', w.handleZodError(e)) : w.E({call, _key: w.K.INTERNAL});
+            (e instanceof ZodError) ? call.emit('error', w.handleZodError(e))
+                : w.E({call, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }
@@ -287,9 +289,11 @@ export default class ThreadsService implements IThreadsServer {
 
             this.#repository.like(threadId, wallet)
                 .then((res: boolean) => res ? callback(null, new Empty())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}));
-        } catch (e: ZodError | unknown) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+                    : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
+        } catch (e: ZodError | MongoError | Error | unknown) {
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }
@@ -305,9 +309,11 @@ export default class ThreadsService implements IThreadsServer {
 
             this.#repository.dislike(threadId, wallet)
                 .then((res: boolean) => res ? callback(null, new Empty())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}));
-        } catch (e: ZodError | unknown) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+                    : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
+        } catch (e: ZodError | MongoError | Error | unknown) {
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e, f: 'dislike'})
         }
     }
@@ -322,10 +328,13 @@ export default class ThreadsService implements IThreadsServer {
                 new AmountWithAuthRequestExtractor(call.request).extract());
 
             this.#repository.donate(threadId, auth, amount)
-                .then((res: boolean) => res ? callback(null, new Empty())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}));
-        } catch (e: ZodError | unknown) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+                .then((res) => res
+                    ? callback(null, new Empty())
+                    : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
+        } catch (e: ZodError | MongoError | Error | unknown) {
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }
@@ -341,9 +350,11 @@ export default class ThreadsService implements IThreadsServer {
 
             this.#repository.promote(threadId, auth, amount)
                 .then((res: boolean) => res ? callback(null, new Empty())
-                    : w.CB({callback, _key: w.K.NOT_FOUND}));
-        } catch (e: ZodError | unknown) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+                    : w.CB({callback, _key: w.K.NOT_FOUND})
+                );
+        } catch (e: ZodError | MongoError | Error | unknown) {
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }
@@ -356,15 +367,16 @@ export default class ThreadsService implements IThreadsServer {
             this.#vlog.debug({d: call.request.toObject(), f: 'pingPong'});
             const {name, timestamp} = zod.PingPongMessage.parse(new PingPongExtractor(call.request).extract())
                 , diffMs = Date.now() - new Date(timestamp).getTime()
-                , sec = Math.floor(diffMs / 1000)
-                , ms = (diffMs % 1000) / 1000;
+                , seconds = Math.floor(diffMs / 1000)
+                , microsecond = (diffMs % 1000) / 1000;
             console.log({
                 data: `[ Ping from "${name}" to "${this.constructor.name}" ]`,
-                time: `[ Time taken: ${sec + ms.toFixed(5)} seconds ]`,
+                time: `[ Time taken: ${seconds + microsecond.toFixed(5)} seconds ]`,
             });
             callback(null, new PingPongBuilder().withName(this.constructor.name).build());
-        } catch (e) {
-            (e instanceof ZodError) ? callback(w.handleZodError(e)) : w.CB({callback, _key: w.K.INTERNAL});
+        } catch (e: ZodError | Error | unknown) {
+            (e instanceof ZodError) ? callback(w.handleZodError(e))
+                : w.CB({callback, _key: w.K.INTERNAL});
             this.#vlog.error({e})
         }
     }

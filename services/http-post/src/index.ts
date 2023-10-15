@@ -9,7 +9,7 @@ import {start_grpc_server} from "./server";
 import Vlogger from '@instamenta/vlogger'
 
 (function initializeService(): void {
-   const _server = initialize_server();
+   const _http_server = initialize_server();
    const db = initialize_database();
    const vlogger = Vlogger.getInstance();
 
@@ -17,16 +17,16 @@ import Vlogger from '@instamenta/vlogger'
    const threadRepository = new ThreadRepository(db);
    const threadController = new ThreadController(threadRepository);
    const threadRouter = new ThreadRouter(threadController).getRouter();
-   _server.use('/thread', threadRouter)
+   _http_server.use('/thread', threadRouter)
 
    //! Error & Not-Found Handling
-   _server.use(_404Handler);
-   _server.use(_errorHandler);
+   _http_server.use(_404Handler);
+   _http_server.use(_errorHandler);
 
    //! Start Web APi
-   _server.listen(config.PORT, () => vlogger.getVlogger(config.SERVICE_NAME).info({
+   _http_server.listen(config.PORT, () => vlogger.getVlogger(config.SERVICE_NAME).info({
       f : 'initializeService', m: `[ ${config.SERVICE_NAME} ] Running on port: [ ${config.PORT} ]`}));
-   _server.on('error', e => vlogger.getVlogger(config.SERVICE_NAME).error({
+   _http_server.on('error', e => vlogger.getVlogger(config.SERVICE_NAME).error({
       f: 'initializeService', m: `[ ${config.SERVICE_NAME} ] ran into Error:`, e}));
 
    start_grpc_server(threadRepository, vlogger);

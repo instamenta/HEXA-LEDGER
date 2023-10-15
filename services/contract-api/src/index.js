@@ -13,6 +13,8 @@ let owner;
 /** @type {HardhatEthersSigner[]} */
 let user;
 
+module.exports = {contract, owner, user}
+
 /**
  * @param {express.Request} r
  * @param {express.Response} w

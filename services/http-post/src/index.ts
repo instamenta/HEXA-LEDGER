@@ -15,7 +15,7 @@ import Vlogger from '@instamenta/vlogger'
 
    //! Components
    const threadRepository = new ThreadRepository(db);
-   const threadController = new ThreadController(threadRepository);
+   const threadController = new ThreadController(threadRepository, vlogger);
    const threadRouter = new ThreadRouter(threadController).getRouter();
    _http_server.use('/thread', threadRouter)
 

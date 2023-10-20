@@ -12,7 +12,7 @@
 		"ping-pomg": "node dist/utilities/pingPongSpammer.js"
 	},
 	"dependencies": {
-		"@clerk/clerk-sdk-node": "^4.12.6",
+		"@clerk/clerk-sdk-node": "^4.12.15",
 		"@faker-js/faker": "^8.1.0",
 		"@grpc/grpc-js": "^1.9.3",
 		"@instamenta/grpc-errors": "^1.3.17",

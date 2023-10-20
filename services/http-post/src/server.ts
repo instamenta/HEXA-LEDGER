@@ -16,9 +16,9 @@ export function start_grpc_server(threadRepository: ThreadRepository, vlogger: V
         (error: Error | null, port: number): void => {
             if (error) {
                 vlogger.getVlogger('GrpcServer').error({e: error, f: 'bindAsync'});
-                process.exit();
+                process.exit(1);
             }
-            vlogger.getVlogger('GrpcServer').info({d: `[ GRPC Service running on PORT: [ ${port}] ]`, f: 'bindAsync'});
+            vlogger.getVlogger('GrpcServer').info({m: `[ GRPC Service running on PORT: [ ${port}] ]`, f: 'bindAsync'});
             _grpc_server.start();
         });
 }

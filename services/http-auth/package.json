@@ -7,7 +7,7 @@
 		"lint-fix": "eslint src/**/*.ts --fix",
 		"seed": "node ./database/seed/thread.seed.mjs",
 		"start": "tsc -p tsconfig.json && node ./dist/index.js",
-		"proto-build": "grpc_tools_node_protoc  --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts  --ts_out=grpc_js:./src/generated/grpc/typescript  --js_out=import_style=commonjs,binary:./src/generated/grpc/typescript  --grpc_out=grpc_js:./src/generated/grpc/typescript  -I ./src/generated/grpc/  ./src/generated/grpc/threads.proto",
+		"proto-build": "grpc_tools_node_protoc  --plugin=protoc-gen-ts=./node_modules/.bin/protoc-gen-ts  --ts_out=grpc_js:./src/generated/grpc/typescript  --js_out=import_style=commonjs,binary:./src/generated/grpc/typescript  --grpc_out=grpc_js:./src/generated/grpc/typescript  -I ./src/generated/grpc/  src/generated/grpc/stat.proto",
 		"test": "jest",
 		"ping-pong": "node dist/utilities/pingPongSpammer.js"
 	},

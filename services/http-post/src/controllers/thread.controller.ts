@@ -26,7 +26,7 @@ export default class ThreadController {
         r: Req<object, object, z.infer<typeof zod.createBody>>,
         w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
     ): Promise<void> {
-        this.#vlog.debug({f: 'create'});
+        this.#vlog.debug({f: 'create', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const threadData = zod.createBody.parse(r.body);
 
@@ -51,7 +51,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }, object, z.infer<typeof zod.updateBody>>,
         w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
     ): Promise<void> {
-        this.#vlog.debug({f: 'update'});
+        this.#vlog.debug({f: 'update', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {threadId} = zod.threadIdParam.parse(r.params);
             const threadData = zod.updateBody.parse(r.body);
@@ -72,7 +72,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
     ): Promise<void> {
-        this.#vlog.debug({f: 'delete'});
+        this.#vlog.debug({f: 'delete', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {threadId} = zod.threadIdParam.parse(r.params);
 
@@ -92,7 +92,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res<string | Omit<I.OThreadsModel, 'deleted'> | Error>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getOne'});
+        this.#vlog.debug({f: 'getOne', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {threadId} = zod.threadIdParam.parse(r.params);
 
@@ -113,7 +113,7 @@ export default class ThreadController {
         r: Req<object, { skip: number, limit: number }>,
         w: Res<Omit<I.SOThreadsModel, 'deleted'>[] | Error>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getMany'});
+        this.#vlog.debug({f: 'getMany', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {skip, limit} = zod.pageQuery.parse(r.query);
 
@@ -133,7 +133,7 @@ export default class ThreadController {
         r: Req<object, { skip: number, limit: number }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'getByOwner'});
+        this.#vlog.debug({f: 'getByOwner', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {wallet: ownerAddr} = zod.walletParam.parse(r.params)
                 , {skip, limit} = zod.pageQuery.parse(r.query);
@@ -154,7 +154,7 @@ export default class ThreadController {
         r: Req,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'getTotalCount'});
+        this.#vlog.debug({f: 'getTotalCount', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             this.threadRepository.getTotalCount()
                 .then((res: number) =>
@@ -168,11 +168,8 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'like'});
+        this.#vlog.debug({f: 'like', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            console.log('===============')
-            console.log(r.auth?.claims?.wallet)
-            console.log('===============')
             const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
                 , {threadId} = zod.threadIdParam.parse(r.params);
 
@@ -192,7 +189,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'dislike'});
+        this.#vlog.debug({f: 'dislike', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             console.log('===============')
             console.log(r.auth?.claims?.wallet)
@@ -214,7 +211,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'promote'});
+        this.#vlog.debug({f: 'promote', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
                 , {threadId} = zod.threadIdParam.parse(r.params)
@@ -234,7 +231,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'donate'});
+        this.#vlog.debug({f: 'donate', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
                 , {threadId} = zod.threadIdParam.parse(r.params)
@@ -254,7 +251,7 @@ export default class ThreadController {
         r: Req<{ threadId: string, wallet: string }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'transferOwnership'});
+        this.#vlog.debug({f: 'transferOwnership', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
                 , {threadId} = zod.threadIdParam.parse(r.params)
@@ -274,7 +271,7 @@ export default class ThreadController {
         r: Req<{ threadId: string, }>,
         w: Res<string[]>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getLikes'});
+        this.#vlog.debug({f: 'getLikes', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {threadId} = zod.threadIdParam.parse(r.params);
 
@@ -292,7 +289,7 @@ export default class ThreadController {
         r: Req<{ threadId: string, }>,
         w: Res<string[]>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getDislikes'});
+        this.#vlog.debug({f: 'getDislikes', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {threadId} = zod.threadIdParam.parse(r.params);
 
@@ -310,7 +307,7 @@ export default class ThreadController {
         r: Req<{ threadId: string, }>,
         w: Res<I.OStatsModel | I.OStatsModel[] | null>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getStatistics'});
+        this.#vlog.debug({f: 'getStatistics', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {threadId} = zod.threadIdParamOptional.parse(r.params);
 
@@ -333,7 +330,7 @@ export default class ThreadController {
         r: Req<{ threadId: string }>,
         w: Res<string | Error>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getMany_$'});
+        this.#vlog.debug({f: 'getMany_$', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {skip, limit} = zod.pageQuery.parse(r.query);
 
@@ -364,7 +361,7 @@ export default class ThreadController {
         r: Req<object, { skip: number, limit: number }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'getByOwner_$'});
+        this.#vlog.debug({f: 'getByOwner_$', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {wallet: ownerAddr} = zod.walletParam.parse(r.params);
             const {skip, limit} = zod.pageQuery.parse(r.query);

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import {_metrics_endpoint, _metrics_middleware} from '../middlewares/monitoring.middleware';
-import {ClerkExpressWithAuth, LooseAuthProp} from '@clerk/clerk-sdk-node';
+import {ClerkExpressWithAuth, StrictAuthProp} from '@clerk/clerk-sdk-node';
 import {MongoClient} from 'mongodb';
 import {config} from './config';
 import express from 'express';
@@ -14,7 +14,7 @@ export function initialize_server(): express.Express {
     _server.use(require('helmet')());
     _server.use(require('compression')());
     _server.use(require('cookie-parser')());
-    _server.use(require('morgan')('combined'));
+    _server.use(require('morgan')('dev'));
     _server.use(express.json());
 
     //* Prometheus
@@ -37,7 +37,7 @@ export function initialize_database() {
     return db_client.db(config.DB_NAME);
 }
 
-export class Graceful_Shutdown {
+export class graceful_shutdown {
 
     public static process_on(_cases_: string[]): void {
         _cases_.forEach((_type_: string) => {
@@ -69,7 +69,7 @@ export class Graceful_Shutdown {
 
 declare global {
     namespace Express {
-        interface Request extends LooseAuthProp {
+        interface Request extends StrictAuthProp {
         }
     }
 }

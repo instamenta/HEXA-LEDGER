@@ -1,41 +1,40 @@
-import {Request as Req, Response as Res} from 'express';
+import {type Request as Req, type Response as Res} from 'express';
 import StatusCode from '@instamenta/http-status-codes';
-import * as zod from '../validation/auth.zod';
-import * as I from '../types/types';
-import StatRepository from '../repositories/stat.repository';
+import * as zod from '../validation/user.zod';
+import type * as I from '../types/user';
 import UserModel from '../models/user.model';
 import {RespondGeneralPurpose} from '../utilities/errors/error.handler';
-import {Transform} from 'stream';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {type ZodError, z} from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {type MongoError} from 'mongodb';
 import Vlogger, {type IVlog} from "@instamenta/vlogger";
+import UserRepository from "../repositories/user.repository";
 
-export default class StatController {
-
-    private threadRepository: StatRepository;
+export default class UserController {
+    readonly #repository: UserRepository;
     readonly #vlog: IVlog;
 
-    constructor(threadRepository: StatRepository, vlogger: Vlogger) {
-        this.threadRepository = threadRepository;
+    constructor(repository: UserRepository, vlogger: Vlogger) {
+        this.#repository = repository;
         this.#vlog = vlogger.getVlogger('ThreadController');
     }
 
     public async create(
         r: Req<object, object, z.infer<typeof zod.createBody>>,
-        w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
+        w: Res<I.OUserModel | string | Error>
     ): Promise<void> {
         this.#vlog.debug({f: 'create', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const threadData = zod.createBody.parse(r.body);
+            const userData = zod.createBody.parse(r.body);
+            const clerkId = r.auth.claims?.clerk_id;
 
-            if (!r.auth.hasOwnProperty('claims')) {
+            if (!r.auth.hasOwnProperty('claims') || typeof clerkId !== 'string') {
                 w.status(StatusCode.UNAUTHORIZED).end();
                 return this.#vlog.info({f: 'create', m: r.ip, d: r.body})
             }
 
-            this.threadRepository.create(threadData)
+            this.#repository.create({...userData, clerkId})
                 .then((model: UserModel | null) => model instanceof UserModel
                     ? w.status(StatusCode.CREATED)
                         .json(model.get()).end()
@@ -48,20 +47,21 @@ export default class StatController {
     }
 
     public async update(
-        r: Req<{ threadId: string }, object, z.infer<typeof zod.updateBody>>,
-        w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
+        r: Req<{ userId: string }>,
+        w: Res<I.OUserModel | string | Error>
     ): Promise<void> {
         this.#vlog.debug({f: 'update', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const {threadId} = zod.threadIdParam.parse(r.params);
-            const threadData = zod.updateBody.parse(r.body);
+            const {param} = zod.userIdOrWalletParam.parse(r.params);
+            const userData = zod.updateBody.parse(r.body);
 
-            this.threadRepository.update(threadId, threadData)
-                .then((model: UserModel | null) => model instanceof UserModel
-                    ? w.status(StatusCode.CREATED)
-                        .json(model.get()).end()
-                    : w.status(StatusCode.NOT_FOUND)
-                        .json('Failed to create').end()
+            this.#repository.update(param, userData)
+                .then((model: UserModel | null) =>
+                    model instanceof UserModel
+                        ? w.status(StatusCode.CREATED)
+                            .json(model.get()).end()
+                        : w.status(StatusCode.NOT_FOUND)
+                            .json('Failed to create').end()
                 );
         } catch (e: Error | ZodError | MongoError | unknown) {
             RespondGeneralPurpose(e, w);
@@ -70,18 +70,19 @@ export default class StatController {
 
     public async delete(
         r: Req<{ threadId: string }>,
-        w: Res<Omit<I.OThreadsModel, 'deleted'> | string | Error>
+        w: Res<I.OUserModel | string | Error>
     ): Promise<void> {
         this.#vlog.debug({f: 'delete', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const {threadId} = zod.threadIdParam.parse(r.params);
+            const {param} = zod.userIdOrWalletParam.parse(r.params);
 
-            this.threadRepository.deleteById(threadId)
-                .then((model: UserModel | null) => model instanceof UserModel
-                    ? w.status(StatusCode.OK)
-                        .json(model.get()).end()
-                    : w.status(StatusCode.NOT_FOUND)
-                        .json('Failed to create').end()
+            this.#repository.delete(param)
+                .then((model: UserModel | null) =>
+                    model instanceof UserModel
+                        ? w.status(StatusCode.OK)
+                            .json(model.get()).end()
+                        : w.status(StatusCode.NOT_FOUND)
+                            .json('Failed to create').end()
                 );
         } catch (e: Error | ZodError | MongoError | unknown) {
             RespondGeneralPurpose(e, w);
@@ -89,14 +90,14 @@ export default class StatController {
     }
 
     public async getOne(
-        r: Req<{ threadId: string }>,
-        w: Res<string | Omit<I.OThreadsModel, 'deleted'> | Error>
+        r: Req<{ userId: string }>,
+        w: Res<string | I.OUserModel | Error>
     ): Promise<void> {
         this.#vlog.debug({f: 'getOne', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const {threadId} = zod.threadIdParam.parse(r.params);
+            const {param} = zod.userIdOrWalletParam.parse(r.params);
 
-            this.threadRepository.getOneById(threadId)
+            this.#repository.getOneById(param)
                 .then((model: UserModel | null) =>
                     model instanceof UserModel
                         ? w.status(StatusCode.OK)
@@ -111,38 +112,17 @@ export default class StatController {
 
     public async getMany(
         r: Req<object, { skip: number, limit: number }>,
-        w: Res<Omit<I.SOThreadsModel, 'deleted'>[] | Error>
+        w: Res<I.OUserModel[] | Error>
     ): Promise<void> {
         this.#vlog.debug({f: 'getMany', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
             const {skip, limit} = zod.pageQuery.parse(r.query);
 
-            this.threadRepository.getMany(skip, limit)
+            this.#repository.getMany(skip, limit)
                 .then((models: UserModel[]) =>
                     models.length
                         ? w.status(StatusCode.OK)
-                            .json(models.map((model) => model.getStatic())).end()
-                        : w.status(StatusCode.NOT_FOUND).end()
-                );
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async getByOwner(
-        r: Req<object, { skip: number, limit: number }>,
-        w: Res
-    ): Promise<void> {
-        this.#vlog.debug({f: 'getByOwner', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {wallet: ownerAddr} = zod.walletParam.parse(r.params)
-                , {skip, limit} = zod.pageQuery.parse(r.query);
-
-            this.threadRepository.getByOwner(ownerAddr, skip, limit)
-                .then((models: UserModel[]) =>
-                    models.length
-                        ? w.status(StatusCode.OK)
-                            .json(models.map((model) => model.getStatic())).end()
+                            .json(models.map((model) => model.get())).end()
                         : w.status(StatusCode.NOT_FOUND).end()
                 );
         } catch (e: Error | ZodError | MongoError | unknown) {
@@ -156,7 +136,7 @@ export default class StatController {
     ): Promise<void> {
         this.#vlog.debug({f: 'getTotalCount', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            this.threadRepository.getTotalCount()
+            this.#repository.getTotalCount()
                 .then((res: number) =>
                     w.status(StatusCode.OK).json(res).end());
         } catch (e: Error | ZodError | MongoError | unknown) {
@@ -164,18 +144,16 @@ export default class StatController {
         }
     }
 
-    public async like(
-        r: Req<{ threadId: string }>,
+    public async addReferenceId(
+        r: Req<{ param: string, service: string, refId: string}>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'like', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
+        this.#vlog.debug({f: 'addReferenceId', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
-                , {threadId} = zod.threadIdParam.parse(r.params);
+            const {param} = zod.userIdOrWalletParam.parse(r.params);
+            const {service, refId} = zod.refIdAndService.parse(r.params)
 
-            console.log(wallet, threadId)
-
-            this.threadRepository.like(threadId, wallet)
+            this.#repository.addReferenceId(param, service, refId)
                 .then((res: boolean) => res
                     ? w.status(StatusCode.OK).end()
                     : w.status(StatusCode.NOT_FOUND).end()
@@ -185,19 +163,16 @@ export default class StatController {
         }
     }
 
-    public async dislike(
-        r: Req<{ threadId: string }>,
+    public async assignOwnership(
+        r: Req<{ param: string, }>,
         w: Res
     ): Promise<void> {
-        this.#vlog.debug({f: 'dislike', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
+        this.#vlog.debug({f: 'assignOwnership', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            console.log('===============')
-            console.log(r.auth?.claims?.wallet)
-            console.log('===============')
-            const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
-                , {threadId} = zod.threadIdParam.parse(r.params);
+            const {param} = zod.userIdOrWalletParam.parse(r.params);
+            const {refId, type} = zod.refIdAndType.parse(r.params)
 
-            this.threadRepository.dislike(threadId, wallet)
+            this.#repository.assignOwnership(param, type, refId)
                 .then((res: boolean) => res
                     ? w.status(StatusCode.OK).end()
                     : w.status(StatusCode.NOT_FOUND).end()
@@ -207,191 +182,5 @@ export default class StatController {
         }
     }
 
-    public async promote(
-        r: Req<{ threadId: string }>,
-        w: Res
-    ): Promise<void> {
-        this.#vlog.debug({f: 'promote', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
-                , {threadId} = zod.threadIdParam.parse(r.params)
-                , {amount} = zod.amountBody.parse(r.body);
-
-            this.threadRepository.promote(threadId, wallet, amount)
-                .then((res: boolean) => res
-                    ? w.status(StatusCode.OK).end()
-                    : w.status(StatusCode.NOT_FOUND).end()
-                );
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async donate(
-        r: Req<{ threadId: string }>,
-        w: Res
-    ): Promise<void> {
-        this.#vlog.debug({f: 'donate', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
-                , {threadId} = zod.threadIdParam.parse(r.params)
-                , {amount} = zod.amountBody.parse(r.body);
-
-            this.threadRepository.donate(threadId, wallet, amount)
-                .then((res: boolean) => res
-                    ? w.status(StatusCode.OK).end()
-                    : w.status(StatusCode.NOT_FOUND).end()
-                );
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async transferOwnership(
-        r: Req<{ threadId: string, wallet: string }>,
-        w: Res
-    ): Promise<void> {
-        this.#vlog.debug({f: 'transferOwnership', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
-                , {threadId} = zod.threadIdParam.parse(r.params)
-                , {wallet: newOwner} = zod.walletParam.parse(r.params);
-
-            this.threadRepository.transferOwnership(threadId, wallet, newOwner)
-                .then((res: boolean) => res
-                    ? w.status(StatusCode.OK).end()
-                    : w.status(StatusCode.NOT_FOUND).end()
-                );
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async getLikes(
-        r: Req<{ threadId: string, }>,
-        w: Res<string[]>
-    ): Promise<void> {
-        this.#vlog.debug({f: 'getLikes', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {threadId} = zod.threadIdParam.parse(r.params);
-
-            this.threadRepository.getLikes(threadId)
-                .then((res: string[] | null) => res
-                    ? w.status(StatusCode.OK).json(res).end()
-                    : w.status(StatusCode.NOT_FOUND).end()
-                );
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async getDislikes(
-        r: Req<{ threadId: string, }>,
-        w: Res<string[]>
-    ): Promise<void> {
-        this.#vlog.debug({f: 'getDislikes', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {threadId} = zod.threadIdParam.parse(r.params);
-
-            this.threadRepository.getDislikes(threadId)
-                .then((res: string[] | null) => res
-                    ? w.status(StatusCode.OK).json(res).end()
-                    : w.status(StatusCode.NOT_FOUND).end()
-                );
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async getStatistics(
-        r: Req<{ threadId: string, }>,
-        w: Res<I.OStatsModel | I.OStatsModel[] | null>
-    ): Promise<void> {
-        this.#vlog.debug({f: 'getStatistics', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {threadId} = zod.threadIdParamOptional.parse(r.params);
-
-            const stats = await this.threadRepository.getStatistics(threadId ?? null);
-            if (Array.isArray(stats)) {
-                stats.length
-                    ? w.status(StatusCode.OK).json(stats.map(d => d.get())).end()
-                    : w.status(StatusCode.NOT_FOUND).end();
-            } else {
-                stats
-                    ? w.status(StatusCode.OK).json(stats.get()).end()
-                    : w.status(StatusCode.NOT_FOUND).end();
-            }
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async getMany_$( // deprecated
-        r: Req<{ threadId: string }>,
-        w: Res<string | Error>
-    ): Promise<void> {
-        this.#vlog.debug({f: 'getMany_$', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {skip, limit} = zod.pageQuery.parse(r.query);
-
-            const $_DB = await this.threadRepository.getMany_$(skip, limit);
-            let c = 0;
-
-            w.write('[');
-            $_DB.on('data', (model: UserModel) => {
-                w.write(JSON.stringify(model.getStatic()) + ',');
-                c++;
-            });
-
-            $_DB.on('end', () => {
-                c ? w.status(StatusCode.OK).end()
-                    : w.status(StatusCode.NOT_FOUND).end();
-            });
-
-            $_DB.on('error', (e: Error) => {
-                w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
-            });
-
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
-
-    public async getByOwner_$( // deprecated
-        r: Req<object, { skip: number, limit: number }>,
-        w: Res
-    ): Promise<void> {
-        this.#vlog.debug({f: 'getByOwner_$', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-        try {
-            const {wallet: ownerAddr} = zod.walletParam.parse(r.params);
-            const {skip, limit} = zod.pageQuery.parse(r.query);
-
-            const $_DB = await this.threadRepository.getByOwner_$(
-                ownerAddr, skip, limit
-            );
-            const $_T_ = new Transform({readableObjectMode: true, writableObjectMode: true});
-            w.setHeader('Content-Type', 'application/json');
-            let c = 0;
-
-            w.write('[');
-            $_T_._transform = (d: UserModel, encryption, call) => {
-                call(null, JSON.stringify(d.getStatic()) + ',');
-                c++;
-            };
-
-            $_T_.on('end', () => {
-                w.write(']');
-                c ? w.status(StatusCode.OK).end()
-                    : w.status(StatusCode.NOT_FOUND).end();
-            });
-
-            $_DB.on('error', (e: Error) => {
-                w.status(StatusCode.INTERNAL_SERVER_ERROR).json(e).end();
-            });
-
-            $_DB.pipe($_T_).pipe(w);
-        } catch (e: Error | ZodError | MongoError | unknown) {
-            RespondGeneralPurpose(e, w);
-        }
-    }
 }
+

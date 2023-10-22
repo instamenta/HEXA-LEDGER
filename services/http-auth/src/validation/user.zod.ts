@@ -1,31 +1,17 @@
 import { z } from 'zod';
 
 export const createBody = z.object({
-   name: z.string()
-      .min(1, { message: '🚫 Name must be at least 1 character.' })
-      .max(48, { message: '🚫 Name cannot exceed 48 characters.' })
-      .trim(),
-   description: z.string()
-      .min(3, { message: '📝 Description must be at least 3 characters.' })
-      .max(120, { message: '🚫 Description cannot exceed 120 characters.' })
-      .trim()
-      .default('No Description!'),
-   content: z.string()
-      .min(26, { message: '📜 Content must be at least 26 characters.' })
-      .max(360, { message: '🚫 Content cannot exceed 360 characters.' })
-      .trim()
-      .default('No Content Provided!'),
-   images: z.array(z.string())
-      .default([]),
-   owner: z.string()
-      .min(24, { message: '👤 Owner must be a string of minimum 24 characters.' })
-      .max(42, { message: '🚫 Wallet must be a string of maximum 42 characters.' }),
-   promoted: z.number()
-      .min(1, { message: '🌟 Promotion amount must be a positive number.' })
-      .optional()
-      .default(1),
-   tags: z.array(z.string())
-      .default([]),
+    wallet: z.string()
+        .min(24, { message: '👤 Wallet must be a string of minimum 24 characters.' })
+        .max(42, { message: '🚫 Wallet cannot exceed 42 characters.' }),
+    name: z.string()
+        .min(1, { message: '🚫 Name must be at least 1 character.' })
+        .max(24, { message: '🚫 Name cannot exceed 24 characters.' }),
+    bio: z.string()
+        .min(1, { message: '🚫 Bio must be at least 1 character.' })
+        .max(36, { message: '🚫 Bio cannot exceed 36 characters.' }),
+    role: z.string(),
+    image: z.string(),
 });
 
 export const amountBody = z.object({
@@ -33,8 +19,14 @@ export const amountBody = z.object({
       .positive({ message: '💰 Amount must be a positive number.' })
 });
 
-export const threadIdParam = z.object({
-   threadId: z.string()
+export const userIdOrWalletParam = z.object({
+    param: z.string()
+        .min(23, { message: '🧵 Thread ID must be a string of 24 characters.' })
+        .max(50, { message: '🧵 Wallet must be a valid ethereum wallet.' }),
+});
+
+export const userIdParam = z.object({
+   userId: z.string()
       .length(24, { message: '🧵 Thread ID must be a string of 24 characters.' }),
 });
 
@@ -63,22 +55,25 @@ export const pageQuery = z.object({
 });
 
 export const updateBody = z.object({
-   name: z.string()
-      .min(1, { message: '🚫 Name must be at least 1 character.' })
-      .max(48, { message: '🚫 Name cannot exceed 48 characters.' })
-      .trim(),
-   description: z.string()
-      .min(3, { message: '📝 Description must be at least 3 characters.' })
-      .max(120, { message: '🚫 Description cannot exceed 120 characters.' })
-      .trim()
-      .default('No Description!'),
-   content: z.string()
-      .min(26, { message: '📜 Content must be at least 26 characters.' })
-      .max(360, { message: '🚫 Content cannot exceed 360 characters.' })
-      .trim()
-      .default('No Content Provided!'),
-   images: z.array(z.string())
-      .default([]),
-   tags: z.array(z.string())
-      .default([]),
+    wallet: z.string()
+        .min(24, { message: '👤 Wallet must be a string of minimum 24 characters.' })
+        .max(42, { message: '🚫 Wallet cannot exceed 42 characters.' }),
+    name: z.string()
+        .min(1, { message: '🚫 Name must be at least 1 character.' })
+        .max(24, { message: '🚫 Name cannot exceed 24 characters.' }),
+    bio: z.string()
+        .min(1, { message: '🚫 Bio must be at least 1 character.' })
+        .max(36, { message: '🚫 Bio cannot exceed 36 characters.' }),
+    image: z.string(),
+    images: z.array(z.string()),
+});
+
+export const refIdAndService = z.object({
+    service: z.string(),
+    refId: z.string(),
+});
+
+export const refIdAndType = z.object({
+    type: z.string(),
+    refId: z.string(),
 });

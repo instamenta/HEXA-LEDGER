@@ -11,8 +11,7 @@ export default class BaseUser {
     ban: boolean;  //* banned
     img: Buffer;   //* image
     imgs: Buffer[] //* images
-    cpuid: Buffer; //* clerkPublicId
-    cprid: Buffer; //* clerkPrivateId
+    cid: Buffer; //* clerkId
     oo: {    //* ownerOf
         th: ObjectId[]; //* Threads
         bo: ObjectId[]; //* Bounties
@@ -39,8 +38,7 @@ export default class BaseUser {
         this.ban = props.ban
         this.img = props.img
         this.imgs = props.imgs
-        this.cpuid = props.cpuid
-        this.cprid = props.cprid
+        this.cid = props.cid
         this.oo = props.oo
         this.ca = props.ca
         this.up = props.up
@@ -107,12 +105,8 @@ export default class BaseUser {
         return this.r;
     }
 
-    get clerkPublicId(): string {
-        return this.cpuid?.toString();
-    }
-
-    get clerkPrivateId(): string {
-        return this.cprid?.toString();
+    get clerkId(): string {
+        return this.cid?.toString();
     }
 
     get created_at(): Date {

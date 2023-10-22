@@ -18,8 +18,7 @@ export default class UserModel extends BaseUser {
             banned: this.banned,
             image: this.image,
             images: this.images,
-            clerkPublicId: this.clerkPublicId,
-            clerkPrivateId: this.clerkPrivateId,
+            clerkId: this.clerkId,
             ownerOf: this.ownerOf,
             referenceIds: this.referenceIds,
             createdAt: this.created_at,
@@ -38,8 +37,7 @@ export default class UserModel extends BaseUser {
         if (this.banned) data.banned = this.banned;
         if (this.image) data.image = this.image;
         if (this.images) data.images = this.images;
-        if (this.clerkPublicId) data.clerkPublicId = this.clerkPublicId;
-        if (this.clerkPrivateId) data.clerkPrivateId = this.clerkPrivateId;
+        if (this.clerkId) data.clerkId = this.clerkId;
         if (this.ownerOf) data.ownerOf = this.ownerOf;
         if (this.referenceIds) data.referenceIds = this.referenceIds;
         if (this.created_at) data.createdAt = this.created_at;

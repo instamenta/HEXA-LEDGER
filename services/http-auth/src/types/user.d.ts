@@ -9,8 +9,7 @@ export interface IUserSchema {
     ban: boolean   //* banned
     img: Buffer    //* image
     imgs: Buffer[] //* images
-    cpuid: Buffer  //* clerkPublicId
-    cprid: Buffer  //* clerkPrivateId
+    cid: Buffer  //* clerkId
     oo: {    //* ownerOf
         th: ObjectId[] //* thread
         bo: ObjectId[] //* bounty
@@ -36,8 +35,7 @@ export interface OUserModel {
     banned: boolean
     image: string
     images: string[]
-    clerkPublicId: string
-    clerkPrivateId: string
+    clerkId: string
     ownerOf: {
         thread: ObjectId[]
         bounty: ObjectId[]
@@ -84,33 +82,15 @@ export interface PCreateUser {
     wallet: string,
     name: string,
     bio: string,
-    role: ObjectId,
-    balance: BigInt,
-    banned: boolean,
+    role: string,
     image: string,
-    clerkPublicId: string,
-    clerkPrivateId: string,
-    ownerOf: [],
-    referenceIds: [],
-    ca: Date,
-    up: Date,
-    del: boolean,
+    clerkId: string,
 }
 
 export interface PUpdateUser {
     wallet: string,
     name: string,
     bio: string,
-    role: ObjectId,
-    balance: string,
-    banned: boolean,
     image: string,
     images: string[],
-    clerkPublicId: string,
-    clerkPrivateId: string,
-    ownerOf: [],
-    referenceIds: [],
-    ca: Date,
-    up: Date,
-    del: boolean,
 }

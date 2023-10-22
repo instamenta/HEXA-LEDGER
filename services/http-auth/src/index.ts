@@ -1,14 +1,8 @@
 import 'dotenv/config';
 import {config} from './utilities/config'
-import StatRouter from "./routes/stat.router";
 import UserRouter from "./routes/user.router";
-import AuthRouter from "./routes/auth.router";
-import StatController from "./controllers/stat.controller";
 import UserController from "./controllers/user.controller";
-import AuthController from "./controllers/auth.controller";
-import StatRepository from "./repositories/stat.repository";
 import UserRepository from "./repositories/user.repository";
-import AuthRepository from "./repositories/auth.repository";
 import {_404Handler, _errorHandler} from "./middlewares/error.middleware";
 import {initialize_server, initialize_database, graceful_shutdown} from './utilities/initialize';
 // import {start_grpc_server} from "./server";
@@ -20,21 +14,10 @@ import Vlogger from '@instamenta/vlogger'
    const vlogger = Vlogger.getInstance();
 
    //! Components
-    const statRepository = new StatRepository(database);
-    const authRepository = new AuthRepository(database);
     const userRepository = new UserRepository(database);
-
-    const statController = new StatController(statRepository, vlogger);
-    const authController = new AuthController(authRepository, vlogger);
     const userController = new UserController(userRepository, vlogger);
-
-    const statRouter = new StatRouter(statController).getRouter();
-    const authRouter = new AuthRouter(authController).getRouter();
     const userRouter = new UserRouter(userController).getRouter();
 
-
-    _http_server.use('/stat', statRouter)
-    _http_server.use('/auth', authRouter)
     _http_server.use('/user', userRouter)
 
    //! Error & Not-Found Handling

@@ -20,7 +20,7 @@ export interface IUserSchema {
         vo: Buffer | null //* voter - service id reference
         tx: Buffer | null //* trans - service id reference
         ss: Buffer | null //* stats - service id reference
-    }
+    },
     ca: number   //* createdAt
     up: number   //* updatedAt
     del: boolean //* deleted

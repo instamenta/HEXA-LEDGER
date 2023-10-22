@@ -4,11 +4,11 @@ import UserController from '../controllers/user.controller';
 export default class UserRouter {
 
     private readonly router: Router = Router();
-    private readonly userController: UserController;
+    private readonly controller: UserController;
 
     constructor(controller: UserController) {
-        this.userController = controller;
-        this.initialize(this.userController);
+        this.controller = controller;
+        this.initialize(this.controller);
     }
 
     private initialize(c: UserController) {
@@ -23,11 +23,8 @@ export default class UserRouter {
             .delete(c.delete.bind(c))
             .put(c.update.bind(c))
 
-        this.router.route('/add-ref/:param/:refId/:service')
-            .put(c.addReferenceId.bind(c));
-
-        this.router.route('/assign/:param/:refId/:type')
-            .put(c.assignOwnership)
+        this.router.put('/add-reference/:param/:refId/:service', c.addReferenceId.bind(c));
+        this.router.put('/assign-ownership/:param/:refId/:type', c.assignOwnership.bind(c))
 
     }
 

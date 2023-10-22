@@ -13,7 +13,7 @@ import StatsModel from '../models/statistics.model';
 import StatsModelBuilder from '../generated/grpc/builders/stats.model';
 import PromotedStatsBuilder from '../generated/grpc/builders/promoted.stats';
 import DonationsStatsBuilder from '../generated/grpc/builders/donation.stats';
-import ThreadModel from '../models/thread.model';
+import UserModel from '../models/user.model';
 import {
     PingPongExtractor,
     PaginationExtractor,
@@ -55,7 +55,7 @@ export default class AuthService implements IThreadsServer {
 
             this.#repository.create(data)
                 .then((model) =>
-                    model instanceof ThreadModel
+                    model instanceof UserModel
                         ? callback(null, new ThreadBuilder(model).build_GRPC())
                         : w.CB({callback, _key: w.K.NOT_FOUND})
                 );
@@ -82,7 +82,7 @@ export default class AuthService implements IThreadsServer {
             const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract());
 
             this.#repository.deleteById(threadId)
-                .then((model) => model instanceof ThreadModel
+                .then((model) => model instanceof UserModel
                     ? callback(null, new ThreadBuilder(model).build_GRPC())
                     : w.CB({callback, _key: w.K.NOT_FOUND})
                 );
@@ -156,7 +156,7 @@ export default class AuthService implements IThreadsServer {
             const {id: threadId} = zod.IdRequest.parse(new IdRequestExtractor(call.request).extract());
 
             this.#repository.getOneById(threadId)
-                .then((model: ThreadModel | null) =>
+                .then((model: UserModel | null) =>
                     model
                         ? callback(null, new ThreadBuilder(model).build_GRPC())
                         : w.CB({callback, _key: w.K.NOT_FOUND})

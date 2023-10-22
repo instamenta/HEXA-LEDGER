@@ -1,4 +1,4 @@
-import BaseThread from "../base/base.thread";
+import BaseUser from "../base/base.user";
 import PromotedObjectBuilder from "../../generated/grpc/builders/promoted.object";
 import DonationObjectBuilder from "../../generated/grpc/builders/donation.object";
 import ThreadModelBuilder from "../../generated/grpc/builders/thread.model";
@@ -8,7 +8,7 @@ import {IP_build_DonationObject, IP_build_PromotedObject} from "../../types/grpc
 import {WithId} from "mongodb";
 
 
-export default class ThreadBuilder extends BaseThread {
+export default class ThreadBuilder extends BaseUser {
 
    constructor(props: WithId<IThreadSchema>) {
       super(props);

@@ -1,25 +1,116 @@
-import {ObjectId} from "mongodb";
-
+import {type ObjectId} from "mongodb";
 
 export interface IUserSchema {
-    w: Buffer, // wallet
-    n: Buffer, // name
-    b: Buffer, // bio
-    r: ObjectId, // role
-    cpuid: Buffer, // clerkPublicId
-    cprid: Buffer, // clerkPrivateId
-    ban: boolean, // banned
-    img: string, // image
-    o: {         // ownerOf
-
+    w: Buffer      //* wallet
+    n: Buffer      //* name
+    b: Buffer      //* bio
+    r: ObjectId    //* role
+    bal: BigInt    //* balance
+    ban: boolean   //* banned
+    img: Buffer    //* image
+    imgs: Buffer[] //* images
+    cpuid: Buffer  //* clerkPublicId
+    cprid: Buffer  //* clerkPrivateId
+    oo: {    //* ownerOf
+        th: ObjectId[] //* thread
+        bo: ObjectId[] //* bounty
+        bc: ObjectId[]  //* bcData
     },
-    rids: {     // referenceIds
-        chat: Buffer, // chat service reference
-        thread: Buffer, // chat service reference
-        bounty: Buffer, // bounty service reference
-        bcData: Buffer, // bcData service reference
-        voter: Buffer, // voter service reference
-        bounty: Buffer, // bounty service reference
-
+    srids: { //* referenceIds
+        ch: Buffer | null //* chat - service id reference
+        vo: Buffer | null //* voter - service id reference
+        tx: Buffer | null //* trans - service id reference
+        ss: Buffer | null //* stats - service id reference
     }
+    ca: number   //* createdAt
+    up: number   //* updatedAt
+    del: boolean //* deleted
+}
+
+export interface OUserModel {
+    wallet: string
+    name: string
+    bio: string
+    role: ObjectId
+    balance: BigInt
+    banned: boolean
+    image: string
+    images: string[]
+    clerkPublicId: string
+    clerkPrivateId: string
+    ownerOf: {
+        thread: ObjectId[]
+        bounty: ObjectId[]
+        bcData: ObjectId[]
+    },
+    referenceIds: {
+        chat: string | null
+        voter: string | null
+        trans: string | null
+        stats: string | null
+    }
+    createdAt: Date
+    updatedAt: Date
+    deleted: boolean
+}
+
+
+export type IOwnerOf = {
+    th: ObjectId[]
+    bo: ObjectId[]
+    bc: ObjectId[]
+};
+export type IReferenceIds = {
+    ch: Buffer | null,
+    vo: Buffer | null,
+    tx: Buffer | null,
+    ss: Buffer | null,
+};
+
+export type OOwnerOf = {
+    thread: ObjectId[]
+    bounty: ObjectId[]
+    bcData: ObjectId[]
+};
+
+export type OReferenceIds = {
+    chat: string | null,
+    voter: string | null,
+    trans: string | null,
+    stats: string | null,
+};
+
+export interface PCreateUser {
+    wallet: string,
+    name: string,
+    bio: string,
+    role: ObjectId,
+    balance: BigInt,
+    banned: boolean,
+    image: string,
+    clerkPublicId: string,
+    clerkPrivateId: string,
+    ownerOf: [],
+    referenceIds: [],
+    ca: Date,
+    up: Date,
+    del: boolean,
+}
+
+export interface PUpdateUser {
+    wallet: string,
+    name: string,
+    bio: string,
+    role: ObjectId,
+    balance: string,
+    banned: boolean,
+    image: string,
+    images: string[],
+    clerkPublicId: string,
+    clerkPrivateId: string,
+    ownerOf: [],
+    referenceIds: [],
+    ca: Date,
+    up: Date,
+    del: boolean,
 }

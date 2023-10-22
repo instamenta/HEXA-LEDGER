@@ -3,7 +3,7 @@ import StatusCode from '@instamenta/http-status-codes';
 import * as zod from '../validation/auth.zod';
 import * as I from '../types/types';
 import StatRepository from '../repositories/stat.repository';
-import ThreadModel from '../models/thread.model';
+import UserModel from '../models/user.model';
 import {RespondGeneralPurpose} from '../utilities/errors/error.handler';
 import {Transform} from 'stream';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,7 +36,7 @@ export default class StatController {
             }
 
             this.threadRepository.create(threadData)
-                .then((model: ThreadModel | null) => model instanceof ThreadModel
+                .then((model: UserModel | null) => model instanceof UserModel
                     ? w.status(StatusCode.CREATED)
                         .json(model.get()).end()
                     : w.status(StatusCode.BAD_REQUEST)
@@ -57,7 +57,7 @@ export default class StatController {
             const threadData = zod.updateBody.parse(r.body);
 
             this.threadRepository.update(threadId, threadData)
-                .then((model: ThreadModel | null) => model instanceof ThreadModel
+                .then((model: UserModel | null) => model instanceof UserModel
                     ? w.status(StatusCode.CREATED)
                         .json(model.get()).end()
                     : w.status(StatusCode.NOT_FOUND)
@@ -77,7 +77,7 @@ export default class StatController {
             const {threadId} = zod.threadIdParam.parse(r.params);
 
             this.threadRepository.deleteById(threadId)
-                .then((model: ThreadModel | null) => model instanceof ThreadModel
+                .then((model: UserModel | null) => model instanceof UserModel
                     ? w.status(StatusCode.OK)
                         .json(model.get()).end()
                     : w.status(StatusCode.NOT_FOUND)
@@ -97,8 +97,8 @@ export default class StatController {
             const {threadId} = zod.threadIdParam.parse(r.params);
 
             this.threadRepository.getOneById(threadId)
-                .then((model: ThreadModel | null) =>
-                    model instanceof ThreadModel
+                .then((model: UserModel | null) =>
+                    model instanceof UserModel
                         ? w.status(StatusCode.OK)
                             .json(model.get()).end()
                         : w.status(StatusCode.NOT_FOUND)
@@ -118,7 +118,7 @@ export default class StatController {
             const {skip, limit} = zod.pageQuery.parse(r.query);
 
             this.threadRepository.getMany(skip, limit)
-                .then((models: ThreadModel[]) =>
+                .then((models: UserModel[]) =>
                     models.length
                         ? w.status(StatusCode.OK)
                             .json(models.map((model) => model.getStatic())).end()
@@ -139,7 +139,7 @@ export default class StatController {
                 , {skip, limit} = zod.pageQuery.parse(r.query);
 
             this.threadRepository.getByOwner(ownerAddr, skip, limit)
-                .then((models: ThreadModel[]) =>
+                .then((models: UserModel[]) =>
                     models.length
                         ? w.status(StatusCode.OK)
                             .json(models.map((model) => model.getStatic())).end()
@@ -338,7 +338,7 @@ export default class StatController {
             let c = 0;
 
             w.write('[');
-            $_DB.on('data', (model: ThreadModel) => {
+            $_DB.on('data', (model: UserModel) => {
                 w.write(JSON.stringify(model.getStatic()) + ',');
                 c++;
             });
@@ -374,7 +374,7 @@ export default class StatController {
             let c = 0;
 
             w.write('[');
-            $_T_._transform = (d: ThreadModel, encryption, call) => {
+            $_T_._transform = (d: UserModel, encryption, call) => {
                 call(null, JSON.stringify(d.getStatic()) + ',');
                 c++;
             };

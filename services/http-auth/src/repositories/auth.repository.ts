@@ -1,6 +1,6 @@
 import * as I from '../types/types';
 import {config} from '../utilities/config';
-import ThreadModel from '../models/thread.model';
+import UserModel from '../models/user.model';
 import {HandleMongoError} from '../utilities/errors/error.handler';
 import {
    Db, ObjectId, Collection, MongoError,
@@ -16,7 +16,7 @@ export default class AuthRepository {
       this.#collection = db.collection(config.DB_AUTH_COLLECTION);
    }
 
-    public async create(d: I.PCreateData): Promise<ThreadModel | null> {
+    public async create(d: I.PCreateData): Promise<UserModel | null> {
         const record = {
             n: Buffer.from(d.name),
             des: Buffer.from(d.description),
@@ -37,7 +37,7 @@ export default class AuthRepository {
         return this.#collection
             .insertOne(record)
             .then((res: InsertOneResult<I.IThreadSchema>) => res.insertedId
-                ? new ThreadModel({...record, _id: res.insertedId})
+                ? new UserModel({...record, _id: res.insertedId})
                 : null)
             .catch((e: MongoError) => {
                 HandleMongoError(e);
@@ -56,7 +56,7 @@ export default class AuthRepository {
             });
     }
 
-    public async deleteById(threadId: string): Promise<ThreadModel | null> {
+    public async deleteById(threadId: string): Promise<UserModel | null> {
         const filter: Filter<I.IThreadSchema> = {
             $match: {_id: new ObjectId(threadId), del: true}
         };
@@ -69,7 +69,7 @@ export default class AuthRepository {
         return this.#collection
             .findOneAndUpdate(filter, update, options)
             .then((res: WithId<I.IThreadSchema> | null) => res
-                ? new ThreadModel(res)
+                ? new UserModel(res)
                 : null
             ).catch((e: MongoError) => {
                 HandleMongoError(e);
@@ -77,7 +77,7 @@ export default class AuthRepository {
             });
     }
 
-    public async update(threadId: string, d: I.PUpdateData): Promise<ThreadModel | null> {
+    public async update(threadId: string, d: I.PUpdateData): Promise<UserModel | null> {
         const filter: Filter<I.IThreadSchema> = {
             $match: {_id: new ObjectId(threadId), del: false}
         };
@@ -99,7 +99,7 @@ export default class AuthRepository {
         return this.#collection
             .findOneAndUpdate(filter, update, options)
             .then((res: WithId<I.IThreadSchema> | null) => res
-                ? new ThreadModel(res)
+                ? new UserModel(res)
                 : null
             ).catch((e: MongoError) => {
                 HandleMongoError(e);
@@ -107,14 +107,14 @@ export default class AuthRepository {
             });
     }
 
-    public async getOneById(threadId: string): Promise<ThreadModel | null> {
+    public async getOneById(threadId: string): Promise<UserModel | null> {
         const filter: Filter<I.IThreadSchema> = {
             _id: new ObjectId(threadId), del: false
         };
         return this.#collection
             .findOne(filter)
             .then((res: WithId<I.IThreadSchema> | null) => res
-                ? new ThreadModel(res)
+                ? new UserModel(res)
                 : null
             ).catch((e: MongoError) => {
                 HandleMongoError(e);
@@ -122,7 +122,7 @@ export default class AuthRepository {
             });
     }
 
-    public async getMany(skip: number, limit: number): Promise<ThreadModel[]> {
+    public async getMany(skip: number, limit: number): Promise<UserModel[]> {
         try {
             const filter: Filter<I.IThreadSchema> = {
                 del: false
@@ -133,7 +133,7 @@ export default class AuthRepository {
             return this.#collection
                 .find(filter, options)
                 .toArray()
-                .then((models) => models.map((data) => new ThreadModel(data)));
+                .then((models) => models.map((data) => new UserModel(data)));
         } catch (e: MongoError | unknown) {
             HandleMongoError(e);
             throw e;

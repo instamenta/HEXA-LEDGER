@@ -19,7 +19,6 @@ export default class UserRepository {
         const doc = {
             w: Buffer.from(d.wallet.replace(/^0x/, ''), 'hex'),
             n: Buffer.from(d.name),
-            b: Buffer.from(d.bio),
             r: new ObjectId(d.role),
             bal: BigInt(0),
             ban: false,
@@ -89,7 +88,6 @@ export default class UserRepository {
         };
         if (d.name) Object.assign(update.$set, {n: Buffer.from(d.name)});
         if (d.wallet) Object.assign(update.$set, {w: Buffer.from(d.wallet.replace(/^0x/, ''))}, 'hex');
-        if (d.bio) Object.assign(update.$set, {b: Buffer.from(d.bio)});
         if (d.image) Object.assign(update.$set, {img: Buffer.from(d.image)});
         if (d.images) Object.assign(update.$set, {imgs: (d.images).map((img) => Buffer.from(img))});
         return this.#collection

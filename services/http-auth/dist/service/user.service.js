@@ -1,3 +1,4 @@
+"use strict";
 // import * as PI from '../generated/grpc/typescript/threads_pb';
 // import ThreadBuilder from '../models/builder-models/thread.builder';
 // import StatRepository from '../repositories/stat.repository';

@@ -1,0 +1,24 @@
+import { ServerErrorResponse } from '@grpc/grpc-js';
+export declare const invalidArgumentError: ServerErrorResponse;
+export declare const deadlineExceededError: ServerErrorResponse;
+export declare const notFoundError: ServerErrorResponse;
+export declare const alreadyExistsError: ServerErrorResponse;
+export declare const permissionDeniedError: ServerErrorResponse;
+export declare const internalError: ServerErrorResponse;
+export declare const unavailableError: ServerErrorResponse;
+export declare const dataLossError: ServerErrorResponse;
+export declare const unauthenticatedError: ServerErrorResponse;
+export declare const failedPreconditionError: ServerErrorResponse;
+declare const ERRORS: {
+    INVALID_ARGUMENT: ServerErrorResponse;
+    DEADLINE_EXCEEDED: ServerErrorResponse;
+    NOT_FOUND: ServerErrorResponse;
+    ALREADY_EXISTS: ServerErrorResponse;
+    PERMISSION_DENIED: ServerErrorResponse;
+    INTERNAL: ServerErrorResponse;
+    UNAVAILABLE: ServerErrorResponse;
+    DATA_LOSS: ServerErrorResponse;
+    UNAUTHENTICATED: ServerErrorResponse;
+    FAILED_PRECONDITION: ServerErrorResponse;
+};
+export default ERRORS;

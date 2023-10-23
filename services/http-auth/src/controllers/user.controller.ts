@@ -17,7 +17,7 @@ export default class UserController {
 
     constructor(repository: UserRepository, vlogger: Vlogger) {
         this.#repository = repository;
-        this.#vlog = vlogger.getVlogger('ThreadController');
+        this.#vlog = vlogger.getVlogger('UserController');
     }
 
     public async create(
@@ -69,7 +69,7 @@ export default class UserController {
     }
 
     public async delete(
-        r: Req<{ threadId: string }>,
+        r: Req<{ param: string }>,
         w: Res<I.OUserModel | string | Error>
     ): Promise<void> {
         this.#vlog.debug({f: 'delete', m: r.url, d: {body: r.body, param: r.params, query: r.query}});

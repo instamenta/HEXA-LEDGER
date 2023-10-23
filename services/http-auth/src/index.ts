@@ -35,3 +35,20 @@ import Vlogger from '@instamenta/vlogger'
 
 graceful_shutdown.process_on(['unhandledRejection', 'uncaughtException']);
 graceful_shutdown.process_once(['SIGTERM', 'SIGINT', 'SIGUSR2']);
+
+// fix before reuse, no dublicates
+// _http_server.use('/test', (async (req, res) => {
+//     for (const client of (await users.getUserList())) {
+//         if (client.web3Wallets.length) {
+//             const d = {
+//                 wallet: client.web3Wallets[0].web3Wallet,
+//                 name: client.username ?? 'default',
+//                 role: new ObjectId().toString(),
+//                 image: client.imageUrl,
+//                 clerkId: client.id,
+//             }
+//             await userRepository.create(d)
+//         }
+//     }
+//     res.end()
+// }));

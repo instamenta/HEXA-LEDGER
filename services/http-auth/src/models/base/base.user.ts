@@ -5,7 +5,6 @@ export default class BaseUser {
     _id: ObjectId
     w: Buffer;     //* wallet
     n: Buffer;     //* name
-    b: Buffer;     //* bio
     r: ObjectId;   //* role
     bal: BigInt    //* balance
     ban: boolean;  //* banned
@@ -32,7 +31,6 @@ export default class BaseUser {
         this._id = props._id
         this.w = props.w
         this.n = props.n
-        this.b = props.b
         this.r = props.r
         this.bal = props.bal
         this.ban = props.ban
@@ -61,10 +59,6 @@ export default class BaseUser {
 
     get name(): string {
         return this.n?.toString();
-    }
-
-    get bio(): string {
-        return this.b?.toString();
     }
 
     get balance(): BigInt {

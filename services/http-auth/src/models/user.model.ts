@@ -12,7 +12,6 @@ export default class UserModel extends BaseUser {
         return {
             wallet: this.wallet,
             name: this.name,
-            bio: this.bio,
             role: this.role,
             balance: this.balance,
             banned: this.banned,
@@ -31,7 +30,6 @@ export default class UserModel extends BaseUser {
         const data = {} as T & Partial<I.OUserModel>;
         if (this.wallet) data.wallet = this.wallet;
         if (this.name) data.name = this.name;
-        if (this.bio) data.bio = this.bio;
         if (this.role) data.role = this.role;
         if (this.balance) data.balance = this.balance;
         if (this.banned) data.banned = this.banned;

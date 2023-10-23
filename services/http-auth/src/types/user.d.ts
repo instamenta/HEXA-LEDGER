@@ -3,7 +3,6 @@ import {type ObjectId} from "mongodb";
 export interface IUserSchema {
     w: Buffer      //* wallet
     n: Buffer      //* name
-    b: Buffer      //* bio
     r: ObjectId    //* role
     bal: BigInt    //* balance
     ban: boolean   //* banned
@@ -29,7 +28,6 @@ export interface IUserSchema {
 export interface OUserModel {
     wallet: string
     name: string
-    bio: string
     role: ObjectId
     balance: BigInt
     banned: boolean
@@ -81,7 +79,6 @@ export type OReferenceIds = {
 export interface PCreateUser {
     wallet: string,
     name: string,
-    bio: string,
     role: string,
     image: string,
     clerkId: string,
@@ -90,7 +87,6 @@ export interface PCreateUser {
 export interface PUpdateUser {
     wallet: string,
     name: string,
-    bio: string,
     image: string,
     images: string[],
 }

@@ -1,0 +1,26 @@
+import { MongoError } from 'mongodb';
+import { Response } from 'express';
+import { ZodError } from 'zod';
+export declare const ZodIssueCode: {
+    readonly invalid_type: "invalid_type";
+    readonly invalid_literal: "invalid_literal";
+    readonly custom: "custom";
+    readonly invalid_union: "invalid_union";
+    readonly invalid_union_discriminator: "invalid_union_discriminator";
+    readonly invalid_enum_value: "invalid_enum_value";
+    readonly unrecognized_keys: "unrecognized_keys";
+    readonly invalid_arguments: "invalid_arguments";
+    readonly invalid_return_type: "invalid_return_type";
+    readonly invalid_date: "invalid_date";
+    readonly invalid_string: "invalid_string";
+    readonly too_small: "too_small";
+    readonly too_big: "too_big";
+    readonly invalid_intersection_types: "invalid_intersection_types";
+    readonly not_multiple_of: "not_multiple_of";
+    readonly not_finite: "not_finite";
+};
+export declare function HandleMongoError(error: unknown): void;
+export declare function RespondMongoToError(error: MongoError | unknown, res: Response): void;
+export declare function RespondToError(error: unknown, w: Response): void;
+export declare function RespondGeneralPurpose(error: Error | ZodError | MongoError | unknown, w: Response): void;
+export declare function RespondToZodError(error: unknown, res: Response): void;

@@ -53,8 +53,8 @@ export default class ThreadController {
     ): Promise<void> {
         this.#vlog.debug({f: 'update', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const {threadId} = zod.threadIdParam.parse(r.params);
-            const threadData = zod.updateBody.parse(r.body);
+            const {threadId} = zod.threadIdParam.parse(r.params)
+                , threadData = zod.updateBody.parse(r.body);
 
             this.threadRepository.update(threadId, threadData)
                 .then((model: ThreadModel | null) => model instanceof ThreadModel
@@ -173,8 +173,6 @@ export default class ThreadController {
             const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
                 , {threadId} = zod.threadIdParam.parse(r.params);
 
-            console.log(wallet, threadId)
-
             this.threadRepository.like(threadId, wallet)
                 .then((res: boolean) => res
                     ? w.status(StatusCode.OK).end()
@@ -191,9 +189,6 @@ export default class ThreadController {
     ): Promise<void> {
         this.#vlog.debug({f: 'dislike', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            console.log('===============')
-            console.log(r.auth?.claims?.wallet)
-            console.log('===============')
             const {wallet} = zod.walletAuthClaims.parse(r.auth.claims)
                 , {threadId} = zod.threadIdParam.parse(r.params);
 
@@ -363,8 +358,8 @@ export default class ThreadController {
     ): Promise<void> {
         this.#vlog.debug({f: 'getByOwner_$', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const {wallet: ownerAddr} = zod.walletParam.parse(r.params);
-            const {skip, limit} = zod.pageQuery.parse(r.query);
+            const {wallet: ownerAddr} = zod.walletParam.parse(r.params)
+                , {skip, limit} = zod.pageQuery.parse(r.query);
 
             const $_DB = await this.threadRepository.getByOwner_$(
                 ownerAddr, skip, limit

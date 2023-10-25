@@ -10,9 +10,16 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox-viem": "^1.0.0",
-    "hardhat": "^2.18.2",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "chai": "^4.3.10",
+    "hardhat": "^2.18.3"
+  },
+  "dependencies": {
+    "@instamenta/http-status-codes": "^1.3.4",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "morgan": "^1.10.0"
   }
 }

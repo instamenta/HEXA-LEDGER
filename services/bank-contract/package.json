@@ -17,6 +17,7 @@
   "dependencies": {
     "@instamenta/http-status-codes": "^1.3.4",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+    "@nomicfoundation/hardhat-ethers": "^3.0.4",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",

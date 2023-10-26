@@ -1,8 +1,13 @@
+'use strict';
+
 const express = require('express');
-const useContract = require('../scripts/deploy')
+const SimpleWallet = require('../scripts/deploy')
 const {ethers, HardhatEthersSigner} = require("hardhat");
 const StatusCode = require('./statusCode')
 require('dotenv').config();
+
+/** @typedef {import('ethers').Contract} Contract */
+/** @typedef {import('@nomicfoundation/hardhat-ethers/signers').HardhatEthersSigner} Signer */
 
 (async function initialize_service() {
     const config = process.env;
@@ -11,15 +16,12 @@ require('dotenv').config();
     _http_server.use(require('cors')());
     _http_server.use(require('morgan')('dev'));
 
-    let contract;
-    /**@type HardhatEthersSigner  */ let owner;
-    /**@type HardhatEthersSigner[]*/ let user;
+    /**@type Contract */ let contract;
+    /**@type Signer   */ let owner;
+    /**@type Signer[] */ let user;
 
     await (async () => {
-        const data = await useContract();
-        contract = data.contract;
-        owner = data.owner;
-        user = data.user;
+        [contract, owner, user] = await SimpleWallet.useContract();
     })()
 
     /**@param {import('express').Request} r

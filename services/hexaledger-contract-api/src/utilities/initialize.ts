@@ -1,25 +1,26 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import {_metrics_endpoint, _metrics_middleware} from '../middlewares/monitoring.middleware';
 import {ClerkExpressWithAuth, StrictAuthProp} from '@clerk/clerk-sdk-node';
-import {MongoClient} from 'mongodb';
+import {Long, MongoClient} from 'mongodb';
 import {config} from './config';
 import express from 'express';
 import Vlogger from "@instamenta/vlogger";
-// @ts-ignore
-import {ethers} from "hardhat";
-import {HardhatEthersSigner} from '@nomicfoundation/hardhat-ethers/signers'
-import {SimpleWallet} from "../../typechain-types";
+import {SimpleWallet, SimpleWallet__factory} from "../../typechain-types";
+import {ethers, Wallet, JsonRpcProvider} from 'ethers'
 
-export async function initialize_simple_wallet_contract(): Promise<[SimpleWallet, HardhatEthersSigner, HardhatEthersSigner[]]> {
-    const contract: SimpleWallet = await ethers.deployContract("SimpleWallet");
-    await contract.waitForDeployment();
+export async function initialize_contract()
+    : Promise<{ contract: SimpleWallet, signer: Wallet, provider: JsonRpcProvider }
+> {
+    //* Get the Infura JSON RPC Provider
+    const provider = new ethers.JsonRpcProvider(`https://sepolia.infura.io/v3/${config.INFURA_API_KEY}`,);
 
-    let owner: HardhatEthersSigner;
-    let users: HardhatEthersSigner[];
+    //* Get the Signer's Wallet
+    const signer = new ethers.Wallet(config.SEPOLIA_PRIVATE_KEY, provider);
 
-    [owner, ...users] = await ethers.getSigners();
+    //* Connect with the Simple Wallet Contract
+    const contract = SimpleWallet__factory.connect(config.CONTRACT_ADDRESS, signer);
 
-    return [contract, owner, users];
+    return {contract, signer, provider};
 }
 
 export function initialize_server(): express.Express {
@@ -44,10 +45,12 @@ export function initialize_server(): express.Express {
 }
 
 export function initialize_database() {
+    //* Connect with the Mongo Client
     Vlogger.getInstance().getVlogger(config.SERVICE_NAME)
         .info({f: 'initialize_database', m: '[ Connecting to Mongo Client ]'})
     const db_client = new MongoClient(config.DB_URI, config.DB_OPTIONS);
 
+    //* Connect with the Mongo Database
     Vlogger.getInstance().getVlogger(config.SERVICE_NAME)
         .info({f: 'initialize_database', m: `[ Connecting to Database "${config.DB_NAME} ]`})
     return db_client.db(config.DB_NAME);
@@ -90,8 +93,18 @@ declare global {
     }
 }
 
+// @ts-ignore
+BigInt.prototype.toJSON = function() {
+    return this.toString();
+};
+
+// @ts-ignore
+Long.prototype.toJSON = function () {
+    return this.toString(); // Convert the Long to a string
+};
+
 export default {
     server: initialize_server,
     database: initialize_database,
-    wallet_contract: initialize_simple_wallet_contract,
+    wallet_contract: initialize_contract,
 }

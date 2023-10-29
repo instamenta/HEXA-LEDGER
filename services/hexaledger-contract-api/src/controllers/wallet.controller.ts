@@ -5,88 +5,86 @@ import {RespondGeneralPurpose} from '../utilities/errors/error.handler';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {type ZodError, z} from 'zod';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {type MongoError} from 'mongodb';
+import {type MongoError, ObjectId} from 'mongodb';
 import Vlogger, {type IVlog} from "@instamenta/vlogger";
 import WalletRepository from "../repositories/wallet.repository";
 import {SimpleWallet} from "../../typechain-types";
-import "@nomicfoundation/hardhat-ethers";
-import {ethers} from 'hardhat'
+import {Wallet, JsonRpcProvider} from 'ethers'
+import {config} from "../utilities/config";
+import * as I from '../types/types'
 
 export default class WalletController {
     readonly #repository: WalletRepository;
     readonly #contract: SimpleWallet
-    #address: string | null = null;
     readonly #vlog: IVlog;
+    readonly #signer: Wallet;
+    readonly #provider: JsonRpcProvider;
 
-    constructor(repository: WalletRepository, vlogger: Vlogger, contract: SimpleWallet) {
+    constructor(
+        repository: WalletRepository,
+        vlogger: Vlogger,
+        contract: SimpleWallet,
+        signer: Wallet,
+        provider: JsonRpcProvider,
+    ) {
         this.#repository = repository;
         this.#contract = contract;
         this.#vlog = vlogger.getVlogger('UserController');
-
-        this.assignAddress(contract)
-            .then((address: string) => this.#address = address)
+        this.#signer = signer;
+        this.#provider = provider;
     }
 
-    private async assignAddress(contract: SimpleWallet): Promise<string> {
-        return await this.#contract.getAddress();
-    }
-
-    //
-    // public async getBalanceByWallet(
-    //     r: Req<{ userId: string }>,
-    //     w: Res
-    // ): Promise<void> {
-    //     this.#vlog.debug({f: 'getBalanceByWallet', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
-    //     try {
-    //         const {param} = zod.userIdOrWalletParam.parse(r.params);
-    //
-    //         this.#repository.getOneById(param)
-    //             .then((model: UserModel | null) =>
-    //                 model instanceof UserModel
-    //                     ? w.status(StatusCode.OK)
-    //                         .json(model.get()).end()
-    //                     : w.status(StatusCode.NOT_FOUND)
-    //                         .json('Failed to create').end()
-    //             );
-    //     } catch (e: Error | ZodError | MongoError | unknown) {
-    //         RespondGeneralPurpose(e, w);
-    //     }
-    // }
-
-    public async getContractAddress(
-        r: Req,
-        w: Res<{ address: string }>
+    public async getBalanceByWallet(
+        r: Req<{ wallet: string }>,
+        w: Res<I.WalletModel>
     ): Promise<void> {
-        this.#vlog.debug({f: 'getContractAddress', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
+        this.#vlog.debug({f: 'getBalanceByWallet', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            this.#address
-                ? w.status(StatusCode.OK).json({address: this.#address}).end()
-                : w.status(StatusCode.NOT_FOUND).end()
-            ;
+            const wallet = zod.addressSchema.parse(r.params.wallet);
+
+            this.#repository.getOneByWallet(wallet)
+                .then(data => data
+                    ? w.status(StatusCode.OK)
+                        .json(data.get()).end()
+                    : w.status(StatusCode.NOT_FOUND)
+                        .end());
         } catch (e: Error | ZodError | MongoError | unknown) {
             RespondGeneralPurpose(e, w);
         }
     }
 
-    public async getUnsignedTransaction(
-        r: Req<{ amount: string }, { sender: string }>,
-        w: Res
+    public async getContractAddress(
+        r: Req,
+        w: Res<{ address: string, abi: string, signers_address: string }>
+    ): Promise<void> {
+        this.#vlog.debug({f: 'getContractAddress', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
+        try {
+            w.status(StatusCode.OK)
+                .json({
+                    address: config.CONTRACT_ADDRESS,
+                    abi: this.#contract.interface.formatJson(),
+                    signers_address: await this.#signer.getAddress()
+                }).end()
+        } catch (e: Error | ZodError | MongoError | unknown) {
+            RespondGeneralPurpose(e, w);
+        }
+    }
+
+    public async getMany(
+        r: Req<object, object, object, { skip: string, limit: string }>,
+        w: Res<I.WalletModel[]>
     ): Promise<any> {
         this.#vlog.debug({f: 'getUnsignedTransaction', m: r.url, d: {body: r.body, param: r.params, query: r.query}});
         try {
-            const amount = r.params?.amount
-                , sender = zod.addressSchema.parse(r.body.sender);
+            const skip = +Number.parseInt(r.query?.skip ?? '0').toFixed(0);
+            const limit = +Number.parseInt(r.query?.limit ?? '0').toFixed(0);
 
-            if (amount === undefined || isNaN(Number(amount)) || parseFloat(amount) < 0) {
-                w.status(StatusCode.I_AM_A_TEAPOT).end();
-                return this.#vlog.error({e: {amount, sender}, f: 'getUnsignedTransaction', m: 'Invalid Amount!'})
-            }
-
-            const unsignedTransaction = await this.#contract
-                .connect(await ethers.provider.getSigner(sender))
-                .deposit({value: ethers.parseEther(amount)} as any);
-
-            w.status(StatusCode.OK).json(unsignedTransaction).end();
+            this.#repository.getMany(skip, limit)
+                .then(data => data
+                    ? w.status(StatusCode.OK)
+                        .json(data.map(d => d.get())).end()
+                    : w.status(StatusCode.NOT_FOUND)
+                        .end());
         } catch (e: Error | ZodError | MongoError | unknown) {
             RespondGeneralPurpose(e, w);
         }

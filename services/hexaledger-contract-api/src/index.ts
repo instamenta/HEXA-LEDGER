@@ -10,13 +10,13 @@ import Vlogger from '@instamenta/vlogger'
 (async function initialize_service(): Promise<void> {
     const database = Initialize.database();
     const _http_server = Initialize.server();
-    const [contract, owner, users] = await Initialize.wallet_contract();
+    const {contract, signer, provider} = await Initialize.wallet_contract();
 
     const vlogger = Vlogger.getInstance();
 
     //! Components
-    const walletRepository = new WalletRepository(database);
-    const walletController = new WalletController(walletRepository, vlogger, contract);
+    const walletRepository = new WalletRepository(database, vlogger);
+    const walletController = new WalletController(walletRepository, vlogger, contract, signer, provider);
     const walletRouter = new WalletRouter(walletController).getRouter();
 
     _http_server.use('/wallet', walletRouter)
@@ -32,6 +32,14 @@ import Vlogger from '@instamenta/vlogger'
     _http_server.on('error', e => vlogger.getVlogger(config.SERVICE_NAME).error({
         f: 'initialize_service', m: `[ ${config.SERVICE_NAME} ] ran into Error:`, e
     }));
+
+    contract.on(contract.filters.Deposit, async (from, value, event) => {
+        const wallet = event.args[0] as string;
+        const balance = event.args[1] as bigint;
+        const result = await walletRepository.updateOrCreate(wallet, balance);
+        console.log(result);
+    });
+
 })();
 
 graceful_shutdown.process_on(['unhandledRejection', 'uncaughtException']);

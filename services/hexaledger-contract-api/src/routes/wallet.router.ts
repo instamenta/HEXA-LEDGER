@@ -12,9 +12,9 @@ export default class WalletRouter {
     }
 
     private initialize(c: WalletController) {
-        // this.router.get('/balance/:wallet', c.getBalanceByWallet.bind(c))
-        this.router.get('/deposit/:amount', c.getUnsignedTransaction.bind(c));
+        this.router.get('/', c.getMany.bind(c));
         this.router.get('/address', c.getContractAddress.bind(c));
+        this.router.get('/:wallet', c.getBalanceByWallet.bind(c))
     }
 
     public getRouter(): Router {

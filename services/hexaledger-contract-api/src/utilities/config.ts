@@ -10,6 +10,10 @@ const envSchema = z.object({
     DB_URI: z.string(),
     DB_NAME: z.string().default('main'),
     DB_WALLET_COLLECTION: z.string().default('wallet'),
+    INFURA_API_KEY: z.string(),
+    SEPOLIA_PRIVATE_KEY: z.string(),
+    OWNER_ADDRESS: z.string(),
+    CONTRACT_ADDRESS: z.string(),
 });
 
 const env = envSchema.parse(process.env);
@@ -22,5 +26,9 @@ export const config = {
     DB_AUTH_COLLECTION: env.DB_WALLET_COLLECTION || 'wallet',
     DB_OPTIONS: {appName: env.SERVICE_NAME,} as MongoClientOptions,
     CLERK_JWT_PUBLIC_KEY: env.CLERK_JWT_PUBLIC_KEY,
-    GRPC_PORT: env.GRPC_PORT
+    GRPC_PORT: env.GRPC_PORT,
+    INFURA_API_KEY: env.INFURA_API_KEY,
+    SEPOLIA_PRIVATE_KEY: env.SEPOLIA_PRIVATE_KEY,
+    OWNER_ADDRESS: env.OWNER_ADDRESS,
+    CONTRACT_ADDRESS: env.CONTRACT_ADDRESS
 };

@@ -1,5 +1,5 @@
 import {ZodError, ZodIssue} from 'zod';
-import {ServerErrorResponse, Metadata} from '@grpc/grpc-js';
+import {Metadata, ServerErrorResponse} from '@grpc/grpc-js';
 import ERRORS from './grpc.errors';
 
 export function handleZodError(error: ZodError): ServerErrorResponse {

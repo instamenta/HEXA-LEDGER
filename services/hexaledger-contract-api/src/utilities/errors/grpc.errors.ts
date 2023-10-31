@@ -1,5 +1,4 @@
-import {ServerErrorResponse} from '@grpc/grpc-js';
-import {Metadata} from '@grpc/grpc-js';
+import {Metadata, ServerErrorResponse} from '@grpc/grpc-js';
 
 export const invalidArgumentError: ServerErrorResponse = {
    name: 'InvalidArgument',

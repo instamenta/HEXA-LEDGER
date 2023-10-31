@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // import UserRepository from "./repositories/user.repository";
 // import {ServerCredentials, Server} from '@grpc/grpc-js';
 // import  from './service/auth.service';

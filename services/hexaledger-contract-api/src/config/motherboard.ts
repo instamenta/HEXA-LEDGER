@@ -1,5 +1,5 @@
 const motherboard = {
-    target: process.env.TARGET ?? 'hardhat'
-}
+   target: process.env.TARGET ?? 'hardhat'
+};
 
 export default motherboard;
